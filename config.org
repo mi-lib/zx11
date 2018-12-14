@@ -1,0 +1,29 @@
+PREFIX=$(HOME)/usr
+PROJNAME=zx11
+VERSION=1.0.1
+
+DEPENDENCY="zeda=1.1.1"
+
+# original widget
+CONFIG_USE_WIDGET=y
+
+# X extension include
+CONFIG_USE_XEXT=y
+
+# X pixmap support
+CONFIG_USE_XPM=y
+
+# PNG(Portable Network Graphics) format support
+CONFIG_USE_PNG=y
+
+# JPEG format support
+CONFIG_USE_JPEG=y
+
+# DIB(Microsoft Device Independent Bitmap, BMP) format support
+CONFIG_USE_DIB=y
+
+# MAG(MAki-chan Graphics) format support
+CONFIG_USE_MAG=y
+
+# PDT(graphics format for AVG32) support
+CONFIG_USE_PDT=y

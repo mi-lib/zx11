@@ -1,0 +1,745 @@
+/* ZX11 - a wrapper for interface library to the X Window System
+ * Copyright (C) 1999 Tomomichi Sugihara (Zhidao)
+ *
+ * zxwidget - original widget set
+ */
+
+#include <zx11/zxwidget.h>
+
+/* ********************************************************** */
+/* default color set
+ * ********************************************************** */
+
+long zxw_front_color;
+long zxw_back_color;
+long zxw_back_rev_color;
+long zxw_hilit_color;
+long zxw_shade_color;
+long zxw_edit_e_color;
+long zxw_edit_d_color;
+long zxw_text_e_color;
+long zxw_text_d_color;
+long zxw_text_rev_color;
+long zxw_gauge_e_color;
+long zxw_gauge_d_color;
+long zxw_gauge_g_color;
+long zxw_bar_color;
+long zxw_nob_color;
+long zxw_radio_color;
+
+void zxWidgetInit(zxWindow *win)
+{
+  zxw_front_color = zxGetColor( win, "lightgray" );
+  zxw_back_color = zxGetColor( win, "lightgray" );
+  zxw_back_rev_color = zxGetColor( win, "midnightblue" );
+  zxw_hilit_color = zxGetColor( win, "white" );
+  zxw_shade_color = zxGetColor( win, "darkgray" );
+  zxw_edit_e_color = zxGetColor( win, "white" );
+  zxw_edit_d_color = zxGetColor( win, "lightgray" );
+  zxw_text_e_color = zxGetColor( win, "black" );
+  zxw_text_d_color = zxGetColor( win, "darkgray" );
+  zxw_text_rev_color = zxGetColor( win, "white" );
+  zxw_gauge_e_color = zxGetColor( win, "white" );
+  zxw_gauge_d_color = zxGetColor( win, "lightgray" );
+  zxw_gauge_g_color = zxGetColor( win, "black" );
+  zxw_bar_color = zxGetColor( win, "darkgray" );
+  zxw_nob_color = zxGetColor( win, "lightgray" );
+  zxw_radio_color = zxGetColor( win, "black" );
+
+  zxSetFont( win, ZXW_DEFAULT_FONT );
+}
+
+/* ********************************************************** */
+/* shade/hilight bar
+ * ********************************************************** */
+
+void zxwSepHoriz(zxWindow *win, short x, short y, short width)
+{
+  zxSetColorMap( win, zxw_shade_color );
+  zxDrawLine( win, x, y, x+width-1, y );
+  y++;
+  zxSetColorMap( win, zxw_hilit_color );
+  zxDrawLine( win, x, y, x+width-1, y );
+}
+
+void zxwSepVert(zxWindow *win, short x, short y, short height)
+{
+  zxSetColorMap( win, zxw_shade_color );
+  zxDrawLine( win, x, y, x, y+height-1 );
+  zxSetColorMap( win, zxw_hilit_color );
+  x++;
+  zxDrawLine( win, x, y, x, y+height-1 );
+}
+
+void zxwSepBoxLower(zxWindow *win, short x, short y, short width, short height)
+{
+  register short x2, y2;
+
+  x2 = x + width;
+  y2 = y + height;
+  zxSetColorMap( win, zxw_shade_color );
+  zxDrawLine( win, x,  y,  x2, y );
+  zxDrawLine( win, x,  y,  x, y2 );
+  zxSetColorMap( win, zxw_hilit_color );
+  zxDrawLine( win, x+1,  y2,  x2, y2 );
+  zxDrawLine( win, x2,  y,  x2,  y2-1 );
+}
+
+void zxwSepBoxRaise(zxWindow *win, short x, short y, short width, short height)
+{
+  register short x2, y2;
+
+  x2 = x + width;
+  y2 = y + height;
+  zxSetColorMap( win, zxw_hilit_color );
+  zxDrawLine( win, x,  y,  x2, y );
+  zxDrawLine( win, x,  y,  x, y2 );
+  zxSetColorMap( win, zxw_shade_color );
+  zxDrawLine( win, x+1,  y2,  x2, y2 );
+  zxDrawLine( win, x2,  y,  x2,  y2-1 );
+}
+
+void zxwSepBoxRelief(zxWindow *win, short x, short y, short width, short height)
+{
+  zxwSepBoxLower( win, x,   y,   width,   height );
+  zxwSepBoxRaise( win, x+1, y+1, width-2, height-2 );
+}
+
+/* ********************************************************** */
+/* box widget
+ * ********************************************************** */
+
+static void _zxwBoxDrawUpperLimb(zxWindow *win, short *x1, short *y1, short *x2, short *y2, long color, int h);
+static void _zxwBoxDrawLowerLimb(zxWindow *win, short *x1, short *y1, short *x2, short *y2, long color, int h);
+
+void _zxwBoxDrawUpperLimb(zxWindow *win, short *x1, short *y1, short *x2, short *y2, long color, int h)
+{
+  register int i;
+
+  zxSetColorMap( win, color );
+  for( i=0; i<h; i++ ){
+    zxDrawLine( win, *x1, *y1, *x2, *y1 );
+    (*y1)++;
+    zxDrawLine( win, *x1, *y1, *x1, *y2 );
+    (*x1)++; (*x2)--; (*y2)--;
+  }
+}
+
+void _zxwBoxDrawLowerLimb(zxWindow *win, short *x1, short *y1, short *x2, short *y2, long color, int h)
+{
+  register int i;
+
+  zxSetColorMap( win, color );
+  for( i=0; i<h; i++ ){
+    (*x2)++;
+    zxDrawLine( win, *x2, *y2, *x2, *y1 );
+    (*y2)++;
+    zxDrawLine( win, *x1, *y2, *x2, *y2 );
+    (*x1)--; (*y1)--;
+  }
+}
+
+void zxwBoxDrawShade(zxWindow *win, zxRegion *reg, long color, long limb1, long limb2, short h)
+{
+  short x1, y1, x2, y2;
+
+  x2 = ( x1 = reg->x ) + reg->width - 1;
+  y2 = ( y1 = reg->y ) + reg->height - 1;
+
+  zxSetLineWidth( win, 0 );
+  _zxwBoxDrawUpperLimb( win, &x1, &y1, &x2, &y2, limb1, h );
+
+  zxSetColorMap( win, color );
+  zxDrawFillRect( win, x1, y1, reg->width-h*2, reg->height-h*2 );
+
+  _zxwBoxDrawLowerLimb( win, &x1, &y1, &x2, &y2, limb2, h );
+}
+
+void zxwBoxDrawRelief(zxWindow *win, zxRegion *reg, long color, short h)
+{
+  short x1, y1, x2, y2;
+
+  x2 = ( x1 = reg->x ) + reg->width - 1;
+  y2 = ( y1 = reg->y ) + reg->height - 1;
+
+  zxSetLineWidth( win, 0 );
+  _zxwBoxDrawUpperLimb( win, &x1, &y1, &x2, &y2, zxw_shade_color, h );
+  _zxwBoxDrawUpperLimb( win, &x1, &y1, &x2, &y2, zxw_hilit_color, h );
+
+  zxSetColorMap( win, color );
+  zxDrawFillRect( win, x1, y1, reg->width-h*4, reg->height-h*4 );
+
+  _zxwBoxDrawLowerLimb( win, &x1, &y1, &x2, &y2, zxw_shade_color, h );
+  _zxwBoxDrawLowerLimb( win, &x1, &y1, &x2, &y2, zxw_hilit_color, h );
+}
+
+/* ********************************************************** */
+/* label class
+ * ********************************************************** */
+
+static void _zxwLabelAlign(char *label, int n, short *x, short *y, zxRegion *reg, char halign, char valign, short emboss);
+
+int zxwLabelHeight(short *asc, short *dsc)
+{
+  zxRegion reg;
+  short _asc, _dsc;
+#define ZXWEDITBOX_TEST_STR "Ty"
+
+  if( !asc ) asc = &_asc;
+  if( !dsc ) dsc = &_dsc;
+  zxTextHeight( ZXWEDITBOX_TEST_STR, asc, dsc );
+  zxTextArea( ZXWEDITBOX_TEST_STR, 0, 0, &reg );
+  return reg.height + *dsc + ZXW_TEXTBOX_TEXTBORDER * 2;
+}
+
+void _zxwLabelAlign(char *label, int n, short *x, short *y, zxRegion *reg, char halign, char valign, short emboss)
+{
+  zxRegion txtreg;
+
+  zxTextNArea( label, n, 0, 0, &txtreg );
+  switch( halign ){
+  case ZXW_ALIGN_LEFT:
+    *x = reg->x+emboss+ZXW_TEXTBOX_TEXTBORDER; break;
+  case ZXW_ALIGN_CENTER:
+    *x = reg->x+(reg->width-txtreg.width)/2; break;
+  case ZXW_ALIGN_RIGHT:
+    *x = reg->x+reg->width-emboss-ZXW_TEXTBOX_TEXTBORDER-txtreg.width; break;
+  default:
+    *x = 0;
+  }
+  switch( valign ){
+  case ZXW_ALIGN_TOP:
+    *y = reg->y+emboss+ZXW_TEXTBOX_TEXTBORDER+txtreg.height; break;
+  case ZXW_ALIGN_MIDDLE:
+    *y = reg->y+(reg->height+txtreg.height)/2; break;
+  case ZXW_ALIGN_BOTTOM:
+    *y = reg->y+reg->height-emboss-ZXW_TEXTBOX_TEXTBORDER; break;
+  default:
+    *y = 0;
+  }
+}
+
+void _zxwLabelNDrawColor(zxWindow *win, char *label, int n, zxRegion *reg, char halign, char valign, char color[])
+{
+  short x, y;
+
+  if( !label ) return;
+  _zxwLabelAlign( label, n, &x, &y, reg, halign, valign, 0 );
+  zxSetColor( win, color );
+  zxDrawNString( win, x, y, label, n );
+}
+
+/* ********************************************************** */
+/* CLASS: zxTextBox
+ * text box widget
+ * ********************************************************** */
+
+static void _zxwTextBoxAlignFlow(zxWindow *win, char *label, short w, char falign, int *first, int *last);
+
+void _zxwTextBoxAlignFlow(zxWindow *win, char *label, short w, char falign, int *first, int *last)
+{
+  *first = 0;
+  *last = strlen(label) - 1;
+  switch( falign ){
+  case ZXW_ALIGN_FLOWLEFT:
+    for( ; *first<*last && zxTextNWidth(win,label,*last-*first+1)>=w; (*first)++ );
+    break;
+  case ZXW_ALIGN_FLOWRIGHT:
+    for( ; *first<*last && zxTextNWidth(win,label,*last-*first+1)>=w; (*last)-- );
+    break;
+  case ZXW_ALIGN_FLOWBOTH:
+    for( ; *first<*last && zxTextNWidth(win,label,*last-*first+1)>=w; (*first)++, (*last)-- );
+  default: ;
+  }
+}
+
+void _zxwTextBoxDrawLabel(zxWindow *win, char *label, zxRegion *reg, char halign, char valign, char falign, short emboss)
+{
+  short x, y;
+  int _first, _last;
+
+  if( !label ) return;
+  _zxwTextBoxAlignFlow( win, label, reg->width-ZXW_TEXTBOX_TEXTBORDER-emboss, falign, &_first, &_last );
+  _zxwLabelAlign( label+_first, _last-_first+1, &x, &y, reg, halign, valign, emboss );
+  zxDrawNString( win, x, y, label+_first, _last-_first+1 );
+}
+
+/* ********************************************************** */
+/* CLASS: zxwEditBox
+ * text edit box widget
+ * ********************************************************** */
+
+static int _zxwEditBoxStrLen(zxwEditBox *eb);
+
+void zxwEditBoxSetHeight(zxwEditBox *eb, short height)
+{
+  short asc; /* dummy */
+
+  /* when 'height' == 0, it is automatically set. */
+  eb->reg.height = height > 0 ? height : zxwLabelHeight( &asc, &eb->emboss );
+}
+
+int _zxwEditBoxStrLen(zxwEditBox *eb)
+{
+  return eb->emboss + ZXW_TEXTBOX_TEXTBORDER - 1
+    + zxTextNWidth( win, eb->label + eb->str_head, eb->str_tail - eb->str_head + 2 );
+}
+
+void zxwEditBoxDraw(zxWindow *win, zxwEditBox *eb)
+{
+  short x, y;
+  int len;
+
+  /* locate head and tail */
+  if( eb->str_cur < eb->str_head )
+    eb->str_head = eb->str_cur;
+  len = strlen( eb->label );
+  for( eb->str_tail=eb->str_head-1; eb->str_tail<len-1; eb->str_tail++ )
+    if( _zxwEditBoxStrLen(eb) >= eb->reg.width ) break;
+  if( eb->str_cur - 1 > eb->str_tail ){
+    eb->str_tail = eb->str_cur - 1;
+    for( eb->str_head=eb->str_tail;
+         eb->str_head>0 && _zxwEditBoxStrLen(eb)<eb->reg.width;
+         eb->str_head-- );
+  }
+  /* draw */
+  zxwEmbossDrawLower( win, eb, eb->enable ? zxw_edit_e_color : zxw_edit_d_color );
+  if( eb->enable ){
+    zxSetColorMap( win, zxw_text_e_color );
+    x = eb->reg.x + eb->emboss + ZXW_TEXTBOX_TEXTBORDER - 1
+      + zxTextNWidth( win, eb->label + eb->str_head, eb->str_cur - eb->str_head );
+    y = eb->reg.y + eb->emboss + ZXW_TEXTBOX_TEXTBORDER;
+    zxDrawLine( win, x, y, x, y + eb->reg.height - 2 * ( eb->emboss + ZXW_TEXTBOX_TEXTBORDER ) );
+  } else{
+    zxSetColorMap( win, zxw_text_d_color );
+  }
+  if( !eb->label ) return;
+  x = eb->reg.x + eb->emboss + ZXW_TEXTBOX_TEXTBORDER;
+  y = eb->reg.y + eb->reg.height - eb->emboss - ZXW_TEXTBOX_TEXTBORDER;
+  zxDrawNString( win, x, y, eb->label+eb->str_head, eb->str_tail-eb->str_head+1 );
+}
+
+int zxwEditBoxKeyPress(zxWindow *win, zxwEditBox *eb)
+{
+  switch( zxKeySymbol() ){
+  case XK_BackSpace:         if( zStrBSChar( eb->label, eb->str_cur ) ) eb->str_cur--; break;
+  case XK_Delete:            zStrDelChar( eb->label, eb->str_cur );                    break;
+  case XK_Home: case XK_Up:  eb->str_cur = 0;                                          break;
+  case XK_Down: case XK_End: eb->str_cur = strlen( eb->label );                        break;
+  case XK_Left:              if( eb->str_cur > 0 ) eb->str_cur--;                      break;
+  case XK_Right:             if( eb->str_cur < strlen(eb->label) ) eb->str_cur++;      break;
+  case XK_Insert:            zxwCursorInsToggle( eb );                                 break;
+  default: ;
+    char str[2];
+
+    if( XLookupString( &zxevent.xkey, str, 2, NULL, NULL ) == 0 ) return 0;
+    if( str[0] == '\r' ) return -1;
+    if( isprint( str[0] ) ){
+      if( eb->ins_mode == ZXW_CURSOR_MODE_INSERT ?
+        zStrInsChar( eb->label, eb->label_size, eb->str_cur, str[0] ) :
+        zStrOvrChar( eb->label, eb->label_size, eb->str_cur, str[0] ) )
+        eb->str_cur++;
+    }
+  }
+  zxwEditBoxDraw( win, eb );
+  return 0;
+}
+
+/* ********************************************************** */
+/* CLASS: zxwGauge
+ * gauge widget
+ * ********************************************************** */
+
+void zxwGaugeSetRate(zxwGauge *gauge, double rate)
+{
+  double x;
+
+  x = (double)gauge->guide.x + rate * (double)gauge->x_range;
+  zxwNobSetX( gauge, (short)x );
+}
+
+void zxwGaugeSetValue(zxwGauge *gauge, double val)
+{
+  if( val > gauge->max ) val = gauge->max;
+  else if( val < gauge->min ) val = gauge->min;
+  zxwGaugeSetRate( gauge, ( val - gauge->min ) / ( gauge->max - gauge->min ) );
+}
+
+void zxwGaugeMove(zxwGauge *gauge, int x, int y)
+{
+  int dx, dy;
+
+  dx = x - gauge->reg.x;
+  dy = y - gauge->reg.y;
+  gauge->reg.x = x;
+  gauge->reg.y = y;
+  gauge->nob.x += dx;
+  gauge->nob.y += dy;
+  gauge->guide.x += dx;
+  gauge->guide.y += dy;
+}
+
+/* ********************************************************** */
+/* CLASS: zxwScrollBar
+ * scroll bar widget
+ * ********************************************************** */
+
+#include <zx11/pixmaps/zxpm_arrow_up.xpm>
+#include <zx11/pixmaps/zxpm_arrow_down.xpm>
+#include <zx11/pixmaps/zxpm_arrow_left.xpm>
+#include <zx11/pixmaps/zxpm_arrow_right.xpm>
+
+void zxwScrollBarCreateHoriz(zxWindow *win, zxwScrollBar *sb, short x, short y, short length)
+{
+  zxwScrollBarResizeHoriz( sb, x, y, length );
+  zxwUngrab( sb );
+  zxwEmbossSetDefault( sb );
+
+  zxwPixButtonReadData( win, &sb->inc, x, y,
+    ZXW_SCROLLBAR_W, ZXW_SCROLLBAR_W, __zxpm_arrow_left, NULL );
+  zxwPixButtonReadData( win, &sb->dec, x+length-ZXW_SCROLLBAR_W, y,
+    ZXW_SCROLLBAR_W, ZXW_SCROLLBAR_W, __zxpm_arrow_right, NULL );
+}
+
+void zxwScrollBarCreateVert(zxWindow *win, zxwScrollBar *sb, short x, short y, short length)
+{
+  zxwScrollBarResizeVert( sb, x, y, length );
+  zxwUngrab( sb );
+  zxwEmbossSetDefault( sb );
+
+  zxwPixButtonReadData( win, &sb->inc, x, y,
+    ZXW_SCROLLBAR_W, ZXW_SCROLLBAR_W, __zxpm_arrow_up, NULL );
+  zxwPixButtonReadData( win, &sb->dec, x, y+length-ZXW_SCROLLBAR_W,
+    ZXW_SCROLLBAR_W, ZXW_SCROLLBAR_W, __zxpm_arrow_down, NULL );
+}
+
+bool zxwScrollBarPress(zxWindow *win, zxwScrollBar *sb, int x, int y)
+{
+  if( zxRegionIsIn( &sb->inc.reg, x, y ) ){
+    zxwPress( &sb->inc );
+    zxwPixButtonDrawLower( win, &sb->inc );
+    return true;
+  }
+  if( zxRegionIsIn( &sb->dec.reg, x, y ) ){
+    zxwPress( &sb->dec );
+    zxwPixButtonDrawLower( win, &sb->dec );
+    return true;
+  }
+  return false;
+}
+
+bool zxwScrollBarReleaseX(zxWindow *win, zxwScrollBar *sb)
+{
+  if( sb->inc.pressed ){
+    zxwRelease( &sb->inc );
+    zxwPixButtonDrawRaise( win, &sb->inc );
+    if( zxwScrollBarDX(sb) > 0 ) zxwNobX(sb)--;
+    return true;
+  }
+  if( sb->dec.pressed ){
+    zxwRelease( &sb->dec );
+    zxwPixButtonDrawRaise( win, &sb->dec );
+    if( zxwNobX(sb) < zxwScrollBarXMax(sb) ) zxwNobX(sb)++;
+    return true;
+  }
+  return false;
+}
+
+bool zxwScrollBarReleaseY(zxWindow *win, zxwScrollBar *sb)
+{
+  if( sb->inc.pressed ){
+    zxwRelease( &sb->inc );
+    zxwPixButtonDrawRaise( win, &sb->inc );
+    if( zxwScrollBarDY(sb) > 0 ) zxwNobY(sb)--;
+    return true;
+  }
+  if( sb->dec.pressed ){
+    zxwRelease( &sb->dec );
+    zxwPixButtonDrawRaise( win, &sb->dec );
+    if( zxwNobY(sb) < zxwScrollBarYMax(sb) ) zxwNobY(sb)++;
+    return true;
+  }
+  return false;
+}
+
+/* ********************************************************** */
+/* CLASS: zxwScrollRegion
+ * scrollable region widget
+ * ********************************************************** */
+
+bool zxwScrollRegionCreate(zxWindow *win, zxwScrollRegion *sr, short x, short y, short width, short height, int fullwidth, int fullheight, void (*draw)(zxWindow*,zxwScrollRegion*,void*))
+{
+  sr->hbar = zAlloc( zxwScrollBar, 1 );
+  sr->vbar = zAlloc( zxwScrollBar, 1 );
+  if( !sr->hbar || !sr->vbar ){
+    zxwScrollRegionDestroy( sr );
+    return false;
+  }
+  zxRegionSet( &sr->fullreg, 0, 0, fullwidth, fullheight );
+  zxwBoxSetRegion( sr, x, y, width-ZXW_SCROLLBAR_W, height-ZXW_SCROLLBAR_W );
+  zxwScrollBarCreateHoriz( win, sr->hbar, x, y+sr->reg.height, sr->reg.width );
+  zxwScrollBarSetNobHoriz( sr->hbar, width, fullwidth );
+  zxwScrollBarCreateVert( win, sr->vbar, x+sr->reg.width, y, sr->reg.height );
+  zxwScrollBarSetNobVert( sr->vbar, height, fullheight );
+  sr->draw = draw;
+  return true;
+}
+
+bool zxwScrollRegionCreateHoriz(zxWindow *win, zxwScrollRegion *sr, short x, short y, short width, short height, int fullwidth, void (*draw)(zxWindow*,zxwScrollRegion*,void*))
+{
+  if( !( sr->hbar = zAlloc( zxwScrollBar, 1 ) ) ) return false;
+  sr->vbar = NULL;
+  zxRegionSet( &sr->fullreg, 0, 0, fullwidth, height );
+  zxwBoxSetRegion( sr, x, y, width, height-ZXW_SCROLLBAR_W );
+  zxwScrollBarCreateHoriz( win, sr->hbar, x, y+sr->reg.height, sr->reg.width );
+  zxwScrollBarSetNobHoriz( sr->hbar, width, fullwidth );
+  sr->draw = draw;
+  return true;
+}
+
+bool zxwScrollRegionCreateVert(zxWindow *win, zxwScrollRegion *sr, short x, short y, short width, short height, int fullheight, void (*draw)(zxWindow*,zxwScrollRegion*,void*))
+{
+  sr->hbar = NULL;
+  if( !( sr->vbar = zAlloc( zxwScrollBar, 1 ) ) ) return false;
+  zxRegionSet( &sr->fullreg, 0, 0, width, fullheight );
+  zxwBoxSetRegion( sr, x, y, width-ZXW_SCROLLBAR_W, height );
+  zxwScrollBarCreateVert( win, sr->vbar, x+sr->reg.width, y, sr->reg.height );
+  zxwScrollBarSetNobVert( sr->vbar, height, fullheight );
+  sr->draw = draw;
+  return true;
+}
+
+/* ********************************************************** */
+/* CLASS: zxwPopup
+ * pop-up menu widget
+ * ********************************************************** */
+
+void zxwPopupAddItem(zxwPopup *popup, char *label, uint hotkey, void *(* callback)(void))
+{
+  zxRegion reg;
+  zxwPopupItem *item;
+
+  if( !( item = zRealloc( popup->item, zxwPopupItem, popup->num+1 ) ) ){
+    ZALLOCERROR();
+    return;
+  }
+  popup->item = item;
+  zxTextArea( label, 0, 0, &reg );
+  if( popup->num > 0 )
+    zxWindowHeight( &popup->w ) += ZXWPOPUPITEM_H;
+  if( reg.width > zxWindowWidth( &popup->w ) ){
+    zxWindowResize( &popup->w, reg.width, zxWindowHeight(&popup->w) );
+    zxwPopupRegSync( popup );
+  }
+
+  zxwButtonCreate( zxwItem( popup, popup->num ),
+    ZXW_EMBOSS_H, ZXWPOPUPITEM_H*popup->num+ZXW_EMBOSS_H, 0, ZXWPOPUPITEM_H, label );
+  zxwHotkeySet( zxwItem( popup, popup->num ), hotkey );
+  zxwCallbackSet( zxwItem( popup, popup->num ), callback );
+  if( zxwLabelIsSep( label ) || !callback )
+    zxwDisable( zxwItem( popup, popup->num ) );
+  zxwItemNumInc( popup );
+}
+
+void zxwPopupAddItemList(zxwPopup *popup, zxwPopupItemEntry *entry)
+{
+  zxwPopupItemEntry *ep;
+
+  for( ep=entry; ep->label; ep++ )
+    zxwPopupAddItem( popup, ep->label, ep->hotkey, ep->callback );
+}
+
+void zxwPopupDraw(zxwPopup *popup)
+{
+  register int i;
+  zxRegion reg;
+
+  zxRegionSet( &reg, 0, 0, popup->w.reg.width, popup->w.reg.height );
+  zxwBoxDrawRaise( &popup->w, &reg, zxw_back_color, ZXW_EMBOSS_H );
+  for( i=0; i<popup->num; i++ ){
+    if( zxwPopupItemIsSep( zxwItem( popup, i ) ) )
+      zxwSepHoriz( &popup->w, zxwItem(popup,i)->reg.x, zxwItem(popup,i)->reg.y+ZXWPOPUPITEM_H/2, zxwItem(popup,i)->reg.width );
+    else
+      zxwButtonDrawFlat( &popup->w, zxwItem(popup,i) );
+  }
+  zxFlush();
+}
+
+void zxwPopupOpen(zxwPopup *popup, short x, short y)
+{
+  register int i;
+
+  zxWindowMove( &popup->w, 0, 0 );
+  zxWindowOpen( &popup->w );
+  for( i=0; i<popup->num; i++ )
+    zxwItem(popup,i)->reg.width = zxWindowWidth( &popup->w ) - ZXW_EMBOSS_H*2;
+  zxWindowMove( &popup->w, x, y );
+  zxwPopupRegSync( popup );
+  zxWindowRaise( &popup->w );
+  zxwPopupDraw( popup );
+}
+
+/* ********************************************************** */
+/* CLASS: zxwMenu
+ * menu bar widget
+ * ********************************************************** */
+
+void zxwMenuItemCreate(zxwMenuItem *item, int n, char *label, uint hotkey, zxwPopup *popup)
+{
+  zxwButtonCreate( item, ZXWMENUITEM_W*n+1, 1, ZXWMENUITEM_W-2, ZXWMENUITEM_H-2, label );
+  zxwEmbossSet( item, 1 );
+  zxwHotkeySet( item, hotkey );
+  item->popup  = popup;
+}
+
+void zxwMenuAddItem(zxwMenu *menu, char *label, uint hotkey, zxwPopup *popup)
+{
+  zxwMenuItem *item;
+
+  if( !( item = zRealloc( menu->item, zxwMenuItem, menu->num+1 ) ) ){
+    ZALLOCERROR();
+    return;
+  }
+  menu->item = item;
+  zxwMenuItemCreate( zxwItem(menu,menu->num), menu->num, label, hotkey, popup );
+  zxwItemNumInc( menu );
+}
+
+void zxwMenuAddItemList(zxwMenu *menu, zxwMenuItemEntry *entry)
+{
+  zxwMenuItemEntry *ep;
+
+  for( ep=entry; ep->label; ep++ )
+    zxwMenuAddItem( menu, ep->label, ep->hotkey, ep->popup );
+}
+
+void zxwMenuDraw(zxWindow *win, zxwMenu *menu)
+{
+  register int i;
+
+  zxwBoxDraw( win, menu, zxw_back_color );
+  for( i=0; i<menu->num; i++ ){
+    zxwButtonDrawFlat( win, zxwItem(menu,i) );
+    if( zxwItem(menu,i)->reg.x > menu->reg.width ) break;
+  }
+  zxwSepHoriz( win, 0, ZXWMENU_H, menu->reg.width );
+}
+
+/* ********************************************************** */
+/* CLASS: zxwPixButtonGroup
+ * grouped pixmap button widget
+ * ********************************************************** */
+
+void zxwPixButtonGroupDestroy(zxwPixButtonGroup *pbg)
+{
+  register int i;
+
+  for( i=0; i<pbg->num; i++ )
+    zxwPixButtonDestroy( zxwItem(pbg,i) );
+  zxwItemDestroy( pbg );
+}
+
+int zxwPixButtonGroupAdd(zxwPixButtonGroup *pbg, int row, int col)
+{
+  zxwPixButton *item;
+
+  if( !( item = zRealloc( pbg->item, zxwPixButton, pbg->num+1 ) ) ){
+    ZALLOCERROR();
+    return -1;
+  }
+  pbg->item = item;
+  if( pbg->reg.width < pbg->btn_w * ( col + 1 ) )
+    pbg->reg.width = pbg->btn_w * ( col + 1 );
+  if( pbg->reg.height < pbg->btn_h * ( row + 1 ) )
+    pbg->reg.height = pbg->btn_h * ( row + 1 );
+  zxwItemNumInc( pbg );
+  return 0;
+}
+
+void zxwPixButtonGroupDraw(zxWindow *win, zxwPixButtonGroup *pbg)
+{
+  register int i;
+
+  zxwSepBoxRelief( win, pbg->reg.x - 1, pbg->reg.y - 1,
+    pbg->reg.width  + 2, pbg->reg.height + 2 );
+  for( i=0; i<pbg->num; i++ )
+    if( i == pbg->selected )
+      zxwPixButtonDrawLower( win, zxwItem(pbg,i) );
+    else
+      zxwPixButtonDrawRaise( win, zxwItem(pbg,i) );
+}
+
+/* ********************************************************** */
+/* CLASS: zxwRadioButtonGroup
+ * grouped radio button widget (exclusive mode assigned)
+ * ********************************************************** */
+
+int zxwRadioButtonGroupAdd(zxwRadioButtonGroup *rbg, int x, int y)
+{
+  zxwRadioButton *item;
+
+  if( !( item = zRealloc( rbg->item, zxwRadioButton, rbg->num+1 ) ) ){
+    ZALLOCERROR();
+    return -1;
+  }
+  rbg->item = item;
+  zxwRadioButtonCreate( zxwItem(rbg,rbg->num), rbg->reg.x+x, rbg->reg.y+y );
+  zxwItemNumInc( rbg );
+  return 0;
+}
+
+void zxwRadioButtonGroupDraw(zxWindow *win, zxwRadioButtonGroup *rbg)
+{
+  register int i;
+
+  zxwBoxDrawRelief( win, &rbg->reg, zxw_front_color, 1 );
+  for( i=0; i<rbg->num; i++ )
+    zxwRadioButtonDraw( win, zxwItem(rbg,i) );
+}
+
+/* ********************************************************** */
+/* CLASS: zxwTabGroup
+ * grouped pixmap button widget
+ * ********************************************************** */
+
+int zxwTabGroupAdd(zxwTabGroup *tg, char *label, void *(* f)(void))
+{
+  zxwTab *item;
+  register int i, x, xn;
+
+  if( !( item = zRealloc( tg->item, zxwTab, tg->num+1 ) ) ){
+    ZALLOCERROR();
+    return -1;
+  }
+  tg->item = item;
+  zxwItemNumInc( tg );
+  zxwButtonCreate( zxwItem(tg,tg->num-1), 0, tg->reg.y, 0, ZXW_TAB_H, label );
+  for( x=tg->reg.x, i=0; i<tg->num; i++ ){
+    xn = tg->reg.x + tg->reg.width * ( i + 1 ) / tg->num;
+    zxwItem(tg,i)->reg.x = x;
+    zxwItem(tg,i)->reg.width = xn - x - 1;
+    x = xn;
+  }
+  zxwCallbackSet( zxwItem(tg,tg->num-1), f );
+  return 0;
+}
+
+void zxwTabGroupDestroy(zxwTabGroup *tg)
+{
+  register int i;
+
+  for( i=0; i<tg->num; i++ )
+    zxwButtonDestroy( zxwItem(tg,i) );
+  zxwItemDestroy( tg );
+}
+
+void zxwTabGroupDraw(zxWindow *win, zxwTabGroup *tg)
+{
+  register int i;
+
+  for( i=0; i<tg->num; i++ ){
+    if( i == tg->active ) continue;
+    zxwTabDrawUnselected( win, zxwItem(tg,i) );
+  }
+  zxwTabGroupDrawSelected( win, tg );
+}

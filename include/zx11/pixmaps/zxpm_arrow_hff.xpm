@@ -1,0 +1,18 @@
+char *__zxpm_arrow_hff[] = {
+"12 12 4 1",/* width height num_colors chars_per_pixel */
+" 	s None	c None",/* colors */
+".	c gray60",
+"@	c gray45",
+"X	c black",
+"            ",/* pixels */
+" @    @     ",
+" X@   X@    ",
+" XX@  XX@   ",
+" XXX@ XXX@  ",
+" XXXX@XXXX@.",
+" XXX@ XXX@  ",
+" XX@  XX@   ",
+" X@   X@    ",
+" @    @     ",
+"            ",
+"            "};
