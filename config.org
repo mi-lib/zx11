@@ -1,6 +1,6 @@
 PREFIX=$(HOME)/usr
 PROJNAME=zx11
-VERSION=1.0.1
+VERSION=1.0.2
 
 DEPENDENCY="zeda=1.1.1"
 
@@ -8,15 +8,19 @@ DEPENDENCY="zeda=1.1.1"
 CONFIG_USE_WIDGET=y
 
 # X extension include
+# (libXext required)
 CONFIG_USE_XEXT=y
 
 # X pixmap support
+# (libxpm required)
 CONFIG_USE_XPM=y
 
 # PNG(Portable Network Graphics) format support
+# (libz and libpng required)
 CONFIG_USE_PNG=y
 
 # JPEG format support
+# (libjpeg required)
 CONFIG_USE_JPEG=y
 
 # DIB(Microsoft Device Independent Bitmap, BMP) format support
