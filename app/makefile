@@ -25,6 +25,7 @@ endif
 LINK+=-lX11 `zeda-config -l`
 
 INSTALL=install -m 755
+UNINSTALL=rm -f
 
 CONFIGGEN=zeda-config-gen
 CONFIG = zx11-config
@@ -44,3 +45,6 @@ install: $(TARGET)
 clean:
 	@echo " CLEAN"
 	-@rm -f *.o *~ core $(TARGET)
+uninstall:
+	@echo " UNINSTALL	" $(TARGET)
+	@cd $(BINDIR); $(UNINSTALL) $(TARGET); cd -
