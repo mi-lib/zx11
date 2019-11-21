@@ -15,7 +15,7 @@ CONFIG_USE_XEXT=y
 # (libxpm required)
 CONFIG_USE_XPM=y
 
-# PNG(Portable Network Graphics) format support
+# PNG (Portable Network Graphics) format support
 # (libz and libpng required)
 CONFIG_USE_PNG=y
 
@@ -23,11 +23,11 @@ CONFIG_USE_PNG=y
 # (libjpeg required)
 CONFIG_USE_JPEG=y
 
-# DIB(Microsoft Device Independent Bitmap, BMP) format support
+# DIB (Microsoft Device Independent Bitmap, BMP) format support
 CONFIG_USE_DIB=y
 
-# MAG(MAki-chan Graphics) format support
+# MAG (MAki-chan Graphics) format support
 CONFIG_USE_MAG=y
 
-# PDT(graphics format for AVG32) support
+# PDT (graphics format for AVG32) support
 CONFIG_USE_PDT=y

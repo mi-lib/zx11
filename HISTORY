@@ -1,3 +1,4 @@
+2019.11.22. Rewrote README as a markdown file. [README]
 2019.10. 1. Enabled make uninstall. [makefile]
 2019. 6.14. Modified config.org, doc/dox.conf and some other files for Git. [lib, doc]
 2018.12.12. Followed renaming of CURE to ZEDA. [all]
