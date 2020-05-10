@@ -7,6 +7,7 @@ SRCDIR:=$(ROOTDIR)/src
 LIBDIR:=$(ROOTDIR)/lib
 APPDIR:=$(ROOTDIR)/app
 DOCDIR:=$(ROOTDIR)/doc
+TESTDIR:=$(ROOTDIR)/test
 SAMPLEDIR:=$(ROOTDIR)/example
 
 CHKDEP=`which zeda-chkdep`
@@ -15,16 +16,17 @@ all:
 	@$(CHKDEP) $(DEPENDENCY) || exit 1
 	@cd $(SRCDIR); make
 	@cd $(APPDIR); make
-
+autotest:
+	@cd $(TESTDIR); ./test.sh
 doc:
 	@cd $(DOCDIR); make
 clean:
 	-@rm -f $(ROOTDIR)/*~ $(INCDIR)/*~
-	-@cd $(SRCDIR); make clean
+	@cd $(SRCDIR); make clean
 	-@rm -f $(LIBDIR)/*.so
-	-@cd $(APPDIR); make clean
-	-@cd $(DOCDIR); make clean
-	-@cd $(SAMPLEDIR); ./allclean.sh
+	@cd $(APPDIR); make clean
+	@cd $(DOCDIR); make clean
+	@cd $(SAMPLEDIR); ./allclean.sh
 install:
 	@echo " INSTALL	library"
 	-@install -m 755 $(LIBDIR)/*.so $(PREFIX)/lib/

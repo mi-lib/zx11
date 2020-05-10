@@ -6,8 +6,7 @@ int main(void)
   zxwButton btn[3];
 
   zxInit();
-  zxWindowCreateAndOpen( &win, 50, 50, 320, 80 );
-  zxWindowSetBG( &win, "lightgray" );
+  zxWindowCreateAndOpen( &win, 1000, 50, 320, 80 );
   zxWidgetInit( &win );
 
   zxwButtonCreate( &btn[0], 20, 20, 80, 24, "hello" );
@@ -37,7 +36,6 @@ int main(void)
   zxwButtonDestroy( &btn[0] );
   zxwButtonDestroy( &btn[1] );
   zxwButtonDestroy( &btn[2] );
-  zxClose();
-
+  zxExit();
   return 0;
 }

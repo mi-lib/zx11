@@ -10,7 +10,6 @@ int main(void)
   zRandInit();
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 320, 120 );
-  zxWindowSetBG( &win, "lightgray" );
   zxWidgetInit( &win );
 
   zxwProgressBarInit( &pb, 40, 40, 240 );
@@ -21,6 +20,6 @@ int main(void)
     usleep( 10000 * zRandI(1,10) );
   }
   getchar();
-  zxClose();
+  zxExit();
   return 0;
 }

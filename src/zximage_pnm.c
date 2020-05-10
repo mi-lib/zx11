@@ -37,30 +37,10 @@ bool zxImageFileIsPNM(char filename[])
 
 /* input of PNM file */
 
-static void _zxImageReadPBMASCII(FILE *fp, zxImage *img, int x, int y);
-static void _zxImageReadPBMBIN(FILE *fp, zxImage *img, int x, int y);
-static void _zxImageReadPGMASCII(FILE *fp, zxImage *img, int x, int y);
-static void _zxImageReadPGMBIN(FILE *fp, zxImage *img, int x, int y);
-static void _zxImageReadPPMASCII(FILE *fp, zxImage *img, int x, int y);
-static void _zxImageReadPPMBIN(FILE *fp, zxImage *img, int x, int y);
-
-static bool _zxImageCreatePBMBuf(uint width);
-static void _zxImageDestroyPBMBuf(void);
-
 static zxPixelManip _zx_pnm_pm;
 
-void (* __zximage_pnm_read_pixel[])(FILE *, zxImage *, int, int) = {
-  NULL /* dummy */,
-  _zxImageReadPBMASCII,
-  _zxImageReadPGMASCII,
-  _zxImageReadPPMASCII,
-  _zxImageReadPBMBIN,
-  _zxImageReadPGMBIN,
-  _zxImageReadPPMBIN,
-};
-
 /* PBM(Portable Bitmap), ASCII mode */
-void _zxImageReadPBMASCII(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPBMASCII(FILE *fp, zxImage *img, int x, int y)
 {
   ubyte val;
 
@@ -71,7 +51,7 @@ void _zxImageReadPBMASCII(FILE *fp, zxImage *img, int x, int y)
 /* PBM(Portable Bitmap), binary mode */
 static ubyte *__zx_pbm_buf = NULL;
 static uint __zx_pbm_rowsize = 0;
-bool _zxImageCreatePBMBuf(uint width)
+static bool _zxImageCreatePBMBuf(uint width)
 {
   __zx_pbm_rowsize = width / 8 + ( ( width % 8 ) ? 1 : 0 );
   if( !( __zx_pbm_buf = zAlloc( ubyte, __zx_pbm_rowsize ) ) ){
@@ -81,12 +61,12 @@ bool _zxImageCreatePBMBuf(uint width)
   return true;
 }
 
-void _zxImageDestroyPBMBuf(void)
+static void _zxImageDestroyPBMBuf(void)
 {
   zFree( __zx_pbm_buf );
 }
 
-void _zxImageReadPBMBIN(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPBMBIN(FILE *fp, zxImage *img, int x, int y)
 {
   static uint k=0;
   static ubyte mask=0x80;
@@ -107,7 +87,7 @@ void _zxImageReadPBMBIN(FILE *fp, zxImage *img, int x, int y)
 }
 
 /* PGM(Portable Graymap), ASCII mode */
-void _zxImageReadPGMASCII(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPGMASCII(FILE *fp, zxImage *img, int x, int y)
 {
   ubyte val;
 
@@ -116,7 +96,7 @@ void _zxImageReadPGMASCII(FILE *fp, zxImage *img, int x, int y)
 }
 
 /* PGM(Portable Graymap), binary mode */
-void _zxImageReadPGMBIN(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPGMBIN(FILE *fp, zxImage *img, int x, int y)
 {
   ubyte val;
 
@@ -125,7 +105,7 @@ void _zxImageReadPGMBIN(FILE *fp, zxImage *img, int x, int y)
 }
 
 /* PPM(Portable Pixmap), ASCII mode */
-void _zxImageReadPPMASCII(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPPMASCII(FILE *fp, zxImage *img, int x, int y)
 {
   ubyte r, g, b;
 
@@ -136,7 +116,7 @@ void _zxImageReadPPMASCII(FILE *fp, zxImage *img, int x, int y)
 }
 
 /* PPM(Portable Pixmap), binary mode */
-void _zxImageReadPPMBIN(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPPMBIN(FILE *fp, zxImage *img, int x, int y)
 {
   ubyte r, g, b;
 
@@ -146,54 +126,18 @@ void _zxImageReadPPMBIN(FILE *fp, zxImage *img, int x, int y)
   zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, r, g, b );
 }
 
-int zxImageReadPNMFile(zxImage *img, char filename[])
+static void (* __zximage_pnm_read_pixel[])(FILE *, zxImage *, int, int) = {
+  NULL /* dummy */,
+  _zxImageReadPBMASCII,
+  _zxImageReadPGMASCII,
+  _zxImageReadPPMASCII,
+  _zxImageReadPBMBIN,
+  _zxImageReadPGMBIN,
+  _zxImageReadPPMBIN,
+};
+
+static int __zximage_pnm_read_header_str(FILE *fp, char *buf)
 {
-  FILE *fp;
-  int result;
-
-  if( !( fp = fopen( filename, "rb" ) ) ){
-    ZOPENERROR( filename );
-    return 0;
-  }
-  result = zxImageReadPNM( fp, img );
-  fclose( fp );
-  return result;
-}
-
-int zxImageReadPNM(FILE *fp, zxImage *img)
-{
-  register int i, j;
-  ubyte type;
-  void (* read_pixel)(FILE *, zxImage *, int, int);
-
-  zxImageInit( img );
-  if( ( type = zxImageReadPNMHeader( fp, img ) ) == ZX_PNM_INVALID ){
-    ZRUNERROR( "unknown file format" );
-    return 0;
-  }
-  /* PBM requires raster buffer for each row */
-  if( type == ZX_PBM_BIN &&
-      !_zxImageCreatePBMBuf( img->width ) ) return 0;
-
-  read_pixel = __zximage_pnm_read_pixel[type];
-  img->buf = zAlloc( ubyte, img->width*img->height*img->bpp );
-  if( !img->buf ){
-    ZRUNERROR( "cannot allocate enough memory for image buffer" );
-    return 0;
-  }
-  zxPixelManipSetDefault( &_zx_pnm_pm );
-  for( i=0; i<img->height; i++ )
-    for( j=0; j<img->width; j++ )
-      read_pixel( fp, img, j, i );
-
-  /* freeing raster buffer for PBM */
-  if( type == ZX_PBM_BIN )
-    _zxImageDestroyPBMBuf();
-  return 1;
-}
-
-static int __zximage_pnm_read_header_str(FILE *fp, char *buf);
-int __zximage_pnm_read_header_str(FILE *fp, char *buf){
   do{
     if( feof( fp ) || !fgets( buf, BUFSIZ, fp ) ){
       ZRUNERROR( "unexpected EOF" );
@@ -231,26 +175,56 @@ int zxImageReadPNMHeader(FILE *fp, zxImage *img)
       return 0;
     }
   }
-  img->bpp = sizeof(long);
+  img->bpp = 4;
   return type;
 }
 
-/* output of PNM file */
-/* only binary output is supported. */
+int zxImageReadPNM(FILE *fp, zxImage *img)
+{
+  register int i, j;
+  ubyte type;
+  void (* read_pixel)(FILE *, zxImage *, int, int);
 
-int zxImageWritePBMFile(zxImage *img, char filename[])
+  zxImageInit( img );
+  if( ( type = zxImageReadPNMHeader( fp, img ) ) == ZX_PNM_INVALID ){
+    ZRUNERROR( "unknown file format" );
+    return 0;
+  }
+  /* PBM requires raster buffer for each row */
+  if( type == ZX_PBM_BIN && !_zxImageCreatePBMBuf( img->width ) ) return 0;
+
+  read_pixel = __zximage_pnm_read_pixel[type];
+  if( !( img->buf = zAlloc( ubyte, img->width*img->height*img->bpp ) ) ){
+    ZRUNERROR( "cannot allocate enough memory for image buffer" );
+    return 0;
+  }
+  zxPixelManipSetDefault( &_zx_pnm_pm );
+  for( i=0; i<img->height; i++ )
+    for( j=0; j<img->width; j++ )
+      read_pixel( fp, img, j, i );
+
+  /* freeing raster buffer for PBM */
+  if( type == ZX_PBM_BIN )
+    _zxImageDestroyPBMBuf();
+  return 1;
+}
+
+int zxImageReadPNMFile(zxImage *img, char filename[])
 {
   FILE *fp;
   int result;
 
-  if( !( fp = fopen( filename, "wb" ) ) ){
+  if( !( fp = fopen( filename, "rb" ) ) ){
     ZOPENERROR( filename );
     return 0;
   }
-  result = zxImageWritePBM( fp, img );
+  result = zxImageReadPNM( fp, img );
   fclose( fp );
   return result;
 }
+
+/* output of PNM file */
+/* only binary output is supported. */
 
 int zxImageWritePBM(FILE *fp, zxImage *img)
 {
@@ -280,7 +254,7 @@ int zxImageWritePBM(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageWritePGMFile(zxImage *img, char filename[])
+int zxImageWritePBMFile(zxImage *img, char filename[])
 {
   FILE *fp;
   int result;
@@ -289,7 +263,7 @@ int zxImageWritePGMFile(zxImage *img, char filename[])
     ZOPENERROR( filename );
     return 0;
   }
-  result = zxImageWritePGM( fp, img );
+  result = zxImageWritePBM( fp, img );
   fclose( fp );
   return result;
 }
@@ -313,7 +287,7 @@ int zxImageWritePGM(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageWritePPMFile(zxImage *img, char filename[])
+int zxImageWritePGMFile(zxImage *img, char filename[])
 {
   FILE *fp;
   int result;
@@ -322,7 +296,7 @@ int zxImageWritePPMFile(zxImage *img, char filename[])
     ZOPENERROR( filename );
     return 0;
   }
-  result = zxImageWritePPM( fp, img );
+  result = zxImageWritePGM( fp, img );
   fclose( fp );
   return result;
 }
@@ -345,4 +319,18 @@ int zxImageWritePPM(FILE *fp, zxImage *img)
       fwrite( &b, 1, 1, fp );
     }
   return 1;
+}
+
+int zxImageWritePPMFile(zxImage *img, char filename[])
+{
+  FILE *fp;
+  int result;
+
+  if( !( fp = fopen( filename, "wb" ) ) ){
+    ZOPENERROR( filename );
+    return 0;
+  }
+  result = zxImageWritePPM( fp, img );
+  fclose( fp );
+  return result;
 }

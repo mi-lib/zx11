@@ -5,16 +5,17 @@ int main(void)
   zxWindow win;
   Window focused, oldfocused;
   zxRegion reg;
+  int count = 0;
 
   zxInit();
   zxWindowCreate( &win, 100, 100, 50, 50 );
   oldfocused = zxrootwindow;
-  while( 1 ){
+  while( count < 10 ){
     focused = zxGetInputFocus();
     if( focused != oldfocused && focused != zxWindowBody(&win) ){
       zxSync();
       if( zxGetGeometry( focused, &reg ) ){
-        printf( "%dx%d+%d+%d\n", reg.width, reg.height, reg.x, reg.y );
+        printf( "<%d> %ld/%ld: %dx%d+%d+%d\n", count++, focused, zxWindowBody(&win), reg.width, reg.height, reg.x, reg.y );
         if( reg.x >= 0 && reg.y >= 0 ){
           zxWindowClose( &win );
           zxWindowSetPos( &win, reg.x, reg.y );
@@ -24,5 +25,6 @@ int main(void)
       }
     }
   }
+  zxExit();
   return 0;
 }

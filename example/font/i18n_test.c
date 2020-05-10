@@ -34,13 +34,13 @@ int main (int argc, char* argv [])
 
   zxTextAreaMB( text, &area );
   zxWindowCreateAndOpen( &win, 0, 0, area.width, area.height );
-  zxWindowSetFG( &win, "black" );
-  zxWindowSetBG( &win, "white" );
+  zxWindowSetBGColorByName( &win, "white" );
   zxWindowClear( &win );
 
+  zxWindowSetColorByName( &win, "black" );
   zxDrawStringMB( &win, area.x, area.y, text );
   zxFlush();
   getchar();
-
+  zxExit();
   return 0;
 }

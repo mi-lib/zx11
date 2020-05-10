@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
   zxPixelManip pm;
 
   zxInit();
-  if( zxImageReadFile( &dat, argc > 1 ? argv[1] : "fig/lena_mini.jpg" ) == 0 )
+  if( zxImageReadFile( &dat, argc > 1 ? argv[1] : "../fig/lena_mini.jpg" ) == 0 )
     exit( 1 );
   zxImageAllocDefault( &rdat, dat.width, dat.height );
   zxImageAllocDefault( &gdat, dat.width, dat.height );
@@ -26,7 +26,6 @@ int main(int argc, char *argv[])
       zxImageCellFromRGB( &gdat, &pm, j, i, 0, g, 0 );
       zxImageCellFromRGB( &bdat, &pm, j, i, 0, 0, b );
     }
-  while( zxGetEvent() != Expose );
   zxImageDrawAll( &win, &dat, 0, 0 );
   zxImageDrawAll( &win, &rdat, dat.width, 0 );
   zxImageDrawAll( &win, &gdat, dat.width, dat.height );
@@ -38,6 +37,6 @@ int main(int argc, char *argv[])
   zxImageDestroy( &rdat );
   zxImageDestroy( &gdat );
   zxImageDestroy( &bdat );
-  zxClose();
+  zxExit();
   return 0;
 } 

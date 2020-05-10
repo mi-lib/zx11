@@ -34,20 +34,20 @@ bool zxImageFileIsPNM(char filename[]);
 
 /* input of PNM file */
 
-int zxImageReadPNMFile(zxImage *img, char filename[]);
-int zxImageReadPNM(FILE *fp, zxImage *img);
 int zxImageReadPNMHeader(FILE *fp, zxImage *img);
+int zxImageReadPNM(FILE *fp, zxImage *img);
+int zxImageReadPNMFile(zxImage *img, char filename[]);
 
 /* output of PNM file */
 
-int zxImageWritePBMFile(zxImage *img, char filename[]);
 int zxImageWritePBM(FILE *fp, zxImage *img);
+int zxImageWritePBMFile(zxImage *img, char filename[]);
 
-int zxImageWritePGMFile(zxImage *img, char filename[]);
 int zxImageWritePGM(FILE *fp, zxImage *img);
+int zxImageWritePGMFile(zxImage *img, char filename[]);
 
-int zxImageWritePPMFile(zxImage *img, char filename[]);
 int zxImageWritePPM(FILE *fp, zxImage *img);
+int zxImageWritePPMFile(zxImage *img, char filename[]);
 
 __END_DECLS
 

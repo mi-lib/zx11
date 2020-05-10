@@ -4,19 +4,17 @@ int main(int argc, char *argv[])
 {
   zxImage dat;
   zxWindow win;
-  char *filename = argc > 1 ? argv[1] : "fig/moon.mag";
+  char *filename = argc > 1 ? argv[1] : "../fig/moon.mag";
 
   zxInit();
   zxMAGDispCommentFile( filename );
   zxImageReadMAGFile( &dat, filename );
 
   zxWindowCreateAndOpen( &win, 0, 0, dat.width, dat.height );
-  while( zxGetEvent() != Expose );
   zxImageDrawAll( &win, &dat, 0, 0 );
   zxFlush();
   getchar();
-
   zxImageDestroy( &dat );
-  zxClose();
+  zxExit();
   return 0;
 }

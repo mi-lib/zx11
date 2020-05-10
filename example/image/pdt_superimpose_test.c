@@ -1,4 +1,4 @@
-#include <zx11/zxpdt.h>
+#include <zx11/zximage_pdt.h>
 
 int main(int argc, char *argv[])
 {
@@ -22,6 +22,6 @@ int main(int argc, char *argv[])
 
   zxImageDestroy( &img1 );
   zxImageDestroy( &img2 );
-  zxClose();
+  zxExit();
   return 0;
 }

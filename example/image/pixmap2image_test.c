@@ -8,17 +8,15 @@ int main(void)
   zxInit();
   zxWindowCreate( &win, 0, 0, 640, 480 );
 
-  zxDoubleBufferEnable( &win );
-  zxSetBGColor( &win, zxGetColor( &win, "blue" ) );
-  zxClear( &win );
-  zxSetColor( &win, "red" );
+  zxWindowDoubleBufferEnable( &win );
+  zxWindowSetBGColorByName( &win, "blue" );
+  zxWindowSetColorByName( &win, "red" );
   zxDrawFillRect( &win, 100, 100, 300, 300 );
-  zxSetColor( &win, "yellow" );
+  zxWindowSetColorByName( &win, "yellow" );
   zxDrawFillRect( &win, 300, 200, 250, 240 );
 
-  zxImageFromPixmap( &img, zxCanvas(&win), 640, 480 );
+  zxImageFromPixmap( &img, zxWindowCanvas(&win), 640, 480 );
   zxImageWritePNGFile( &img, "hoge.png" );
-
-  zxClose();
+  zxExit();
   return 0;
 }

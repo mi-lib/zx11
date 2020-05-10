@@ -6,8 +6,7 @@ int main(void)
   zxwCheckBox b1, b2, b3, b4;
 
   zxInit();
-  zxWindowCreateAndOpen( &win, 50, 50, 320, 80 );
-  zxWindowSetBG( &win, "lightgray" );
+  zxWindowCreateAndOpen( &win, 1000, 50, 320, 80 );
   zxWidgetInit( &win );
 
   zxwCheckBoxCreate( &b1,  50, 16 );
@@ -27,6 +26,6 @@ int main(void)
   zxFlush();
   getchar();
 
-  zxClose();
+  zxExit();
   return 0;
 }

@@ -7,7 +7,6 @@ int main(void)
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 500, 300 );
   zxWidgetInit( &win );
-  zxWindowSetBG( &win, "lightgray" );
 
   zxwSepHoriz( &win, 20, 20, 460 );
   zxwSepVert(  &win, 20, 30, 260 );
@@ -17,6 +16,6 @@ int main(void)
 
   zxFlush();
   getchar();
-  zxClose();
+  zxExit();
   return 0;
 }

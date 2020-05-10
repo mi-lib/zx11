@@ -1,4 +1,4 @@
-#include <zx11/zxpng.h>
+#include <zx11/zximage_png.h>
 
 typedef struct{
   png_structp png_ptr;
@@ -19,7 +19,7 @@ int zxPNGCheck(FILE *fp)
 #define ZX_PNG_CHECK_BITE 8
   ubyte header[ZX_PNG_CHECK_BITE];
 
-  fread( header, sizeof(ubyte), ZX_PNG_CHECK_BITE, fp );
+  if( fread( header, sizeof(ubyte), ZX_PNG_CHECK_BITE, fp ) == 0 ) return 0;
   return !png_sig_cmp( header, 0, ZX_PNG_CHECK_BITE );
 }
 
@@ -193,6 +193,6 @@ int main(int argc, char *argv[])
   zxFlush();
   getchar();
   zxImageDestroy( &dat );
-  zxClose();
+  zxExit();
   return 0;
 } 

@@ -9,7 +9,6 @@ int main(void)
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 200, 240 );
   zxWidgetInit( &win );
-  zxWindowSetBG( &win, "lightgray" );
 
   h = zxwLabelHeight( NULL, NULL );
 
@@ -49,6 +48,6 @@ int main(void)
 
   zxFlush();
   getchar();
-  zxClose();
+  zxExit();
   return 0;
 }

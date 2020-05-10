@@ -8,11 +8,11 @@ int main(void)
 
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 400, 100 );
-  zxKeyEnable( &win );
-  zxWindowSetBG( &win, "lightgray" );
+  zxWindowKeyEnable( &win );
   zxWidgetInit( &win );
 
   zxwEditBoxCreate( &eb, BUFSIZ, 20, 20, 180, 0 );
+  zxwCursorVisible( &eb );
   zxwEditBoxDraw( &win, &eb );
   zxFlush();
   while( 1 ){
@@ -23,7 +23,7 @@ int main(void)
     usleep( 5000 );
   }
   zxwEditBoxDestroy( &eb );
-  zxWindowClose( &win );
-  zxClose();
+  zxWindowDestroy( &win );
+  zxExit();
   return 0;
 }

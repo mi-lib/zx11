@@ -6,15 +6,14 @@ void draw(zxImage *src, double rx, double ry)
   zxWindow win;
 
   zxImageAllocDefault( &dest, src->width*rx, src->height*ry );
-  printf( "%d x %d\n", dest.width, dest.height );
-  zxWindowCreateAndOpen( &win, 0, 0, dest.width, dest.height );
-  while( zxGetEvent() != Expose );
+  printf( "%d x %d", dest.width, dest.height );
+  zxWindowCreateAndOpen( &win, 1000, 0, dest.width, dest.height );
   zxImageResize( src, &dest );
   zxImageDrawAll( &win, &dest, 0, 0 );
   zxImageDestroy( &dest );
   zxFlush();
   getchar();
-  zxWindowClose( &win );
+  zxWindowDestroy( &win );
 }
 
 int main(int argc, char *argv[])
@@ -24,10 +23,9 @@ int main(int argc, char *argv[])
 
   zxInit();
   zxImageReadFile( &src, argc > 1 ? argv[1] : "fig/lena.jpg" );
-  zxWindowCreateAndOpen( &win, 0, 0, src.width, src.height );
-  while( zxGetEvent() != Expose );
+  zxWindowCreateAndOpen( &win, 1000, 0, src.width, src.height );
 
-  printf( "%d x %d\n", src.width, src.height );
+  printf( "%d x %d", src.width, src.height );
   zxImageDrawAll( &win, &src, 0, 0 );
   zxFlush();
   getchar();
@@ -38,6 +36,6 @@ int main(int argc, char *argv[])
   draw( &src, 2.0, 2.0 );
 
   zxImageDestroy( &src );
-  zxClose();
+  zxExit();
   return 0;
 }

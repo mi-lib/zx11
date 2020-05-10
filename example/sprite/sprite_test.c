@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
   zxsLayerInit( &layer );
   zxsLayerCreatePixArray( &layer, 1 );
   zxWindowCreate( &win, 0, 0, 700, 520 );
-  zxWindowSetBG( &win, "blue" );
+  zxWindowSetBGColorByName( &win, "blue" );
   zxSpriteCreate( &win, &spr, 80, 10, 600, 500 );
 
   zxsLayerReadBGPixFile( &win, &layer, "../pixmaps/quinta-2.xpm" );
@@ -63,5 +63,6 @@ int main(int argc, char *argv[])
   getchar();
   pthread_cancel( thread );
   pthread_join( thread, NULL );
+  zxExit();
   return 0;
 }

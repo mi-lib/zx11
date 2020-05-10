@@ -1,14 +1,5 @@
-/*
- * Julia series
- * (C)Copyright, Zhidao since 2000.
- *
- * 2000.10.27. Created.
- */
-
-#include <stdio.h>
-#include <stdlib.h>
+#include <zx11/zximage.h>
 #include <math.h>
-#include <zx11/zxutil.h>
 
 #define K 180
 #define A 0.11031
@@ -18,14 +9,14 @@
 int main(int argc, char *argv[])
 {
   zxWindow c;
+  zxImage img;
+  zxPixelManip pm;
   register int i, j;
   double x, y, zx, zy, r, t, u, v;
 
   zxInit();
-  zxWindowCreateAndOpen( &c, 100, 100, 700, 500 );
-  zxWindowSetTitle( &c, "Julia series" );
-  zxWindowClear( &c );
-
+  zxImageAllocDefault( &img, 700, 500 );
+  zxPixelManipSetDefault( &pm );
   x = y = 0;
   for( i=1; i<=W; i++ ){
     for( j=1; j<=W; j++ ){
@@ -38,12 +29,14 @@ int main(int argc, char *argv[])
       y = r * sin( t );
       u = ( x + 4 ) * K - 350;
       v = ( 2 - y ) * K - 100;
-      zxDrawPoint( &c, u, v );
+      zxImageCellFromRGB( &img, &pm, u, v, 0xff, 0xff, 0xff );
     }
   }
+  zxWindowCreateAndOpen( &c, 100, 100, 700, 500 );
+  zxWindowSetTitle( &c, "Julia series" );
+  zxImageDrawAll( &c, &img, 0, 0 );
   zxFlush();
   getchar();
-
-  zxClose();
+  zxExit();
   return 1;
 }

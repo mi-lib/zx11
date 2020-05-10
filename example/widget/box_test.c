@@ -10,8 +10,7 @@ int main(void)
   box_t b1, b2, b3, b4;
 
   zxInit();
-  zxWindowCreateAndOpen( &win, 50, 50, 320, 360 );
-  zxWindowSetBG( &win, "lightgray" );
+  zxWindowCreateAndOpen( &win, 1000, 50, 320, 360 );
   zxWidgetInit( &win );
 
   zxwBoxSetRegion( &b1, 24,  24, 120, 60 );
@@ -26,6 +25,6 @@ int main(void)
   zxFlush();
   getchar();
 
-  zxClose();
+  zxExit();
   return 0;
 }

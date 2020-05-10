@@ -14,7 +14,6 @@ int main(void)
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 320, 80 );
   zxWidgetInit( &win );
-  zxWindowSetBG( &win, "lightgray" );
 
   zxwTabGroupInit( &tg, 20, 20, 280 );
   zxwTabGroupAdd( &tg, "tab A", fA );
@@ -23,13 +22,13 @@ int main(void)
   zxwTabGroupAdd( &tg, "tab D", fD );
   zxwTabGroupDraw( &win, &tg );
 
-  for( i=0; i<tg.num; i++ ){
-    tg.active = i;
+  for( i=0; i<zxwItemNum(&tg); i++ ){
+    zxwItemActivate( &tg, i );
     zxwTabGroupDrawPress( &win, &tg );
     zxFlush();
     getchar();
   }
   zxwTabGroupDestroy( &tg );
-  zxClose();
+  zxExit();
   return 0;
 }

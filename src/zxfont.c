@@ -10,13 +10,13 @@
 
 XFontStruct *zxfontstruct = NULL;
 
-void zxSetFont(zxWindow *win, char *fontname)
+void zxWindowSetFont(zxWindow *win, char *fontname)
 {
   Font fid;
 
   fid = XLoadFont( zxdisplay, fontname );
   zxfontstruct = XQueryFont( zxdisplay, fid );
-  XSetFont( zxdisplay, zxGC(win), fid );
+  XSetFont( zxdisplay, zxWindowGC(win), fid );
 }
 
 #define ZX_WARN_UNDEF_CHAR "metric undefined for the specified charactor"

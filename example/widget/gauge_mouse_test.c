@@ -20,10 +20,9 @@ int main(void)
 
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 400, 100 );
-  zxKeyEnable( &win );
-  zxMouseEnable( &win );
+  zxWindowKeyEnable( &win );
+  zxWindowMouseEnable( &win );
   zxWidgetInit( &win );
-  zxWindowSetBG( &win, "lightgray" );
 
   zxwGaugeCreate( &gauge[0], 20, 20, 200,  0, -2, 2 );
   zxwGaugeCreate( &gauge[1], 20, 50, 200, 10, -2, 2 );
@@ -69,6 +68,6 @@ int main(void)
  END:
   zxwEditBoxDestroy( &eb[0] );
   zxwEditBoxDestroy( &eb[1] );
-  zxClose();
+  zxExit();
   return 0;
 }

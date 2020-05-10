@@ -15,9 +15,8 @@ int main(void)
 
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 320, 160 );
-  zxWindowSetBG( &win, "lightgray" );
-  zxKeyEnable( &win );
-  zxMouseEnable( &win );
+  zxWindowKeyEnable( &win );
+  zxWindowMouseEnable( &win );
   zxWidgetInit( &win );
 
   zxwRadioButtonGroupInit( &bg1, 50, 20, 200, 48 );
@@ -46,12 +45,12 @@ int main(void)
     case ButtonPress:
       zxwRadioButtonGroupPress( &win, &bg1, &judge );
       if( judge ){
-        eprintf( "group#1 selected = %d\n", bg1.selected );
+        eprintf( "group#1 selected = %d\n", bg1.item_selected );
         break;
       }
       zxwRadioButtonGroupPress( &win, &bg2, &judge );
       if( judge ){
-        eprintf( "group#2 selected = %d\n", bg2.selected );
+        eprintf( "group#2 selected = %d\n", bg2.item_selected );
         break;
       }
       break;
@@ -62,6 +61,6 @@ int main(void)
  END:
   zxwRadioButtonGroupDestroy( &bg1 );
   zxwRadioButtonGroupDestroy( &bg2 );
-  zxClose();
+  zxExit();
   return 0;
 }

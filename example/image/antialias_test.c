@@ -8,26 +8,19 @@ int main(int argc, char *argv[])
   int i;
 
   zxInit();
-  if( zxImageReadFile( &dat, argc > 1 ? argv[1] : "fig/lena.jpg" ) == 0 )
+  if( zxImageReadFile( &dat, argc > 1 ? argv[1] : "../fig/lena_mini.jpg" ) == 0 )
     exit( 1 );
-  zxWindowCreateAndOpen( &win, 0, 0, dat.width, dat.height );
-  while( zxGetEvent() != Expose );
-
-  printf( "original image" );
+  zxWindowCreateAndOpen( &win, 0, 0, dat.width*5, dat.height );
   zxImageDrawAll( &win, &dat, 0, 0 );
-  zxFlush();
-  getchar();
-
-  for( i=1; i<=5; i++ ){
+  for( i=1; i<=4; i++ ){
     zxImageClone( &dat, &cdat );
-    printf( "antialiasing x %d", i );
     zxImageAntialias( &cdat, &dat );
-    zxImageDrawAll( &win, &dat, 0, 0 );
-    zxFlush();
-    getchar();
+    zxImageDrawAll( &win, &dat, dat.width*i, 0 );
     zxImageDestroy( &cdat );
   }
   zxImageDestroy( &dat );
-  zxClose();
+  zxFlush();
+  getchar();
+  zxExit();
   return 0;
 } 

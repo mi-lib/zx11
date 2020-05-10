@@ -13,25 +13,24 @@ int main(void)
 
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 500, 150 );
-  zxWindowSetBG( &win, "navy" );
+  zxWindowSetBGColorByName( &win, "navy" );
 
-  zxSetFont( &win, fontname );
+  zxWindowSetFont( &win, fontname );
 
-  zxSetColor( &win, "white" );
+  zxWindowSetColorByName( &win, "white" );
   zxDrawString( &win, 100, 60, TEXT1 );
   zxTextArea( TEXT1, 100, 60, &reg );
-  zxSetColor( &win, "red" );
+  zxWindowSetColorByName( &win, "red" );
   zxDrawRegionRect( &win, &reg );
 
-  zxSetColor( &win, "white" );
+  zxWindowSetColorByName( &win, "white" );
   zxDrawString( &win, 100, 100, TEXT2 );
   zxTextArea( TEXT2, 100, 100, &reg );
-  zxSetColor( &win, "red" );
+  zxWindowSetColorByName( &win, "red" );
   zxDrawRegionRect( &win, &reg );
 
   zxFlush();
   getchar();
-  zxClose();
-
+  zxExit();
   return 0;
 }

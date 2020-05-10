@@ -40,10 +40,9 @@ int main(void)
 
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 300, 160 );
-  zxKeyEnable( &win );
-  zxMouseEnable( &win );
+  zxWindowKeyEnable( &win );
+  zxWindowMouseEnable( &win );
   zxWidgetInit( &win );
-  zxWindowSetBG( &win, "lightgray" );
 
   zxwMenuCreate( &win, &menu );
   zxwMenuAddItemList( &menu, entry );
@@ -115,6 +114,6 @@ int main(void)
   zxwPixButtonGroupDestroy( &pbg[1] );
   zxwPixButtonGroupDestroy( &pbg[2] );
   zxwMenuDestroy( &menu );
-  zxClose();
+  zxExit();
   return 0;
 }

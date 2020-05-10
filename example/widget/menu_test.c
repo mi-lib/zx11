@@ -2,11 +2,11 @@
 
 zxWindow win;
 zxwMenu menu;
-zxwPopup popup;
+zxwPopup popup1, popup2;
 
 void *dummy(void){ return NULL; }
 
-zxwPopupItemEntry popup_entry[] = {
+zxwPopupItemEntry popup_entry1[] = {
   { 0, "Open",   XK_o, dummy },
   { 0, "Save",   XK_s, NULL },
   { 0, "SaveAs", XK_w, NULL },
@@ -16,23 +16,34 @@ zxwPopupItemEntry popup_entry[] = {
   { 0, NULL,        0, NULL },
 };
 
+zxwPopupItemEntry popup_entry2[] = {
+  { 0, "Select", XK_s, dummy },
+  { 0, "Copy",   XK_c, dummy },
+  { 0, "Cut",    XK_x, dummy },
+  { 0, "Paste",  XK_v, dummy },
+  { 0, NULL,        0, NULL },
+};
+
 zxwMenuItemEntry entry[] = {
-  { 0, "File", XK_f, &popup },
-  { 0, "Edit", XK_e, NULL },
+  { 0, "File", XK_f, &popup1 },
+  { 0, "Edit", XK_e, &popup2 },
   { 0, "Hoge", XK_VoidSymbol, NULL },
   { 0, "Help", XK_h, NULL },
   { 0, NULL, 0, NULL },
 };
 
-void popup_op(zxwPopup *pp)
+void popup_op(zxwMenuItem *mi, zxwPopup *pp)
 {
-  zxwPopupOpen( pp, zxWindowOX(&win), zxWindowOY(&win)+24 );
+  zxRegion reg;
+
+  zxGetGeometry(zxWindowBody(&win),&reg);
+  zxwPopupOpen( pp, reg.x+mi->reg.x, reg.y+mi->reg.y+ZXWMENU_H );
   do{
     zxwPopupDrawMove( pp );
     getchar();
     zxwBackupActive( pp );
     zxwItemNext( pp );
-  } while( pp->active != ZXW_ITEM_NONE );
+  } while( zxwIsActive( pp ) );
   zxwPopupClose( pp );
   zxFlush();
 }
@@ -40,37 +51,39 @@ void popup_op(zxwPopup *pp)
 int main(void)
 {
   zxwMenuItem *mi;
-  int i;
+  int i, j;
 
   zxInit();
-  zxWindowCreateAndOpen( &win, 50, 50, 300, 80 );
-
+  zxWindowCreateAndOpen( &win, 1000, 50, 300, 80 );
   zxWidgetInit( &win );
-  zxWindowSetBG( &win, "lightgray" );
   zxwMenuCreate( &win, &menu );
   zxwMenuAddItemList( &menu, entry );
 
-  zxwPopupCreate( &popup );
-  zxwPopupAddItemList( &popup, popup_entry );
+  zxwPopupCreate( &popup1 );
+  zxwPopupAddItemList( &popup1, popup_entry1 );
+  zxwPopupCreate( &popup2 );
+  zxwPopupAddItemList( &popup2, popup_entry2 );
   zxwMenuDraw( &win, &menu );
   zxFlush();
   getchar();
 
   for( i=0; i<3; i++ ){
-    while( ++menu.active < menu.num ){
+    for( j=0; j<zxwItemNum(&menu); j++ ){
+      zxwItemActivateNext( &menu );
       zxwMenuDrawMove( &win, &menu );
       getchar();
       zxwMenuDrawPress( &win, &menu );
       if( ( mi = zxwItemActive( &menu ) )->popup )
-        popup_op( mi->popup );
+        popup_op( mi, mi->popup );
       getchar();
       zxwBackupActive( &menu );
     }
-    menu.active = ZXW_ITEM_NONE;
+    zxwUnactivate( &menu );
   }
 
-  zxwPopupDestroy( &popup );
+  zxwPopupDestroy( &popup1 );
+  zxwPopupDestroy( &popup2 );
   zxwMenuDestroy( &menu );
-  zxClose();
+  zxExit();
   return 0;
 }

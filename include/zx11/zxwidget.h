@@ -66,13 +66,13 @@ void zxwSepBoxRelief(zxWindow *win, short x, short y, short width, short height)
 /* box widget
  * ********************************************************** */
 
-#define ZXW_BOX_CLASS    zxRegion reg
+#define ZXW_BOX_CLASS zxRegion reg
 
 #define zxwBoxSetPos(b,x,y)        zxRegionSetPos( &(b)->reg, x, y )
 #define zxwBoxSetSize(b,w,h)       zxRegionSetSize( &(b)->reg, w, h )
 #define zxwBoxSetRegion(b,x,y,w,h) zxRegionSet( &(b)->reg, x, y, w, h )
 #define zxwBoxDraw(win,b,c) do{\
-  zxSetColorMap( (win), (c) );\
+  zxWindowSetColor( (win), (c) );\
   zxDrawRegionFillRect( (win), &(b)->reg );\
 } while(0)
 
@@ -194,18 +194,18 @@ void _zxwLabelNDrawColor(zxWindow *win, char *label, int n, zxRegion *reg, char 
  * ********************************************************** */
 
 #define ZXW_PM_CLASS \
-  zxPM pic; short src_x, src_y, dst_x, dst_y
+  zxPM pic; short pic_src_x, pic_src_y, pic_dst_x, pic_dst_y
 
 #define zxwPixmapAlign(p,x,y,w,h) do{\
-  if( ( (p)->src_x = ( (p)->pic.width  - (w) ) / 2 ) >= 0 ){\
-    (p)->dst_x = (x);              (p)->pic.width = (w);\
+  if( ( (p)->pic_src_x = ( (p)->pic.width  - (w) ) / 2 ) >= 0 ){\
+    (p)->pic_dst_x = (x);                  (p)->pic.width = (w);\
   } else{\
-    (p)->dst_x = (x) - (p)->src_x; (p)->src_x = 0;\
+    (p)->pic_dst_x = (x) - (p)->pic_src_x; (p)->pic_src_x = 0;\
   }\
-  if( ( (p)->src_y = ( (p)->pic.height - (h) ) / 2 ) >= 0 ){\
-    (p)->dst_y = (y);              (p)->pic.height = (h);\
+  if( ( (p)->pic_src_y = ( (p)->pic.height - (h) ) / 2 ) >= 0 ){\
+    (p)->pic_dst_y = (y);                  (p)->pic.height = (h);\
   } else{\
-    (p)->dst_y = (y) - (p)->src_y; (p)->src_y = 0;\
+    (p)->pic_dst_y = (y) - (p)->pic_src_y; (p)->pic_src_y = 0;\
   }\
 } while(0)
 
@@ -317,22 +317,29 @@ void _zxwTextBoxDrawLabel(zxWindow *win, char *label, zxRegion *reg, char halign
  * ********************************************************** */
 
 #define ZXW_CURSOR_CLASS \
-  int str_head; /* head position of string to draw */\
-  int str_tail; /* tail position of string to draw */\
-  int str_cur; /* current position of string */\
-  int ins_mode; /* insert/override mode */
+  int cursor_str_head; /* head position of string to draw */\
+  int cursor_str_tail; /* tail position of string to draw */\
+  int cursor_str_cur;  /* current position of string */\
+  int cursor_ins_mode; /* insert/override mode */\
+  bool cursor_visible; /* visible/invisible flag */\
 
 enum{
   ZXW_CURSOR_MODE_INSERT = 0,
   ZXW_CURSOR_OVERRIDE = 1,
 };
 
-#define zxwCursorInsToggle(c)  ( (c)->ins_mode = 1 - (c)->ins_mode )
+#define zxwCursorInsToggle(c)   ( (c)->cursor_ins_mode = 1 - (c)->cursor_ins_mode )
+
+#define zxwCursorVisible(c)     ( (c)->cursor_visible = true )
+#define zxwCursorInvisible(c)   ( (c)->cursor_visible = false )
+#define zxwCursorIsVisible(c)   ( (c)->cursor_visible )
+#define zxwCursorIsInvisible(c) ( !(c)->cursor_visible )
 
 #define zxwCursorInit(c) do{\
-  (c)->str_head = (c)->str_cur = 0;\
-  (c)->str_tail = -1;\
-  (c)->ins_mode = ZXW_CURSOR_MODE_INSERT;\
+  (c)->cursor_str_head = (c)->cursor_str_cur = 0;\
+  (c)->cursor_str_tail = -1;\
+  (c)->cursor_ins_mode = ZXW_CURSOR_MODE_INSERT;\
+  zxwCursorInvisible( c );\
 } while(0)
 
 /* ********************************************************** */
@@ -349,7 +356,7 @@ void zxwEditBoxSetHeight(zxwEditBox *eb, short height);
 
 #define zxwEditBoxFit(win,b) do{\
   if( (b)->label )\
-    (b)->reg.width = zxTextWidth(win,(b)->label) + ZXW_TEXTBOX_TEXTBORDER + (b)->emboss*2;\
+    (b)->reg.width = zxTextWidth((b)->label) + ZXW_TEXTBOX_TEXTBORDER + (b)->emboss*2;\
 } while(0)
 
 #define zxwEditBoxCreate(e,s,x,y,w,h) do{\
@@ -397,11 +404,11 @@ typedef struct{
 #define _zxwButtonDrawLabel(win,b) zxwTextBoxDrawLabel( win, b )
 
 #define zxwButtonDrawLabel(win,b) do{\
-  zxSetColorMap( win, (b)->enable ? zxw_text_e_color:zxw_text_d_color );\
+  zxWindowSetColor( win, (b)->enable ? zxw_text_e_color:zxw_text_d_color );\
   _zxwButtonDrawLabel( win, b );\
 } while(0)
 #define zxwButtonDrawLabelRev(win,b) do{\
-  zxSetColorMap( win, zxw_text_rev_color );\
+  zxWindowSetColor( win, zxw_text_rev_color );\
   _zxwButtonDrawLabel( win, b );\
 } while(0)
 
@@ -452,7 +459,7 @@ typedef struct{
 #define zxwPixButtonDestroy(p) zxPMDestroy( &(p)->pic )
 
 #define zxwPixButtonDrawPic(win,p) \
-  zxPMDraw( win, &(p)->pic, (p)->src_x, (p)->src_y, (p)->pic.width, (p)->pic.height, (p)->dst_x, (p)->dst_y )
+  zxPMDraw( win, &(p)->pic, (p)->pic_src_x, (p)->pic_src_y, (p)->pic.width, (p)->pic.height, (p)->pic_dst_x, (p)->pic_dst_y )
 
 #define zxwPixButtonDrawLower(win,p) do{\
   zxwButtonDrawLower( win, p );\
@@ -491,14 +498,14 @@ typedef struct{
   __x = (b)->reg.x + ZXW_RADIOBUTTON_R;\
   __y = (b)->reg.y + ZXW_RADIOBUTTON_R;\
   zxwBoxDraw( win, b, zxw_front_color );\
-  zxSetColorMap( win, zxw_shade_color );\
+  zxWindowSetColor( win, zxw_shade_color );\
   zxDrawFillArc( win, (b)->reg.x, (b)->reg.y, (b)->reg.width, (b)->reg.height, 45, 180 ); \
-  zxSetColorMap( win, zxw_hilit_color );\
+  zxWindowSetColor( win, zxw_hilit_color );\
   zxDrawFillArc( win, (b)->reg.x, (b)->reg.y, (b)->reg.width, (b)->reg.height, 225, 180 ); \
-  zxSetColorMap( win, (b)->enable ? zxw_hilit_color:zxw_back_color );\
+  zxWindowSetColor( win, (b)->enable ? zxw_hilit_color:zxw_back_color );\
   zxDrawFillCircle( win, __x, __y, ZXW_RADIOBUTTON_R-2 );\
   if( (b)->pressed ){\
-    zxSetColorMap( win, (b)->enable ? zxw_radio_color:zxw_shade_color );\
+    zxWindowSetColor( win, (b)->enable ? zxw_radio_color:zxw_shade_color );\
     zxDrawFillCircle( win, __x, __y, ZXW_RADIOBUTTON_R-4 );\
   }\
 } while(0)
@@ -525,7 +532,7 @@ typedef struct{
 #define zxwCheckBoxDraw(win,b) do{\
   zxwBoxDrawLower(win,&(b)->reg,(b)->enable ? zxw_hilit_color:zxw_back_color,2);\
   if( (b)->pressed ){\
-    zxSetColorMap( win, (b)->enable ? zxw_radio_color:zxw_shade_color );\
+    zxWindowSetColor( win, (b)->enable ? zxw_radio_color:zxw_shade_color );\
     zxDrawLine(win,(b)->reg.x+3,(b)->reg.y+8,(b)->reg.x+6,(b)->reg.y+11);\
     zxDrawLine(win,(b)->reg.x+3,(b)->reg.y+9,(b)->reg.x+6,(b)->reg.y+13);\
     zxDrawLine(win,(b)->reg.x+6,(b)->reg.y+11,(b)->reg.x+13,(b)->reg.y+4);\
@@ -558,7 +565,7 @@ typedef struct{
 
 #define zxwProgressBarDraw(win,b) do{\
   zxwBoxDrawLower( win, &(b)->reg, zxw_front_color, 1 );\
-  zxSetColorMap( (win), zxGetColor(win,"darkblue") );\
+  zxWindowSetColor( (win), zxGetColor(win,"darkblue") );\
   zxDrawRegionFillRect( (win), &(b)->fillreg );\
 } while(0)
 
@@ -602,7 +609,7 @@ typedef struct{
   zxwBoxDraw( win, g, zxw_back_color );\
   if( (g)->div != 0 ){ /* draw discrete gauge */\
     register short __zxw_gauge_i, __zxw_gauge_x;\
-    zxSetColorMap( (win), zxw_gauge_g_color );\
+    zxWindowSetColor( (win), zxw_gauge_g_color );\
     for( __zxw_gauge_i=0; __zxw_gauge_i<=(g)->div; __zxw_gauge_i++ ){\
       __zxw_gauge_x = zxwGaugeXMin(g) + (g)->nob.width/2 + (g)->x_range * __zxw_gauge_i / (g)->div;\
       zxDrawLine( win, __zxw_gauge_x, (g)->reg.y, __zxw_gauge_x, (g)->guide.y - 1 );\
@@ -808,53 +815,63 @@ bool zxwScrollRegionCreateVert(zxWindow *win, zxwScrollRegion *sr, short x, shor
 /* item group class
  * ********************************************************** */
 
-#define ZXW_ITEM_CLASS(type) type *item; int num; int active, prev_active, selected
+#define ZXW_ITEM_CLASS(type) \
+  type *item;           /* array of items */\
+  int item_num;         /* number of items */\
+  int item_active;      /* identifier of active item */\
+  int item_prev_active; /* identifier of previously active item */\
+  int item_selected     /* identifier of selected item */
 
 #define ZXW_ITEM_NONE (-1)
 
-#define zxwIsActive(w)     ( (w)->active != ZXW_ITEM_NONE )
-#define zxwPrevIsActive(w) ( (w)->prev_active != ZXW_ITEM_NONE )
-#define zxwUnactivate(w)   ( (w)->active = ZXW_ITEM_NONE )
-#define zxwBackupActive(w) ( (w)->prev_active = (w)->active )
+#define zxwIsActive(w)     ( (w)->item_active != ZXW_ITEM_NONE )
+#define zxwPrevIsActive(w) ( (w)->item_prev_active != ZXW_ITEM_NONE )
+#define zxwUnactivate(w)   ( (w)->item_active = ZXW_ITEM_NONE )
+#define zxwBackupActive(w) ( (w)->item_prev_active = (w)->item_active )
 
-#define zxwSelect(w)       ( (w)->selected = (w)->active )
-#define zxwUnselect(w)     ( (w)->selected = ZXW_ITEM_NONE )
+#define zxwSelect(w)       ( (w)->item_selected = (w)->item_active )
+#define zxwUnselect(w)     ( (w)->item_selected = ZXW_ITEM_NONE )
 
 #define zxwItemInit(w) do{\
   (w)->item = NULL;\
-  (w)->num = 0;\
-  zxwUnactivate(w);\
-  zxwBackupActive(w);\
-  zxwUnselect(w);\
+  (w)->item_num = 0;\
+  zxwUnactivate( w );\
+  zxwBackupActive( w );\
+  zxwUnselect( w );\
 } while(0)
 #define zxwItemDestroy(w) do{\
   zFree( (w)->item );\
   zxwItemInit( w );\
 } while(0)
 
-#define zxwItem(w,i)         ( &(w)->item[(i)] )
-#define zxwItemActive(w)     zxwItem(w,(w)->active)
-#define zxwItemPrevActive(w) zxwItem(w,(w)->prev_active)
-#define zxwItemSelect(w,i)   ( (w)->selected = (i) )
-#define zxwItemSelected(w)   zxwItem(w,(w)->selected)
 
-#define zxwItemIsDisable(w,i) ((i)!=ZXW_ITEM_NONE && !zxwItem(w,i)->enable)
-#define zxwItemActiveIsDisable(w) zxwItemIsDisable( w, (w)->active )
+#define zxwItem(w,i)           ( &(w)->item[(i)] )
+#define zxwItemNum(w)          ( (w)->item_num )
+#define zxwItemActivate(w,i)   ( (w)->item_active = (i) )
+#define zxwItemActive(w)       zxwItem(w,(w)->item_active)
+#define zxwItemPrevActive(w)   zxwItem(w,(w)->item_prev_active)
+#define zxwItemActivateNext(w) ( (w)->item_active += (w)->item_active < (w)->item_num ? 1 : 0 )
+#define zxwItemSelect(w,i)     ( (w)->item_selected = (i) )
+#define zxwItemSelected(w)     zxwItem(w,(w)->item_selected)
 
-#define zxwItemNumInc(w) ( (w)->num++ )
-#define zxwItemNumDec(w) ( (w)->num-- )
+#define zxwItemIsDisable(w,i) ( (i) != ZXW_ITEM_NONE && !zxwItem(w,i)->enable )
+#define zxwItemActiveIsDisable(w) zxwItemIsDisable( w, (w)->item_active )
+#define zxwItemActiveIsChanged(w) ( (w)->item_active != (w)->item_prev_active )
+
+#define zxwItemNumInc(w) ( (w)->item_num++ )
+#define zxwItemNumDec(w) ( (w)->item_num-- )
 #define zxwItemNext(w) do{\
-  zxwBackupActive(w);\
+  zxwBackupActive( w );\
   do{\
-    if( ++(w)->active == (w)->num ) zxwUnactivate(w);\
-  } while( zxwItemActiveIsDisable( (w) ) );\
+    if( ++(w)->item_active == (w)->item_num ) zxwUnactivate( w );\
+  } while( zxwItemActiveIsDisable( w ) );\
 } while(0)
 #define zxwItemPrev(w) do{\
   do{\
-    zxwBackupActive(w);\
-    if( (w)->active == ZXW_ITEM_NONE ) (w)->active = (w)->num - 1;\
-    else (w)->active--;\
-  } while( zxwItemActiveIsDisable( (w) ) );\
+    zxwBackupActive( w );\
+    if( (w)->item_active == ZXW_ITEM_NONE ) (w)->item_active = (w)->item_num - 1;\
+    else (w)->item_active--;\
+  } while( zxwItemActiveIsDisable( w ) );\
 } while(0)
 
 #define zxwItemPoint(w,x,y) do{\
@@ -862,16 +879,16 @@ bool zxwScrollRegionCreateVert(zxWindow *win, zxwScrollRegion *sr, short x, shor
   zxwBackupActive(w);\
   zxwUnactivate(w);\
   if( zxRegionIsIn( &(w)->reg, (x), (y) ) )\
-    for( __i=0; __i<(w)->num; __i++ )\
+    for( __i=0; __i<(w)->item_num; __i++ )\
       if( zxRegionIsIn( &zxwItem(w,__i)->reg, (x), (y) ) )\
-        (w)->active = __i;\
+        (w)->item_active = __i;\
 } while(0)
 
 #define zxwItemMousePoint(win,w) zxwItemPoint(w,zxMouseX,zxMouseY)
 
 #define zxwItemMouseOP(win,w,b,op) do{\
   zxwItemMousePoint( win, w );\
-  *(b) = zxwIsActive(w);\
+  *(b) = zxwIsActive( w );\
   op;\
 } while(0)
 
@@ -910,9 +927,9 @@ typedef struct{
   zxWindowCreate( &(p)->w, 0, 0, ZXWPOPUPITEM_W+ZXW_EMBOSS_H*2, ZXWPOPUPITEM_H+ZXW_EMBOSS_H*2 );\
   zxwPopupRegSync( p );\
   zxWindowSetBorderWidth( &(p)->w, 0 );\
-  zxOverrideRedirect( &(p)->w );\
-  zxSetFGColor( &(p)->w, zxw_front_color );\
-  zxSetBGColor( &(p)->w, zxw_back_color );\
+  zxWindowOverrideRedirectEnable( &(p)->w );\
+  zxWindowSetColor( &(p)->w, zxw_front_color );\
+  zxWindowSetBGColor( &(p)->w, zxw_back_color );\
   zxwItemInit( p );\
 } while(0)
 
@@ -934,7 +951,7 @@ void zxwPopupDraw(zxwPopup *popup);
     zxwCallback( zxwItemActive(p) );\
   } while(0)
 #define zxwPopupDrawMove(p) \
-  if( (p)->active != (p)->prev_active ){\
+  if( zxwItemActiveIsChanged( p ) ){\
     if( zxwPrevIsActive(p) ){\
       if( zxwItemPrevActive(p)->pressed )\
         zxwRelease( zxwItemPrevActive(p) );\
@@ -952,10 +969,12 @@ void zxwPopupDraw(zxwPopup *popup);
 void zxwPopupOpen(zxwPopup *popup, short x, short y);
 #define zxwPopupClose(p) do{\
   zxWindowClose( &(p)->w );\
-  zxWindowDestroy( &(p)->w );\
   zxFlush();\
 } while(0)
-#define zxwPopupDestroy(p) zxwItemDestroy( p )
+#define zxwPopupDestroy(p) do{\
+  zxwItemDestroy( p );\
+  zxWindowDestroy( &(p)->w );\
+} while(0)
 
 /* ********************************************************** */
 /* CLASS: zxwMenu
@@ -1008,7 +1027,7 @@ void zxwMenuDraw(zxWindow *win, zxwMenu *menu);
     zxFlush();\
   } while(0)
 #define zxwMenuDrawMove(win,m) \
-  if( (m)->active != (m)->prev_active ){\
+  if( zxwItemActiveIsChanged( m ) ){\
     if( zxwPrevIsActive(m) ){\
       if( zxwItemPrevActive(m)->pressed )\
         zxwRelease( zxwItemPrevActive(m) );\
@@ -1065,11 +1084,11 @@ int zxwPixButtonGroupAdd(zxwPixButtonGroup *pbg, int row, int col);
 
 #define zxwPixButtonGroupAddFile(win,p,r,c,n,f) do{\
   if( zxwPixButtonGroupAdd( p, r, c ) == 0 )\
-    zxwPixButtonReadFile( win, zxwItem(p,(p)->num-1), (p)->reg.x+(p)->btn_w*(c), (p)->reg.y+(p)->btn_h*(r), (p)->btn_w, (p)->btn_h, (n), (f) );\
+    zxwPixButtonReadFile( win, zxwItem(p,(p)->item_num-1), (p)->reg.x+(p)->btn_w*(c), (p)->reg.y+(p)->btn_h*(r), (p)->btn_w, (p)->btn_h, (n), (f) );\
 } while(0)
 #define zxwPixButtonGroupAddData(win,p,r,c,d,f) do{\
   if( zxwPixButtonGroupAdd( p, r, c ) == 0 )\
-    zxwPixButtonReadData( win, zxwItem(p,(p)->num-1), (p)->reg.x+(p)->btn_w*(c), (p)->reg.y+(p)->btn_h*(r), (p)->btn_w, (p)->btn_h, (d), (f) );\
+    zxwPixButtonReadData( win, zxwItem(p,(p)->item_num-1), (p)->reg.x+(p)->btn_w*(c), (p)->reg.y+(p)->btn_h*(r), (p)->btn_w, (p)->btn_h, (d), (f) );\
 } while(0)
 
 void zxwPixButtonGroupDraw(zxWindow *win, zxwPixButtonGroup *pbg);
@@ -1089,7 +1108,8 @@ void zxwPixButtonGroupDraw(zxWindow *win, zxwPixButtonGroup *pbg);
   }
 #define zxwPixButtonGroupDrawTogglePress(win,p) \
   if( zxwIsActive(p) ){\
-    if( zxwGroupIsExclusive(p) && (p)->selected != ZXW_ITEM_NONE && (p)->selected != (p)->active ){\
+    if( zxwGroupIsExclusive(p) && (p)->item_selected != ZXW_ITEM_NONE &&\
+        (p)->item_selected != (p)->item_active ){\
       zxwPixButtonDrawRaise( win, zxwItemSelected(p) );\
       zxwToggleOff( zxwItemSelected(p) );\
       zxwRelease( zxwItemSelected(p) );\
@@ -1119,7 +1139,7 @@ void zxwPixButtonGroupDraw(zxWindow *win, zxwPixButtonGroup *pbg);
   }
 #define zxwPixButtonGroupDrawSelective(win,p) \
   if( zxwIsActive(p) ){\
-    if( (p)->selected != ZXW_ITEM_NONE ){\
+    if( (p)->item_selected != ZXW_ITEM_NONE ){\
       zxwRelease( zxwItemSelected(p) );\
       zxwPixButtonDrawRaise( win, zxwItemSelected(p) );\
     }\
@@ -1131,7 +1151,8 @@ void zxwPixButtonGroupDraw(zxWindow *win, zxwPixButtonGroup *pbg);
     zxwRelease( zxwItemActive(p) );\
   }
 #define zxwPixButtonGroupDrawMove(win,p) \
-  if( (p)->prev_active != (p)->active && zxwPrevIsActive(p) && zxwItemPrevActive(p)->pressed ){\
+  if( (p)->item_prev_active != (p)->item_active &&\
+      zxwPrevIsActive(p) && zxwItemPrevActive(p)->pressed ){\
     zxwPixButtonDrawRaise( win, zxwItemPrevActive(p) );\
     zxwRelease( zxwItemPrevActive(p) );\
     zxFlush();\
@@ -1176,7 +1197,7 @@ typedef struct{
 int zxwRadioButtonGroupAdd(zxwRadioButtonGroup *rbg, int x, int y);
 
 #define zxwRadioButtonGroupActivate(r,i) do{\
-  (r)->active = i;\
+  (r)->item_active = i;\
   zxwSelect( r );\
   if( zxwPrevIsActive(r) )\
     zxwRelease( zxwItemPrevActive(r) );\
@@ -1187,11 +1208,11 @@ void zxwRadioButtonGroupDraw(zxWindow *win, zxwRadioButtonGroup *rbg);
 
 #define zxwRadioButtonGroupDrawPress(win,r) do{\
   if( zxwIsActive(r) ){\
-    if( !zxwGroupIsToggle(r) && (r)->active == (r)->selected ){\
+    if( !zxwGroupIsToggle(r) && (r)->item_active == (r)->item_selected ){\
       zxwUnselect( r );\
       zxwRelease( zxwItemActive(r) );\
     } else{\
-      if( (r)->selected != ZXW_ITEM_NONE ){\
+      if( (r)->item_selected != ZXW_ITEM_NONE ){\
         zxwRelease( zxwItemSelected(r) );\
         zxwRadioButtonDraw( win, zxwItemSelected(r) );\
       }\
@@ -1220,12 +1241,12 @@ typedef struct{
 #define ZXW_TAB_H  16
 
 #define zxwTabDraw(w,t) do{\
-  zxSetColorMap( w, zxw_back_color );\
+  zxWindowSetColor( w, zxw_back_color );\
   zxDrawRegionFillRect( w, &(t)->reg );\
-  zxSetColorMap( w, zxw_hilit_color );\
+  zxWindowSetColor( w, zxw_hilit_color );\
   zxDrawLine( w, (t)->reg.x, (t)->reg.y+(t)->reg.height-1, (t)->reg.x+ZXW_TAB_DW, (t)->reg.y );\
   zxDrawLine( w, (t)->reg.x+ZXW_TAB_DW, (t)->reg.y, (t)->reg.x+(t)->reg.width-ZXW_TAB_DW, (t)->reg.y );\
-  zxSetColorMap( w, zxw_shade_color );\
+  zxWindowSetColor( w, zxw_shade_color );\
   zxDrawLine( w, (t)->reg.x+(t)->reg.width-ZXW_TAB_DW, (t)->reg.y, (t)->reg.x+(t)->reg.width, (t)->reg.y+(t)->reg.height-1 );\
   zxwButtonDrawLabel(w,t);\
 } while(0)
@@ -1249,7 +1270,7 @@ typedef struct{
   zxwBoxSetRegion( t, x, y, w, ZXW_TAB_H );\
   zxwGroupResetMode(t);\
   zxwItemInit( t );\
-  (t)->active = 0;\
+  (t)->item_active = 0;\
 } while(0)
 int zxwTabGroupAdd(zxwTabGroup *tg, char *label, void *(* f)(void));
 void zxwTabGroupDestroy(zxwTabGroup *tg);
@@ -1260,7 +1281,7 @@ void zxwTabGroupDraw(zxWindow *win, zxwTabGroup *tg);
   if( zxwItemActive(t) ){\
     zxwSelect( t );\
     zxwTabDrawSelected( w, zxwItemSelected(t) );\
-    zxSetColorMap( w, zxw_hilit_color );\
+    zxWindowSetColor( w, zxw_hilit_color );\
     zxDrawLine( w, (t)->reg.x, (t)->reg.y+(t)->reg.height-1, zxwItemSelected(t)->reg.x, (t)->reg.y+(t)->reg.height-1 );\
     zxDrawLine( w, zxwItemSelected(t)->reg.x+zxwItemSelected(t)->reg.width, (t)->reg.y+(t)->reg.height-1, (t)->reg.x+(t)->reg.width, (t)->reg.y+(t)->reg.height-1 );\
   }\
@@ -1268,7 +1289,7 @@ void zxwTabGroupDraw(zxWindow *win, zxwTabGroup *tg);
 
 #define zxwTabGroupDrawPress(win,t) \
   if( zxwIsActive(t) ){\
-    if( (t)->selected != ZXW_ITEM_NONE )\
+    if( (t)->item_selected != ZXW_ITEM_NONE )\
       zxwTabDrawUnselected( win, zxwItemSelected(t) );\
     zxwSelect( t );\
     zxwPress( zxwItemActive(t) );\

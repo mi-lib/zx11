@@ -12,59 +12,46 @@
 #include <ctype.h>
 #include <zx11/zxutil.h>
 
-/* OBJECT: zxdisplay
- * display handler
- */
+/* display handler */
 Display *zxdisplay;
 
-/* OBJECT: zxrootwindow
- * default root window
- */
+/* default root window */
 Window zxrootwindow;
 
-/* OBJECT: zxscreen
- * default screen
- */
+/* default screen */
 Screen *zxscreen;
 
-/* OBJECT: zxcmap
- * default colormap
- */
+/* default colormap */
 Colormap zxcmap;
 
-/* OBJECT: zxvisual
- * default visual type
- */
+/* default visual type */
 Visual *zxvisual;
 
-/* OBJECT: zxdepth
- * default color depth
- */
+/* default color depth */
 int zxdepth;
 
-/* OBJECT: zxevent
- * event capturer
- */
+/* event capturer */
 XEvent zxevent;
 
 /* ********************************************************** */
-/* CLASS: zxRegion
- * redefinition of XRectangle
+/* alias of XRectangle
  * ********************************************************** */
 
+/* check if a point is in a region. */
 bool zxRegionIsIn(zxRegion *reg, short x, short y)
 {
   return ( x >= reg->x && x < reg->x + reg->width &&
            y >= reg->y && y < reg->y + reg->height ) ? true : false;
 }
 
+/* make a string that represents a specified region. */
 void zxRegionToStr(zxRegion *reg, char *str)
 {
   sprintf( str, "(%dx%d)+%d+%d", reg->width, reg->height, reg->x, reg->y );
 }
 
 /* for debug */
-void zxRegionWrite(zxRegion *reg)
+void zxRegionPrint(zxRegion *reg)
 {
   char buf[BUFSIZ];
 
@@ -82,9 +69,7 @@ static Atom zx_wm_delete_window;
 
 /* basic methods */
 
-/* METHOD: void zxInit(void)
- * initialize X11 system - get information of display & rootwindow
- */
+/* initialize X11 system and get information of display and the root window */
 void zxInit(void)
 {
   zxdisplay = XOpenDisplay( NULL );
@@ -94,14 +79,15 @@ void zxInit(void)
   }
   zxrootwindow = DefaultRootWindow( zxdisplay );
   zxscreen     = DefaultScreenOfDisplay( zxdisplay );
-  zxcmap       = DefaultColormap( zxdisplay, Z_DEFAULT_SCREEN );
-  zxvisual     = DefaultVisual( zxdisplay, Z_DEFAULT_SCREEN );
-  zxdepth      = DefaultDepth( zxdisplay, Z_DEFAULT_SCREEN );
+  zxcmap       = DefaultColormap( zxdisplay, 0 );
+  zxvisual     = DefaultVisual( zxdisplay, 0 );
+  zxdepth      = DefaultDepth( zxdisplay, 0 );
 
   zx_wm_protocols = XInternAtom( zxdisplay, "WM_PROTOCOLS", False );
   zx_wm_delete_window = XInternAtom( zxdisplay, "WM_DELETE_WINDOW", False );
 }
 
+/* set default window attributes */
 void zxDefaultSetWindowAttributes(XSetWindowAttributes *attr)
 {
   attr->background_pixmap = None;
@@ -121,19 +107,18 @@ void zxDefaultSetWindowAttributes(XSetWindowAttributes *attr)
   attr->cursor = None;
 }
 
-static void _zxWindowCreate(zxWindow *win, Window parent, int x, int y, int w, int h, int border);
-static void _zxWindowCreateDefaultGC(zxWindow *win);
-
-void _zxWindowCreateDefaultGC(zxWindow *win)
+/* create default graphics context */
+static void _zxWindowCreateDefaultGC(zxWindow *win)
 {
-  zxDefaultGC(win) = XCreateGC( zxdisplay, zxWindowBody(win), 0, &win->gv );
-  zxSetDefaultGC( win );
-  zxSetCanvas( win, zxWindowBody(win) );
-  zxSetBGColor( win, BlackPixel( zxdisplay, 0 ) );
-  zxSetFGColor( win, WhitePixel( zxdisplay, 0 ) );
+  zxWindowDefaultGC(win) = XCreateGC( zxdisplay, zxWindowBody(win), 0, &win->gv );
+  zxWindowSetDefaultGC( win );
+  zxWindowSetCanvas( win, zxWindowBody(win) );
+  win->bgcolor = BlackPixel( zxdisplay, 0 );
+  zxWindowSetColor( win, WhitePixel( zxdisplay, 0 ) );
 }
 
-void _zxWindowCreate(zxWindow *win, Window parent, int x, int y, int w, int h, int border)
+/* create a window */
+static void _zxWindowCreate(zxWindow *win, Window parent, int x, int y, int w, int h, int border)
 {
   zxWindowSetParent( win, parent );
   zxDefaultSetWindowAttributes( &win->attr );
@@ -145,56 +130,64 @@ void _zxWindowCreate(zxWindow *win, Window parent, int x, int y, int w, int h, i
   _zxWindowCreateDefaultGC( win );
   XSetWMProtocols( zxdisplay, zxWindowBody(win), &zx_wm_delete_window, 1 );
   zxWindowClear( win );
+  win->ic = NULL; /* input context operations defined in zxinput. */
 }
 
-/* METHOD: void zxWindowCreate(zxWindow *win, int x, int y, int w, int h)
- * create simple X-window.
- */
+/* create a primary window */
 void zxWindowCreate(zxWindow *win, int x, int y, int w, int h)
 {
   _zxWindowCreate( win, zxrootwindow, x, y, w, h, 2 );
 }
 
+/* create a child window of another */
 void zxWindowCreateChild(zxWindow *win, zxWindow *parent, int x, int y, int w, int h)
 {
   _zxWindowCreate( win, zxWindowBody(parent), x, y, w, h, 0 );
+  win->attr.background_pixmap = ParentRelative;
+  XChangeWindowAttributes( zxdisplay, zxWindowBody(win), CWBackingPixel, &win->attr );
+  XSetWindowBackgroundPixmap( zxdisplay, zxWindowBody(win), CopyFromParent );
+  XClearWindow( zxdisplay, zxWindowBody(win) );
+  zxWindowSetBGColor( win, parent->bgcolor );
 }
 
-/* METHOD: zxWindowCreateRoot
- * create X-window as a root window.
- */
+/* create a full-size window as a fake root */
 void zxWindowCreateRoot(zxWindow *win)
 {
   zxWindowSetParent( win, zxrootwindow );
   zxWindowSetBody( win, zxrootwindow );
   zxWindowSetGeometry( win, 0, 0, zxScreenWidth(), zxScreenHeight() );
   _zxWindowCreateDefaultGC( win );
-  zxSetEventMask( win, ExposureMask );
+  zxWindowAddEvent( win, ExposureMask );
   XMapWindow( zxdisplay, zxWindowBody(win) );
 }
 
+/* destroy a window and an associated graphics context */
 void zxWindowDestroy(zxWindow *win)
 {
   zxWindowClose( win );
-  XFreeGC( zxdisplay, zxDefaultGC(win) );
+  XFreeGC( zxdisplay, zxWindowDefaultGC(win) );
   XDestroyWindow( zxdisplay, zxWindowBody(win) );
 }
 
-/* METHOD: void zxWindowClear(zxWindow *win)
- * clear window with background color.
- */
+/* clear window with background color */
 void zxWindowClear(zxWindow *win)
 {
-  XSetWindowBackground( zxdisplay, zxWindowBody(win), zxBGColor(win) );
-  XClearWindow( zxdisplay, zxWindowBody(win) );
+  ulong fgcolor;
+
+  fgcolor = win->fgcolor;
+  zxWindowSetColor( win, win->bgcolor );
+  zxDrawFillRect( win, 0, 0, zxWindowWidth(win), zxWindowHeight(win) );
+  zxWindowSetColor( win, fgcolor );
   zxFlush();
 }
 
+/* clear specified area of a window */
 void zxWindowClearArea(zxWindow *win, int x, int y, int w, int h)
 {
   XClearArea( zxdisplay, zxWindowBody(win), x, y, w, h, False );
 }
 
+/* fill a window with a specified pixmap pattern */
 void zxWindowFill(zxWindow *win, Pixmap pattern)
 {
   zxWindowClose( win );
@@ -202,52 +195,44 @@ void zxWindowFill(zxWindow *win, Pixmap pattern)
   zxWindowOpen( win );
 }
 
+/* update geometry information of a window */
 bool zxWindowUpdateRegion(zxWindow *win)
 {
   return zxGetGeometry( zxWindowBody(win), zxWindowRegion(win) );
 }
 
-/* METHOD: zxBackingStoreOn
- * void zxBackingStoreOn(zxWindow *win)
- */
-void zxBackingStoreOn(zxWindow *win)
+/* enable backing-store */
+void zxWindowBackingStoreEnable(zxWindow *win)
 {
   win->attr.backing_store = Always;
-  XChangeWindowAttributes( zxdisplay,
-    zxWindowBody(win), CWBackingStore, &win->attr );
+  XChangeWindowAttributes( zxdisplay, zxWindowBody(win), CWBackingStore, &win->attr );
 }
 
-/* METHOD: zxBackingStoreOff
- * void zxBackingStoreOff(zxWindow *win)
- */
-void zxBackingStoreOff(zxWindow *win)
+/* disable backing-store */
+void zxWindowBackingStoreDisable(zxWindow *win)
 {
   win->attr.backing_store = NotUseful;
-  XChangeWindowAttributes( zxdisplay,
-    zxWindowBody(win), CWBackingStore, &win->attr );
+  XChangeWindowAttributes( zxdisplay, zxWindowBody(win), CWBackingStore, &win->attr );
 }
 
-/* METHOD: void zxOverrideRedirect(zxWindow *win)
- * override redirection to avoid the interrupt from window manager.
- */
-void zxOverrideRedirect(zxWindow *win)
+/* enable override redirection to avoid the interrupt from window manager */
+void zxWindowOverrideRedirectEnable(zxWindow *win)
 {
   win->attr.override_redirect = True;
-  XChangeWindowAttributes( zxdisplay,
-    zxWindowBody(win), CWOverrideRedirect, &win->attr );
+  XChangeWindowAttributes( zxdisplay, zxWindowBody(win), CWOverrideRedirect, &win->attr );
 }
 
-/* zxDeleteWindowEvent
- * - receive the delete-window event.
- */
-bool zxDeleteWindowEvent(void)
+/* receive the event to delete a window */
+bool zxWindowIsReceivedDeleteMsg(zxWindow *win)
 {
   return zxevent.xclient.message_type == zx_wm_protocols &&
-    (Atom)zxevent.xclient.data.l[0] == zx_wm_delete_window ? true : false;
+    (Atom)zxevent.xclient.data.l[0] == zx_wm_delete_window &&
+    zxevent.xclient.window == zxWindowBody(win) ? true : false;
 }
 
 /* pixmaps */
 
+/* clone a pixmap */
 Pixmap zxPixmapClone(zxWindow *win, Pixmap src, int x, int y, int width, int height)
 {
   Pixmap dest;
@@ -257,6 +242,7 @@ Pixmap zxPixmapClone(zxWindow *win, Pixmap src, int x, int y, int width, int hei
   return dest;
 }
 
+/* get size of a pixmap */
 bool zxPixmapGetSize(Drawable drw, int *width, int *height)
 {
   uint x, y, border, depth;
@@ -268,31 +254,30 @@ bool zxPixmapGetSize(Drawable drw, int *width, int *height)
 
 /* double bufferring */
 
-void zxDoubleBufferEnable(zxWindow *win)
+/* enable double buffering */
+void zxWindowDoubleBufferEnable(zxWindow *win)
 {
   win->db = zxPixmapCreate( win, zxWindowWidth(win), zxWindowHeight(win) );
-  zxSetCanvas( win, win->db );
+  zxWindowSetCanvas( win, win->db );
 }
 
-void zxDoubleBufferDisable(zxWindow *win)
+/* disable double buffering */
+void zxWindowDoubleBufferDisable(zxWindow *win)
 {
-  zxSetCanvas( win, zxWindowBody(win) );
+  zxWindowSetCanvas( win, zxWindowBody(win) );
   zxPixmapDestroy( win->db );
 }
 
 /* color operation methods */
 
-void zxColormapCreate(zxWindow *win)
+/* create a color map */
+void zxWindowColorMapCreate(zxWindow *win)
 {
-  win->attr.colormap = XCreateColormap( zxdisplay,
-    zxWindowParent(win), zxvisual, AllocNone);
-  XChangeWindowAttributes( zxdisplay,
-    zxWindowBody(win), CWColormap, &win->attr );
+  win->attr.colormap = XCreateColormap( zxdisplay, zxWindowParent(win), zxvisual, AllocNone);
+  XChangeWindowAttributes( zxdisplay, zxWindowBody(win), CWColormap, &win->attr );
 }
 
-/* METHOD: ulong zxGetColor(char color[])
- * get color with a name 'color'.
- */
+/* get color by a name. */
 ulong zxGetColor(zxWindow *win, char color[])
 {
   XColor c0, c1;
@@ -301,10 +286,8 @@ ulong zxGetColor(zxWindow *win, char color[])
   return c1.pixel;
 }
 
-/* METHOD: ulong zxGetRGBColor(uword red, uword green, uword blue)
- * get color with RGB parameter.
- */
-ulong zxGetRGBColor(zxWindow *win, uword red, uword green, uword blue)
+/* get color by RGB parameters. */
+ulong zxGetColorFromRGB(zxWindow *win, uword red, uword green, uword blue)
 {
   XColor c;
 
@@ -318,31 +301,35 @@ ulong zxGetRGBColor(zxWindow *win, uword red, uword green, uword blue)
 
 /* event operation methods */
 
-/* zxNextEvent
- */
+void zxWindowAddEvent(zxWindow *win, long event)
+{
+  XWindowAttributes attr;
+
+  XGetWindowAttributes( zxdisplay, zxWindowBody(win), &attr );
+  XSelectInput( zxdisplay, zxWindowBody(win), attr.all_event_masks | attr.your_event_mask | event );
+}
+
+/* get next event */
 int zxNextEvent(void)
 {
   XNextEvent( zxdisplay, &zxevent );
   return zxevent.type;
 }
 
-/* METHOD: zxGetEvent
- */
+/* get a pended event */
 int zxGetEvent(void)
 {
   return XPending( zxdisplay ) > 0 ? zxNextEvent() : None;
 }
 
-/* METHOD: zxDequeueEvent
- */
+/* dequeue an event */
 int zxDequeueEvent(void)
 {
   return XEventsQueued( zxdisplay, QueuedAfterReading ) > 0 ?
     zxNextEvent() : None;
 }
 
-/* METHOD: zxCheckEvent
- */
+/* check if an event occured */
 bool zxCheckEvent(int type)
 {
   return zxGetEvent() == type ? true : false;
@@ -350,8 +337,7 @@ bool zxCheckEvent(int type)
 
 /* stacked window manipulation */
 
-/* zxGetInputFocus
- */
+/* get the input focus */
 Window zxGetInputFocus(void)
 {
   Window focused;
@@ -361,17 +347,14 @@ Window zxGetInputFocus(void)
   return focused;
 }
 
-/* zxGetGeometry
- */
+/* get geometry of a drawable */
 bool zxGetGeometry(Drawable drw, zxRegion *reg)
 {
   uint x, y, w, h, border, depth;
   Window rootwin, child;
 
-  if( XGetGeometry( zxdisplay, drw, &rootwin,
-        (int *)&x, (int *)&y, &w, &h, &border, &depth ) ){
-    XTranslateCoordinates( zxdisplay, drw, rootwin,
-      0, 0, (int *)&x, (int *)&y, &child );
+  if( XGetGeometry( zxdisplay, drw, &rootwin, (int *)&x, (int *)&y, &w, &h, &border, &depth ) ){
+    XTranslateCoordinates( zxdisplay, drw, rootwin, 0, 0, (int *)&x, (int *)&y, &child );
     zxRegionSet( reg, x, y, w, h );
     return true;
   }
@@ -380,59 +363,45 @@ bool zxGetGeometry(Drawable drw, zxRegion *reg)
 
 /* drawing methods */
 
-/* METHOD: void zxSetLineWidth(zxWindow *win, int width)
- * set line-width.
- */
+/* set line-width. */
 void zxSetLineWidth(zxWindow *win, int width)
 {
   win->gv.line_width = width;
-  XChangeGC( zxdisplay, zxGC(win), GCLineWidth, &win->gv );
+  XChangeGC( zxdisplay, zxWindowGC(win), GCLineWidth, &win->gv );
 }
 
-/* METHOD: void zxSetLineStyle(zxWindow *win, int style)
- * set line-style.
- */
+/* set line-style. */
 void zxSetLineStyle(zxWindow *win, int style)
 {
   win->gv.line_style = style;
-  XChangeGC( zxdisplay, zxGC(win), GCLineStyle, &win->gv );
+  XChangeGC( zxdisplay, zxWindowGC(win), GCLineStyle, &win->gv );
 }
 
-/* METHOD: void zxSetLineCap(zxWindow *win, int cap)
- * set line-cap.
- */
+/* set line-cap. */
 void zxSetLineCap(zxWindow *win, int cap)
 {
   win->gv.cap_style = cap;
-  XChangeGC( zxdisplay, zxGC(win), GCCapStyle, &win->gv );
+  XChangeGC( zxdisplay, zxWindowGC(win), GCCapStyle, &win->gv );
 }
 
-/* METHOD: void zxSetLineJoin(zxWindow *win, int join)
- * set line-join.
- */
+/* set line-join. */
 void zxSetLineJoin(zxWindow *win, int join)
 {
   win->gv.join_style = join;
-  XChangeGC( zxdisplay, zxGC(win), GCJoinStyle, &win->gv );
+  XChangeGC( zxdisplay, zxWindowGC(win), GCJoinStyle, &win->gv );
 }
 
+/* draw a polygon filled with a pixmap patter */
 void zxPixmapPolygon(zxWindow *win, Pixmap canvas, XPoint *points, int n, Pixmap pattern)
 {
-  XSetFillStyle( zxdisplay, zxGC(win), FillTiled );
-  XSetTile( zxdisplay, zxGC(win), pattern );
+  XSetFillStyle( zxdisplay, zxWindowGC(win), FillTiled );
+  XSetTile( zxdisplay, zxWindowGC(win), pattern );
   zxSetFillRule( win, EvenOddRule );
   zxFillPolygonComplex( win, canvas, points, n );
 }
 
-void zxClear(zxWindow *win)
-{
-  zxSetColorMap( win, zxBGColor(win) );
-  zxDrawFillRect( win, 0, 0, zxWindowWidth(win), zxWindowHeight(win) );
-  zxSetColorMap( win, zxFGColor(win) );
-}
-
-/* METHOD: void zxPutBuffer(zxWindow *win, int x, int y, int w, int h, ulong *buf)
- * put pixel buffer 'buf' on the X contents 'win'.
+#if 0
+/* put pixel buffer 'buf' on the X contents 'win'.
  * 'x' and 'y' is the point of origin on the window.
  * 'w' is a width of 'buf'.
  * 'h' is a height of 'buf'.
@@ -444,54 +413,48 @@ void zxPutBuffer(zxWindow *win, int x, int y, int w, int h, ulong *buf)
   for( i=0; i<h; i++ ){
     k = i * w;
     for( j=0; j<w; j++ ){
-      zxSetColorMap( win, buf[k+j] );
+      zxWindowSetColor( win, buf[k+j] );
       zxDrawPoint( win, x+j, y+i );
     }
   }
 }
+#endif
 
 /* command line option utility */
 
-int zxParseGeometry(char *str, zxRegion *reg)
+bool zxParseGeometry(char *str, zxRegion *reg)
 {
   char op[] = { 'x', '+', '+' };
-  int ret;
 
+  zxRegionSet( reg, 0, 0, 0, 0 );
   if( isdigit( str[0] ) ){
-    ret = sscanf( str, "%hd%c%hd%c%hd%c%hd",
-      &reg->width, &op[0], &reg->height,
-      &op[1], &reg->x, &op[2], &reg->y );
-    switch( ret ){
-    case 1:
-      reg->height = 0;
-    case 3:
-      if( op[0] != 'x' ) goto ERROR;
-      reg->x = ZX_GEOMETRY_NONE;
-    case 5:
-      reg->y = ZX_GEOMETRY_NONE; break;
-    case 2: case 4: case 6:
-      goto ERROR;
+    switch( sscanf( str, "%hd%c%hd%c%hd%c%hd",
+      &reg->width, &op[0], &reg->height, &op[1], &reg->x, &op[2], &reg->y ) ){
+    case 2: case 3: if( op[0] != 'x' ) goto ERROR; break;
+    case 1: case 4: case 6: goto ERROR;
     default: ;
     }
   } else{
-    reg->width = reg->height = 0;
-    ret = sscanf( str, "%c%hd%c%hd", &op[1], &reg->x, &op[2], &reg->y );
-    switch( ret ){
-    case 2: reg->y = ZX_GEOMETRY_NONE; break;
-    case 1: case 3:
-      goto ERROR;
-    default: ;
+    if( str[0] == 'x' ){
+      switch( sscanf( str, "%c%hd%c%hd%c%hd",
+        &op[0], &reg->height, &op[1], &reg->x, &op[2], &reg->y ) ){
+      case 1: case 3: case 5: goto ERROR;
+      default: ;
+      }
+    } else{
+      switch( sscanf( str, "%c%hd%c%hd", &op[1], &reg->x, &op[2], &reg->y ) ){
+      case 1: case 3: goto ERROR;
+      default: ;
+      }
     }
   }
-  if( op[1] == '-' ) reg->x = zxScreenWidth() - reg->x;
+  if( op[1] == '-' ) reg->x = -reg->x;
   else if( op[1] != '+' ) goto ERROR;
-  if( op[2] == '-' ) reg->y = zxScreenHeight() - reg->y;
+  if( op[2] == '-' ) reg->y = -reg->y;
   else if( op[2] != '+' ) goto ERROR;
-  return 1;
+  return true;
 
  ERROR:
-  ZRUNERROR( "invalid geometry expression" );
-  reg->x = reg->y = ZX_GEOMETRY_NONE;
-  reg->width = reg->height = 0;
-  return 0;
+  ZRUNERROR( "invalid geometry expression: %s", str );
+  return false;
 }

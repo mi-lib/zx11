@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   zxInit();
 
   zxWindowCreate( &win, 0, 0, 400, 300 );
-  zxWindowSetBG( &win, "dark blue" );
+  zxWindowSetBGColorByName( &win, "dark blue" );
 
   zxSpriteCreate( &win, &spr, 25, 25, 350, 250 );
   zxsLayerInit( &layer );
@@ -59,5 +59,6 @@ int main(int argc, char *argv[])
   getchar();
   pthread_cancel( thread );
   pthread_join( thread, NULL );
+  zxExit();
   return 0;
 }

@@ -1,4 +1,7 @@
+#include <unistd.h>
 #include <zx11/zximage.h>
+
+double myabs(double x){ return x >= 0 ? x : -x; }
 
 void brightR(zxPixelManip *pm, zxImage *img, double brightness)
 {
@@ -39,11 +42,14 @@ void bright(zxPixelManip *pm, zxImage *img, double brightness)
       zxImageCellFromPixel( img, j, i, zxPixelFromFGS( pm, brightness ) );
 }
 
+#define DIV 10
+
 int main(void)
 {
   zxWindow win;
   zxImage dat;
-  register double alpha;
+  register int i;
+  double alpha;
   zxPixelManip pm;
 
   zxInit();
@@ -51,29 +57,36 @@ int main(void)
   zxWindowCreateAndOpen( &win, 0, 0, dat.width, dat.height );
 
   zxPixelManipSet( &pm, zxdepth );
-  for( alpha=1.0; alpha>0; alpha-=0.1 ){
+  for( i=0; i<DIV; i++ ){
+    alpha = 1 - 2 * myabs( (double)i / DIV - 0.5 );
     brightR( &pm, &dat, alpha );
     zxImageDrawAll( &win, &dat, 0, 0 );
     zxFlush();
+    usleep( 100000 );
   }
-  for( alpha=1.0; alpha>0; alpha-=0.1 ){
+  for( i=0; i<DIV; i++ ){
+    alpha = 1 - 2 * myabs( (double)i / DIV - 0.5 );
     brightG( &pm, &dat, alpha );
     zxImageDrawAll( &win, &dat, 0, 0 );
     zxFlush();
+    usleep( 100000 );
   }
-  for( alpha=1.0; alpha>0; alpha-=0.1 ){
+  for( i=0; i<DIV; i++ ){
+    alpha = 1 - 2 * myabs( (double)i / DIV - 0.5 );
     brightB( &pm, &dat, alpha );
     zxImageDrawAll( &win, &dat, 0, 0 );
     zxFlush();
+    usleep( 100000 );
   }
-  for( alpha=1.0; alpha>0; alpha-=0.1 ){
+  for( i=0; i<DIV; i++ ){
+    alpha = 1 - 2 * myabs( (double)i / DIV - 0.5 );
     bright( &pm, &dat, alpha );
     zxImageDrawAll( &win, &dat, 0, 0 );
     zxFlush();
+    usleep( 100000 );
   }
   getchar();
   zxImageDestroy( &dat );
-  zxWindowClose( &win );
-  zxClose();
+  zxExit();
   return 0;
 }

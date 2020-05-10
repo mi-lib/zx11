@@ -7,7 +7,6 @@ int main(void)
 
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 320, 80 );
-  zxWindowSetBG( &win, "lightgray" );
   zxWidgetInit( &win );
 
   zxwRadioButtonCreate( &b1,  50, 16 );
@@ -27,6 +26,6 @@ int main(void)
   zxFlush();
   getchar();
 
-  zxClose();
+  zxExit();
   return 0;
 }

@@ -18,10 +18,15 @@ __BEGIN_DECLS
 
 extern XFontStruct *zxfontstruct;
 
-void zxSetFont(zxWindow *win, char *fontname);
+void zxWindowSetFont(zxWindow *win, char *fontname);
 #define zxUnsetFont() ( zxfontstruct = NULL )
+#if 0
 #define zxTextNWidth(win,s,n) ( zxfontstruct ? XTextWidth( zxfontstruct, (s), (n) ) : 0 )
 #define zxTextWidth(win,s)    zxTextNWidth( win, s, strlen(s) )
+#else
+#define zxTextNWidth(s,n) ( zxfontstruct ? XTextWidth( zxfontstruct, (s), (n) ) : 0 )
+#define zxTextWidth(s)    zxTextNWidth( s, strlen(s) )
+#endif
 
 XCharStruct *zxCharStruct(char c);
 int zxCharWidth(char c);
@@ -36,9 +41,9 @@ int zxTextNArea(const char *str, int n, short x, short y, zxRegion *reg);
 #define zxTextArea(s,x,y,r)  zxTextNArea( s, strlen(s), x, y, r )
 
 #define zxDrawNString(win,x,y,s,n) \
-  XDrawString( zxdisplay, zxCanvas(win), zxGC(win), (x), (y), (s), (n) )
+  XDrawString( zxdisplay, zxWindowCanvas(win), zxWindowGC(win), (x), (y), (s), (n) )
 #define zxDrawImageNString(win,x,y,s,n) \
-  XDrawImageString( zxdisplay, zxCanvas(win), zxGC(win), (x), (y), (s), (n) )
+  XDrawImageString( zxdisplay, zxWindowCanvas(win), zxWindowGC(win), (x), (y), (s), (n) )
 
 #define zxDrawString(win,x,y,s)      zxDrawNString( win, x, y, s, strlen(s) )
 #define zxDrawImageString(win,x,y,s) zxDrawImageNString( win, x, y, s, strlen(s) )
@@ -64,11 +69,11 @@ void zxTextAreaMB(const char *str, zxRegion *area);
 void zxTextAreaWC(const wchar_t *str, zxRegion *area);
 
 #define zxDrawNStringMB(win,x,y,s,n) \
-  XmbDrawString( zxdisplay, zxCanvas(win), zxfontset, zxGC(win), (x), (y), (s), (n) )
+  XmbDrawString( zxdisplay, zxWindowCanvas(win), zxfontset, zxWindowGC(win), (x), (y), (s), (n) )
 #define zxDrawStringMB(win,x,y,s) zxDrawNStringMB( win, x, y, s, strlen(s) )
 
 #define zxDrawNStringWC(win,x,y,s,n) \
-  XwcDrawString( zxdisplay, zxCanvas(win), zxfontset, zxGC(win), (x), (y), (s), (n) )
+  XwcDrawString( zxdisplay, zxWindowCanvas(win), zxfontset, zxWindowGC(win), (x), (y), (s), (n) )
 #define zxDrawStringMWC(win,x,y,s) zxDrawNStringWC( win, x, y, s, strlen(s) )
 
 __END_DECLS

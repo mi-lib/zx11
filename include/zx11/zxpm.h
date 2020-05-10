@@ -39,7 +39,7 @@ void zxPMCopy(zxWindow *win, zxPM *pm, Pixmap pmap, int src_x, int src_y, int w,
   zxPMCopy( (win), (pm), (p), 0, 0, (p)->width, (p)->height, (x), (y) )
 
 #define zxPMDraw(win,p,src_x,src_y,w,h,dest_x,dest_y) do{\
-  zxPMCopy(win,p,zxCanvas(win),src_x,src_y,w,h,dest_x,dest_y);\
+  zxPMCopy( win, p, zxWindowCanvas(win), src_x, src_y, w, h, dest_x, dest_y );\
   zxFlush();\
 } while(0)
 #define zxPMDrawRegion(win,p,r,x,y) \
@@ -49,7 +49,7 @@ void zxPMCopy(zxWindow *win, zxPM *pm, Pixmap pmap, int src_x, int src_y, int w,
 
 void zxPMCromachy(zxWindow *win, Pixmap canvas, zxPM *pm, int src_x, int src_y, Pixmap bgmap, int src_bx, int src_by, int width, int height, int dest_x, int dest_y);
 #define zxPMDrawCromachy(win,p,sx,sy,b,sbx,sby,w,h,dx,dy) do{\
-  zxPMCromachy( (win), zxCanvas(win), (p), (sx), (sy), (b), (sbx), (sby), (w), (h), (dx), (dy) );\
+  zxPMCromachy( (win), zxWindowCanvas(win), (p), (sx), (sy), (b), (sbx), (sby), (w), (h), (dx), (dy) );\
   zxFlush();\
 } while(0)
 #define zxPMDrawCromachyAll(win,p,b,sbx,sby,dx,dy) \

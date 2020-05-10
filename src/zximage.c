@@ -636,7 +636,7 @@ Pixmap zxImageToPixmap(zxWindow *win, zxImage *img, Pixmap pmap, uint src_x, uin
   if( ( ip = XCreateImage( zxdisplay, CopyFromParent, zxdepth, ZPixmap,
           16, (char *)img->buf, img->width, img->height,
           img->bpp<<3, img->bpp*img->width ) ) ){
-    XPutImage( zxdisplay, pmap, zxGC(win), ip, src_x, src_y, dest_x, dest_y, w, h );
+    XPutImage( zxdisplay, pmap, zxWindowGC(win), ip, src_x, src_y, dest_x, dest_y, w, h );
     free( ip );
   }
   return pmap;
@@ -685,7 +685,7 @@ void zxImageDraw(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w, ui
     zxClipSetOrigin( win, dest_x - src_x, dest_y - src_y );
     zxClipSetMask( win, mask );
   }
-  zxImageToPixmap( win, img, zxCanvas(win), src_x, src_y, w, h, dest_x, dest_y );
+  zxImageToPixmap( win, img, zxWindowCanvas(win), src_x, src_y, w, h, dest_x, dest_y );
   if( mask != None ){
     zxClipUnsetMask( win );
     zxPixmapDestroy( mask );

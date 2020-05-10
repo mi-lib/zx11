@@ -1,22 +1,28 @@
+#include <liw/liw_debug.h>
 #include <zx11/zxutil.h>
 
 int main(void)
 {
   zxWindow win;
+  long cl[2];
 
   zxInit();
-  zxWindowCreateAndOpen( &win, 100, 100, 500, 500 );
+  zxWindowCreateAndOpen( &win, 1000, 100, 500, 500 );
+  zxWindowDoubleBufferEnable( &win );
+  MEASURE_EXEC_CLOCK( &cl[0],
+    zxWindowSetBGColorByName( &win, "blue" );
+    zxWindowClear( &win );
+    zxWindowSetColorByName( &win, "red" );
+    zxDrawFillRect( &win, 100, 100, 300, 300 );
+  );
+  printf( "Hit enter key to expose a picture." );
   getchar();
-
-  zxDoubleBufferEnable( &win );
-  zxSetBGColor( &win, zxGetColor( &win, "blue" ) );
-  zxClear( &win );
-  zxSetColor( &win, "red" );
-  zxDrawFillRect( &win, 100, 100, 300, 300 );
-  zxDoubleBufferAppear( &win );
-  zxFlush();
+  MEASURE_EXEC_CLOCK( &cl[1],
+    zxWindowDoubleBufferAppear( &win );
+    zxFlush();
+  );
+  printf( "clock for processes:\n pixmap->%ld window->%ld\n", cl[0], cl[1] );
   getchar();
-  zxClose();
-
+  zxExit();
   return 0;
 }

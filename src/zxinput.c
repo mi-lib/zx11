@@ -6,29 +6,27 @@
 
 #include <zx11/zxinput.h>
 
-/* key event operation */
+/* key event operations */
 
-/* modifiers */
-byte __zx_modkey = ZX_MODKEY_NONE;
+/* key modifiers */
+byte zxmodkey = ZX_MODKEY_NONE;
 
-/* METHOD: zxKeySymbol
- * return key symbol accepted by event.
- */
+/* return key symbol accepted by event. */
 KeySym zxKeySymbol(void)
 {
   return XkbKeycodeToKeysym( zxdisplay, zxevent.xkey.keycode, 0, 0 );
 }
 
-/* zxKeySymbolAndString
- * - get key symbol and the input string.
- */
+/* get key symbol and the input string. */
 int zxKeySymbolAndString(char *str, size_t size, KeySym *key)
 {
   return XLookupString( &zxevent.xkey, str, size, key, NULL );
 }
 
-byte zxModkey(void){ return __zx_modkey; }
+/* return the key modifier */
+byte zxModkey(void){ return zxmodkey; }
 
+/* detect the key modifier */
 bool zxModkeyOn(KeySym key)
 {
   switch( key ){
@@ -42,6 +40,7 @@ bool zxModkeyOn(KeySym key)
   return false;
 }
 
+/* unset the key modifier */
 bool zxModkeyOff(KeySym key)
 {
   switch( key ){
@@ -55,8 +54,9 @@ bool zxModkeyOff(KeySym key)
   return false;
 }
 
-/* mouse event operation */
+/* mouse event operations */
 
+/* check if the mouse pointer is inside of a specified region */
 bool zxMouseInRegion(zxRegion *reg)
 {
   return zxRegionIsIn( reg, zxMouseX, zxMouseY );
@@ -65,47 +65,49 @@ bool zxMouseInRegion(zxRegion *reg)
 /* input method & input context */
 
 static XIM _zxim; /* input method */
-static XIC _zxic; /* input context */
 
-int zxIMInit(zxWindow *win)
+/* initialize input method */
+int zxIMInit(void)
 {
-  unsigned long fevent; /* events filtered to input method */
-
   if( !( _zxim = XOpenIM( zxdisplay, NULL, NULL, NULL ) ) ){
     ZRUNERROR( "cannot open input method" );
     return -1;
   }
-  if( !( _zxic = XCreateIC( _zxim,
+  return 0;
+}
+
+/* enable input method of a window */
+int zxWindowIMEnable(zxWindow *win)
+{
+  unsigned long fevent; /* events filtered to input method */
+
+  if( !( win->ic = XCreateIC( _zxim,
       XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
       XNClientWindow, zxWindowBody(win), NULL ) ) ){
     ZRUNERROR( "cannot create input context" );
     XCloseIM( _zxim );
     return -1;
   }
-  XGetICValues( _zxic, XNFilterEvents, &fevent, NULL );
-  zxAddEventMask( win, fevent );
+  XGetICValues( win->ic, XNFilterEvents, &fevent, NULL );
+  zxWindowAddEvent( win, fevent );
   return 0;
 }
 
-int zxIMInitOffspot(zxWindow *win, zxRegion *preg, zxRegion *sreg)
+/* enable off-spot input method of a window */
+int zxWindowIMOffspotEnable(zxWindow *win, zxRegion *preg, zxRegion *sreg)
 {
   XVaNestedList pa, sa;
 
-  if( !( _zxim = XOpenIM( zxdisplay, NULL, NULL, NULL ) ) ){
-    ZRUNERROR( "cannot open input method" );
-    return -1;
-  }
-
   pa = XVaCreateNestedList( 0, XNArea, preg, XNFontSet, zxfontset, NULL );
   sa = XVaCreateNestedList( 0, XNArea, sreg, XNFontSet, zxfontset, NULL );
-  _zxic = XCreateIC( _zxim,
+  win->ic = XCreateIC( _zxim,
     XNInputStyle, XIMPreeditArea | XIMStatusArea,
     XNClientWindow, zxWindowBody(win),
     XNPreeditAttributes, pa, XNStatusAttributes, sa, NULL );
   XFree( pa );
   XFree( sa );
 
-  if( !_zxic ){
+  if( !win->ic ){
     ZRUNERROR( "cannot create input context" );
     XCloseIM( _zxim );
     return -1;
@@ -113,23 +115,36 @@ int zxIMInitOffspot(zxWindow *win, zxRegion *preg, zxRegion *sreg)
   return 0;
 }
 
-void zxIMClose(void)
+/* disable input method of a window */
+void zxWindowIMDisable(zxWindow *win)
 {
-  XDestroyIC( _zxic );
-  XCloseIM( _zxim );
+  XDestroyIC( win->ic );
+  win->ic = NULL;
 }
 
-void zxICFocus(void)
+/* exit input method */
+void zxIMExit(void)
 {
-  XSetICFocus( _zxic );
+  if( _zxim ){
+    XCloseIM( _zxim );
+    _zxim = NULL;
+  }
 }
 
-void zxICUnfocus(void)
+/* set input context focus */
+void zxWindowSetICFocus(zxWindow *win)
 {
-  XUnsetICFocus( _zxic );
+  XSetICFocus( win->ic );
 }
 
-int zxICGetString(wchar_t *buf, size_t size, KeySym *ks, Status *st)
+/* unset input context focus */
+void zxWindowUnsetICFocus(zxWindow *win)
 {
-  return XwcLookupString( _zxic, (XKeyPressedEvent*)&zxevent, buf, size, ks, st );
+  XUnsetICFocus( win->ic );
+}
+
+/* get a string from input context */
+int zxWindowICGetString(zxWindow *win, wchar_t *buf, size_t size, KeySym *ks, Status *st)
+{
+  return XwcLookupString( win->ic, (XKeyPressedEvent*)&zxevent, buf, size, ks, st );
 }

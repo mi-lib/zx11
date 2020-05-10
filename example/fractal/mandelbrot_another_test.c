@@ -1,12 +1,4 @@
-/*
- * Mandelbrot series
- * (C)Copyright, Zhidao since 2000.
- *
- * 2000.10.27. Created.
- */
-
-#include <stdio.h>
-#include <zx11/zxutil.h>
+#include <zx11/zximage.h>
 
 #define A -0.745429
 #define B 0.113009
@@ -17,17 +9,15 @@
 int main(int argc, char *argv[])
 {
   zxWindow c;
+  zxImage img;
+  zxPixelManip pm;
   register int i, j, l;
   float cf;
   double x, y, zx, zy, u, v, mx;
 
   zxInit();
-  zxWindowCreateAndOpen( &c, 100, 100, 400, 400 );
-  zxWindowSetTitle( &c, "Mandelbrot series" );
-
-  printf( "*** Mandelbrot series on X11 ***\n" );
-  zxWindowClear( &c );
-
+  zxImageAllocDefault( &img, 400, 400 );
+  zxPixelManipSetDefault( &pm );
   for( i=-H; i<=H; i++ ){
     u = W * i / H + A;
     for( j=-H; j<=H; j++ ){
@@ -40,15 +30,15 @@ int main(int argc, char *argv[])
         y = zy;
         if( ( mx = x*x + y*y ) >= 20.0 ) break;
       }
-      cf = 0xffff * ( (float)l / N );
-      zxSetColorMap( &c, zxGetRGBColor( &c, 0, cf, cf ) );
-      zxDrawPoint( &c, 200+i, 200-j );
+      cf = 0xff * ( (float)l / N );
+      zxImageCellFromRGB( &img, &pm, 200+i, 200-j, 0, cf, cf );
     }
   }
-
+  zxWindowCreateAndOpen( &c, 100, 100, 400, 400 );
+  zxWindowSetTitle( &c, "Mandelbrot series" );
+  zxImageDrawAll( &c, &img, 0, 0 );
   zxFlush();
   getchar();
-
-  zxClose();
+  zxExit();
   return 1;
 }

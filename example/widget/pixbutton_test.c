@@ -12,9 +12,8 @@ int main(void)
   register int i;
 
   zxInit();
-  zxWindowCreateAndOpen( &win, 50, 50, 300, 80 );
+  zxWindowCreateAndOpen( &win, 1000, 50, 300, 80 );
   zxWidgetInit( &win );
-  zxWindowSetBG( &win, "lightgray" );
 
   zxwPixButtonGroupInit( &pbg, 20, 20, 20, 20 );
   zxwPixButtonGroupAddData( &win, &pbg, 0, 0, mini_x_xpm, NULL );
@@ -27,15 +26,14 @@ int main(void)
   zxFlush();
   getchar();
 
-  for( i=0; i<pbg.num; i++ ){
-    pbg.active = i;
+  for( i=0; i<zxwItemNum(&pbg); i++ ){
+    zxwItemActivate( &pbg, i );
     zxwPixButtonGroupDrawPress( &win, &pbg );
     zxFlush();
     getchar();
     zxwPixButtonGroupDrawRelease( &win, &pbg );
   }
   zxwPixButtonGroupDestroy( &pbg );
-  zxClose();
-
+  zxExit();
   return 0;
 }

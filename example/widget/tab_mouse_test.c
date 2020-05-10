@@ -13,10 +13,9 @@ int main(void)
 
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 320, 80 );
-  zxKeyEnable( &win );
-  zxMouseEnable( &win );
+  zxWindowKeyEnable( &win );
+  zxWindowMouseEnable( &win );
   zxWidgetInit( &win );
-  zxWindowSetBG( &win, "lightgray" );
 
   zxwTabGroupInit( &tg, 20, 20, 280 );
   zxwTabGroupAdd( &tg, "tab A", fA );
@@ -43,6 +42,6 @@ int main(void)
   }
  END:
   zxwTabGroupDestroy( &tg );
-  zxClose();
+  zxExit();
   return 0;
 }

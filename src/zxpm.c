@@ -16,7 +16,7 @@ void zxPMCreate(zxWindow *win, zxPM *pm, int width, int height)
 
 void zxPMClear(zxWindow *win, zxPM *pm)
 {
-  zxSetColorMap( win, zxBGColor(win) );
+  zxWindowSetColor( win, win->bgcolor );
   zxFillRect( win, pm->pmap, 0, 0, pm->width, pm->height );
 }
 

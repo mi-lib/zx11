@@ -8,7 +8,7 @@ int main(void)
 
   zxInit();
   zxWindowCreate( &win, x, y, w, h );
-  zxOverrideRedirect( &win );
+  zxWindowOverrideRedirectEnable( &win );
   zxWindowMove( &win, x, y );
   zxWindowOpen( &win );
   for( ; w<=300; w+=3, h+=2 ){
