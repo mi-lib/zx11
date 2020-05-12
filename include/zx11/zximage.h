@@ -116,9 +116,14 @@ Pixmap zxImageToPixmap(zxWindow *win, zxImage *img, Pixmap pmap, uint src_x, uin
   zxImageToPixmap( (win), (i), (p), 0, 0, (i)->width, (i)->height, 0, 0 )
 Pixmap zxImageCreatePixmap(zxWindow *win, zxImage *img);
 Pixmap zxImageCreatePixmapMask(zxWindow *win, zxImage *img);
+
 void zxImageDraw(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
 #define zxImageDrawAll(win,i,x,y) \
   zxImageDraw( (win), (i), 0, 0, (i)->width, (i)->height, (x), (y) )
+
+bool zxImageDrawMask(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
+#define zxImageDrawMaskAll(win,i,x,y) \
+  zxImageDrawMask( (win), (i), 0, 0, (i)->width, (i)->height, (x), (y) )
 
 zxImage *zxImageFromPixmap(zxImage *img, Pixmap pmap, uint w, uint h);
 

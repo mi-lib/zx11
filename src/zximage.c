@@ -709,6 +709,26 @@ void zxImageDraw(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w, ui
   }
 }
 
+bool zxImageDrawMask(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y)
+{
+  zxImage mask;
+  zxPixelManip pm;
+  register int i, j;
+  ubyte val, *mp;
+
+  if( !( mp = img->mask_buf ) ) return false;
+  if( !zxImageAllocDefault( &mask, img->width, img->height ) ) return false;
+  zxPixelManipSetDefault( &pm );
+  for( i=0; i<img->height; i++ )
+    for( j=0; j<img->width; j++ ){
+      val = *mp++;
+      zxImageCellFromRGB( &mask, &pm, j, i, val, val, val );
+    }
+  zxImageToPixmap( win, &mask, zxWindowCanvas(win), src_x, src_y, w, h, dest_x, dest_y );
+  zxImageDestroy( &mask );
+  return true;
+}
+
 zxImage *zxImageFromPixmap(zxImage *img, Pixmap pmap, uint w, uint h)
 {
   XImage *_image;
