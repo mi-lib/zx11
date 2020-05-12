@@ -39,7 +39,7 @@ bool zxImageFileIsPNM(char filename[])
 
 static zxPixelManip _zx_pnm_pm;
 
-/* PBM(Portable Bitmap), ASCII mode */
+/* PBM (Portable Bitmap), ASCII mode */
 static void _zxImageReadPBMASCII(FILE *fp, zxImage *img, int x, int y)
 {
   ubyte val;
@@ -48,7 +48,7 @@ static void _zxImageReadPBMASCII(FILE *fp, zxImage *img, int x, int y)
   zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, val, val, val );
 }
 
-/* PBM(Portable Bitmap), binary mode */
+/* PBM (Portable Bitmap), binary mode */
 static ubyte *__zx_pbm_buf = NULL;
 static uint __zx_pbm_rowsize = 0;
 static bool _zxImageCreatePBMBuf(uint width)
@@ -86,7 +86,7 @@ static void _zxImageReadPBMBIN(FILE *fp, zxImage *img, int x, int y)
   }
 }
 
-/* PGM(Portable Graymap), ASCII mode */
+/* PGM (Portable Graymap), ASCII mode */
 static void _zxImageReadPGMASCII(FILE *fp, zxImage *img, int x, int y)
 {
   ubyte val;
@@ -95,7 +95,7 @@ static void _zxImageReadPGMASCII(FILE *fp, zxImage *img, int x, int y)
   zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, val, val, val );
 }
 
-/* PGM(Portable Graymap), binary mode */
+/* PGM (Portable Graymap), binary mode */
 static void _zxImageReadPGMBIN(FILE *fp, zxImage *img, int x, int y)
 {
   ubyte val;
@@ -104,7 +104,7 @@ static void _zxImageReadPGMBIN(FILE *fp, zxImage *img, int x, int y)
   zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, val, val, val );
 }
 
-/* PPM(Portable Pixmap), ASCII mode */
+/* PPM (Portable Pixmap), ASCII mode */
 static void _zxImageReadPPMASCII(FILE *fp, zxImage *img, int x, int y)
 {
   ubyte r, g, b;
@@ -115,7 +115,7 @@ static void _zxImageReadPPMASCII(FILE *fp, zxImage *img, int x, int y)
   zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, r, g, b );
 }
 
-/* PPM(Portable Pixmap), binary mode */
+/* PPM (Portable Pixmap), binary mode */
 static void _zxImageReadPPMBIN(FILE *fp, zxImage *img, int x, int y)
 {
   ubyte r, g, b;

@@ -1,3 +1,6 @@
+2020. 5.12. Added zxmagv. [app]
+2020. 5.12. Added zxImageToneDown. [zximage]
+2020. 5.11. Deleted some unnecessary parts. [zxutil]
 2020. 5.10. Debugged zxImageReadPNMHeader. [zximage_pnm]
 2020. 5.10. Deleted obsolete effector examples. [example]
 2020. 5. 9. Modified zxWidgetInit to set default background color. [zxwidget]

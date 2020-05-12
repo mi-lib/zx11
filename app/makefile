@@ -1,35 +1,56 @@
 include ../config
 
-INCLUDE=-I. -I../include -I$(PREFIX)/include
-LIB=-L../lib -L$(PREFIX)/lib
+INCLUDE=-I$(PREFIX)/include -I../include -I.
+LIB=-L$(PREFIX)/lib -L../lib
 BINDIR=$(PREFIX)/bin
+
+CC=gcc
+CFLAGS=-ansi -Wall -O3 $(INCLUDE) $(LIB)
 
 LINK=-lzx11
 
 ifeq ($(CONFIG_USE_XEXT),y)
 	LINK+=-lXext
+	CFLAGS += -D__ZX11_USE_XEXT
 endif
 
 ifeq ($(CONFIG_USE_XPM),y)
 	LINK+=-lXpm
+	CFLAGS += -D__ZX11_USE_XPM
 endif
 
 ifeq ($(CONFIG_USE_PNG),y)
 	LINK+=-lpng -lz
+	CFLAGS += -D__ZX11_USE_PNG
 endif
 
 ifeq ($(CONFIG_USE_JPEG),y)
 	LINK+=-ljpeg
+	CFLAGS += -D__ZX11_USE_JPEG
+endif
+
+ifeq ($(CONFIG_USE_DIB),y)
+	CFLAGS += -D__ZX11_USE_BMP
+endif
+
+ifeq ($(CONFIG_USE_MAG),y)
+	CFLAGS += -D__ZX11_USE_MAG
+endif
+
+ifeq ($(CONFIG_USE_PDT),y)
+	CFLAGS += -D__ZX11_USE_PDT
 endif
 
 LINK+=-lX11 `zeda-config -l`
+
+COMPILE=$(CC) $(CFLAGS) -o $@ $< $(LINK)
 
 INSTALL=install -m 755
 UNINSTALL=rm -f
 
 CONFIGGEN=zeda-config-gen
 CONFIG = zx11-config
-TARGET=$(CONFIG)
+TARGET=$(CONFIG) zxmagv
 
 #####################################################################
 all: $(TARGET)
@@ -39,6 +60,9 @@ $(CONFIG):
 	-@rm -f $@
 	@$(CONFIGGEN) -I $(PREFIX)/include -L $(PREFIX)/lib -l "$(LINK)" -v $(VERSION) > $@
 
+%: %.c
+	@echo " CC	" $<
+	@$(COMPILE)
 install: $(TARGET)
 	@echo " INSTALL	" $^
 	@$(INSTALL) $^ $(BINDIR)

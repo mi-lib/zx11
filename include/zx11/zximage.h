@@ -101,6 +101,7 @@ zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest);
 zxImage *zxImageDiff(zxImage *src, zxImage *dest);
 zxImage *zxImageIntegral(zxImage *src, zxImage *dest);
 zxImage *zxImageNegate(zxImage *src, zxImage *dest);
+zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate);
 
 /* special effect */
 

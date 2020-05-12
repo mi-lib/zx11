@@ -572,6 +572,23 @@ zxImage *zxImageNegate(zxImage *src, zxImage *dest)
   return dest;
 }
 
+zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate)
+{
+  register uint i, j;
+  ubyte r, g, b;
+  zxPixelManip pm;
+
+  rate = zLimit( rate, 0, 1 );
+  zxPixelManipSetDefault( &pm );
+  for( i=0; i<src->height; i++ )
+    for( j=0; j<src->width; j++ ){
+      zxImageCellRGB( src, &pm, j, i, &r, &g, &b );
+      r *= rate; g *= rate; b *= rate;
+      zxImageCellFromRGB( dest, &pm, j, i, r, g, b );
+    }
+  return dest;
+}
+
 /* special effect */
 
 zxPixel zxImageAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h)

@@ -400,26 +400,6 @@ void zxPixmapPolygon(zxWindow *win, Pixmap canvas, XPoint *points, int n, Pixmap
   zxFillPolygonComplex( win, canvas, points, n );
 }
 
-#if 0
-/* put pixel buffer 'buf' on the X contents 'win'.
- * 'x' and 'y' is the point of origin on the window.
- * 'w' is a width of 'buf'.
- * 'h' is a height of 'buf'.
- */
-void zxPutBuffer(zxWindow *win, int x, int y, int w, int h, ulong *buf)
-{
-  register int i, j, k;
-
-  for( i=0; i<h; i++ ){
-    k = i * w;
-    for( j=0; j<w; j++ ){
-      zxWindowSetColor( win, buf[k+j] );
-      zxDrawPoint( win, x+j, y+i );
-    }
-  }
-}
-#endif
-
 /* command line option utility */
 
 bool zxParseGeometry(char *str, zxRegion *reg)

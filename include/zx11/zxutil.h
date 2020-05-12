@@ -280,15 +280,7 @@ typedef char zxColorMode;
 
 /* event operation methods */
 
-#if 0
-#define zxSetEventMask(win,m) \
-  XSelectInput( zxdisplay, zxWindowBody(win), ( (win)->attr.event_mask = (m) ) )
-#define zxAddEventMask(win,m) \
-  XSelectInput( zxdisplay, zxWindowBody(win), ( (win)->attr.event_mask |= (m) ) )
-#define zxEventAccept(win) ( zxevent.xany.window == zxWindowBody(win) ? true : false )
-#else
 void zxWindowAddEvent(zxWindow *win, long event);
-#endif
 
 /* get next event */
 int zxNextEvent(void);
@@ -397,20 +389,7 @@ void zxPixmapPolygon(zxWindow *win, Pixmap canvas, XPoint *points, int n, Pixmap
 #define zxDrawPixmapPolygon(win,v,n,pat) \
   zxPixmapPolygon( (win), zxWindowCanvas(win), (v), (n), (pat) )
 
-#if 0
-/* clear a window */
-void zxClear(zxWindow *win);
-#endif
-
-#if 0
-void zxPutBuffer(zxWindow *win, int x, int y, int w, int h, ulong *buf);
-#endif
-
 /* command line option utility */
-
-#if 0
-#define ZX_GEOMETRY_NONE -1
-#endif
 
 /*! \brief parse a string for geometry parameters.
  *
