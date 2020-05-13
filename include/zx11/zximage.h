@@ -27,29 +27,29 @@ typedef struct{
 
 /* pixel manipulation */
 
-#define zxImagePosIsValid(i,x,y) \
-  ( (x)<(i)->width && (y)<(i)->height )
+#define zxImagePosIsValid(img,x,y) \
+  ( (x) < (img)->width && (y) < (img)->height )
 
-#define zxImageAddr(i,x,y) ((i)->buf+(i)->bpp*((i)->width*(y)+(x)))
-#define zxImageCell(i,x,y) *zxImageAddr(i,x,y)
+#define zxImageAddr(img,x,y) ((img)->buf+(img)->bpp*((img)->width*(y)+(x)))
+#define zxImageCell(img,x,y) *zxImageAddr(img,x,y)
 
 zxPixel zxImageCellPixel(zxImage *img, uint x, uint y);
 zxPixel zxImageCellPixelCheck(zxImage *img, uint x, uint y);
 void zxImageCellFromPixel(zxImage *img, uint x, uint y, zxPixel pixel);
 void zxImageCellFromPixelCheck(zxImage *img, uint x, uint y, zxPixel pixel);
 
-#define zxImageCellRGB(i,p,x,y,r,g,b) \
-  (p)->PixelRGB( zxImageCellPixel(i,x,y), r, g, b )
-#define zxImageCellFromRGB(i,p,x,y,r,g,b) \
-  zxImageCellFromPixel( i, x, y, (p)->PixelFromRGB(r,g,b) )
-#define zxImageCellFromGS(i,p,x,y,v) \
-  zxImageCellFromPixel( i, x, y, zxPixelFromGS(p,v) )
-#define zxImageCellNegate(i,p,x,y) \
-  zxPixelNegate( p, zxImageCellPixel(i,x,y) )
+#define zxImageCellRGB(img,pm,x,y,r,g,b) \
+  (pm)->PixelRGB( zxImageCellPixel(img,x,y), r, g, b )
+#define zxImageCellFromRGB(img,pm,x,y,r,g,b) \
+  zxImageCellFromPixel( img, x, y, (pm)->PixelFromRGB(r,g,b) )
+#define zxImageCellFromGS(img,pm,x,y,v) \
+  zxImageCellFromPixel( img, x, y, zxPixelFromGS(pm,v) )
+#define zxImageCellNegate(img,pm,x,y) \
+  zxPixelNegate( pm, zxImageCellPixel(img,x,y) )
 
-#define zxImageMaskAddr(i,x,y)  ((i)->mask_buf+((i)->width*(y)+(x)))
-#define zxImageMask(i,x,y)      *zxImageMaskAddr(i,x,y)
-#define zxImageSetMask(i,x,y,m) ( zxImageMask(i,x,y) = (m) )
+#define zxImageMaskAddr(img,x,y)  ((img)->mask_buf+((img)->width*(y)+(x)))
+#define zxImageMask(img,x,y)      *zxImageMaskAddr(img,x,y)
+#define zxImageSetMask(img,x,y,m) ( zxImageMask(img,x,y) = (m) )
 
 ubyte zxImageBPP(ubyte depth);
 #define zxImageBPPDefault() zxImageBPP( zxdepth )
@@ -58,11 +58,11 @@ ubyte zxImageBPP(ubyte depth);
 
 zxImage *zxImageInit(zxImage *img);
 zxImage *zxImageAlloc(zxImage *img, uint width, uint height, ubyte depth);
-#define zxImageAllocDefault(i,w,h)  zxImageAlloc( i, w, h, zxdepth )
+#define zxImageAllocDefault(img,w,h) zxImageAlloc( img, w, h, zxdepth )
 zxImage *zxImageAllocMask(zxImage *img);
 zxImage *zxImageCreateMask(zxImage *img, zxPixel mask);
-#define zxImageCreateMaskDefault(i) \
-  zxImageCreateMask( i, WhitePixel( zxdisplay, 0 ) )
+#define zxImageCreateMaskDefault(img) \
+  zxImageCreateMask( img, WhitePixel( zxdisplay, 0 ) )
 zxImage *zxImageDestroy(zxImage *img);
 zxImage *zxImageClear(zxImage *img);
 zxImage *zxImageFill(zxImage *img, zxPixel pixel);
@@ -79,7 +79,7 @@ zxImage *zxImagePutMasked(zxImage *canvas, zxImage *img, uint x, uint y, zxPixel
 zxImage *zxImagePutAlphaBlend(zxImage *canvas, zxImage *img1, zxImage *img2, uint x, uint y, double alpha);
 zxImage *zxImagePutAlphaBlendMasked(zxImage *canvas, zxImage *img1, zxImage *img2, uint x, uint y, double alpha, zxPixel mask);
 zxImage *zxImagePutSuperimpose(zxImage *canvas, zxImage *img, uint x, uint y);
-#define zxImagePutSuperimposeDefault(c,i) zxImagePutSuperimpose( c, i, 0, 0 )
+#define zxImagePutSuperimposeDefault(c,img) zxImagePutSuperimpose( c, img, 0, 0 )
 
 zxImage *zxImageGet(zxImage *src, zxImage *dest, uint x, uint y);
 
@@ -112,18 +112,18 @@ zxImage *zxImageMosaic(zxImage *img, uint x, uint y, uint w, uint h, uint nx, ui
 /* drawing */
 
 Pixmap zxImageToPixmap(zxWindow *win, zxImage *img, Pixmap pmap, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
-#define zxImageToPixmapAll(win,i,p) \
-  zxImageToPixmap( (win), (i), (p), 0, 0, (i)->width, (i)->height, 0, 0 )
+#define zxImageToPixmapAll(win,img,pixmap) \
+  zxImageToPixmap( (win), (img), (pixmap), 0, 0, (img)->width, (img)->height, 0, 0 )
 Pixmap zxImageCreatePixmap(zxWindow *win, zxImage *img);
 Pixmap zxImageCreatePixmapMask(zxWindow *win, zxImage *img);
 
 void zxImageDraw(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
-#define zxImageDrawAll(win,i,x,y) \
-  zxImageDraw( (win), (i), 0, 0, (i)->width, (i)->height, (x), (y) )
+#define zxImageDrawAll(win,img,x,y) \
+  zxImageDraw( (win), (img), 0, 0, (img)->width, (img)->height, (x), (y) )
 
 bool zxImageDrawMask(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
-#define zxImageDrawMaskAll(win,i,x,y) \
-  zxImageDrawMask( (win), (i), 0, 0, (i)->width, (i)->height, (x), (y) )
+#define zxImageDrawMaskAll(win,img,x,y) \
+  zxImageDrawMask( (win), (img), 0, 0, (img)->width, (img)->height, (x), (y) )
 
 zxImage *zxImageFromPixmap(zxImage *img, Pixmap pmap, uint w, uint h);
 

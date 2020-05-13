@@ -31,7 +31,11 @@ extern XEvent zxevent;
 void zxInit(void);
 
 /*! \brief exit from connection with X11 system */
-#define zxExit()  XCloseDisplay( zxdisplay )
+#define zxExit() do{\
+  XCloseDisplay( zxdisplay );\
+  zxdisplay = NULL;\
+} while( 0 )
+
 /*! \brief flush all events in queue */
 #define zxFlush() XFlush( zxdisplay )
 /*! \brief synchronize things appearing on display and events */

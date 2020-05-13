@@ -13,7 +13,7 @@
 #include <zx11/zxutil.h>
 
 /* display handler */
-Display *zxdisplay;
+Display *zxdisplay = NULL;
 
 /* default root window */
 Window zxrootwindow;
@@ -72,8 +72,11 @@ static Atom zx_wm_delete_window;
 /* initialize X11 system and get information of display and the root window */
 void zxInit(void)
 {
-  zxdisplay = XOpenDisplay( NULL );
-  if( zxdisplay == NULL ){
+  if( zxdisplay ){
+    ZRUNWARN( "already connected to X server" );
+    return;
+  }
+  if( !( zxdisplay = XOpenDisplay( NULL ) ) ){
     ZRUNERROR( "cannot connect to X server" );
     exit( 1 );
   }
