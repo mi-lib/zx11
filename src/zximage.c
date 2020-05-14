@@ -465,6 +465,26 @@ zxImage *zxImageResize(zxImage *src, zxImage *dest)
 
 /* color manipulation */
 
+zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bimg)
+{
+  register int i, j;
+  ubyte r, g, b;
+  zxPixelManip pm;
+
+  zxPixelManipSet( &pm, zxdepth );
+  for( i=0; i<src->height; i++ )
+    for( j=0; j<src->width; j++ ){
+      zxImageCellRGB( src, &pm, j, i, &r, &g, &b );
+      if( rimg && zxImagePosIsValid( rimg, j, i ) )
+        zxImageCellFromRGB( rimg, &pm, j, i, r, 0, 0 );
+      if( gimg && zxImagePosIsValid( gimg, j, i ) )
+        zxImageCellFromRGB( gimg, &pm, j, i, 0, g, 0 );
+      if( bimg && zxImagePosIsValid( bimg, j, i ) )
+        zxImageCellFromRGB( bimg, &pm, j, i, 0, 0, b );
+    }
+  return src;
+}
+
 zxImage *zxImageAntialias(zxImage *src, zxImage *dest)
 {
   register uint x, y, x1, x2, y1, y2;
@@ -585,6 +605,32 @@ zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate)
       zxImageCellRGB( src, &pm, j, i, &r, &g, &b );
       r *= rate; g *= rate; b *= rate;
       zxImageCellFromRGB( dest, &pm, j, i, r, g, b );
+    }
+  return dest;
+}
+
+zxImage *zxImageDither(zxImage *src, zxImage *dest)
+{
+  static double bayerpattern[] = {
+     0,  8,  2, 10,
+    12,  4, 14,  6,
+     3, 11,  1,  9,
+    15,  7, 13,  5 };
+  register int i, j;
+  uint w, h;
+  zxPixelManip pm;
+  ubyte r, g, b, th;
+
+  zxImageCanvasRange( dest, src, 0, 0, &w, &h );
+  zxPixelManipSetDefault( &pm );
+  for( i=0; i<h; i++ )
+    for( j=0; j<w; j++ ){
+      th = bayerpattern[ (i%4)*4 + (j%4) ]*16 + 8;
+      zxImageCellRGB( src, &pm, j, i, &r, &g, &b );
+      zxImageCellFromRGB( dest, &pm, j, i,
+        r >= th ? 0xff : 0,
+        g >= th ? 0xff : 0,
+        b >= th ? 0xff : 0 );
     }
   return dest;
 }

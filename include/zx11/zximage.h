@@ -96,12 +96,14 @@ zxImage *zxImageResize(zxImage *src, zxImage *dest);
 
 /* color manipulation */
 
+zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bimg);
 zxImage *zxImageAntialias(zxImage *src, zxImage *dest);
 zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest);
 zxImage *zxImageDiff(zxImage *src, zxImage *dest);
 zxImage *zxImageIntegral(zxImage *src, zxImage *dest);
 zxImage *zxImageNegate(zxImage *src, zxImage *dest);
 zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate);
+zxImage *zxImageDither(zxImage *src, zxImage *dest);
 
 /* special effect */
 
