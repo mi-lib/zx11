@@ -1,7 +1,7 @@
 /* ZX11 - a wrapper for interface library to the X Window System
  * Copyright (C) 1999 Tomomichi Sugihara (Zhidao)
  *
- * zximage_png - PNG support on zxImage(requires libpng).
+ * zximage_png - PNG support on zxImage (requires libpng).
  */
 
 #ifndef __ZX_IMAGE_PNG_H__

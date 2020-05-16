@@ -1,7 +1,7 @@
 /* ZX11 - a wrapper for interface library to the X Window System
  * Copyright (C) 1999 Tomomichi Sugihara (Zhidao)
  *
- * zximage_mag - MAG(MA_KIchan Graphic format) support.
+ * zximage_mag - MAG (MA_KIchan Graphic format) support.
  */
 
 #ifndef __ZX_IMAGE_MAG_H__

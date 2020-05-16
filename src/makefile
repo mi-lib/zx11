@@ -31,6 +31,11 @@ ifeq ($(CONFIG_USE_PNG),y)
 	CFLAGS += -D__ZX11_USE_PNG
 endif
 
+ifeq ($(CONFIG_USE_TIFF),y)
+	OBJ += zximage_tiff.o
+	CFLAGS += -D__ZX11_USE_TIFF
+endif
+
 ifeq ($(CONFIG_USE_JPEG),y)
 	OBJ += zximage_jpeg.o
 	CFLAGS += -D__ZX11_USE_JPEG

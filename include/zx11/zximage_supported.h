@@ -16,26 +16,27 @@
 # include <zx11/zximage_png.h>
 #endif /* __ZX11_USE_PNG */
 
+/* TIFF support */
+#ifdef __ZX11_USE_TIFF
+# include <zx11/zximage_tiff.h>
+#endif /* __ZX11_USE_TIFF */
+
 /* JPEG support */
 #ifdef __ZX11_USE_JPEG
 # include <zx11/zximage_jpeg.h>
 #endif /* __ZX11_USE_JPEG */
 
-/* TIFF support */
-#ifdef __ZX11_USE_TIFF
-#endif /* __ZX11_USE_TIFF */
-
-/* Microsoft Bitmap (Device Independent Bitmap) support */
+/* Microsoft Bitmap support */
 #ifdef __ZX11_USE_BMP
 # include <zx11/zximage_dib.h>
 #endif /* __ZX11_USE_BMP */
 
-/* MAG (MA_KIchan Graphic format) support */
+/* MAG support */
 #ifdef __ZX11_USE_MAG
 # include <zx11/zximage_mag.h>
 #endif /* __ZX11_USE_MAG */
 
-/* PDT (graphic format for AVG32) support */
+/* PDT support */
 #ifdef __ZX11_USE_PDT
 # include <zx11/zximage_pdt.h>
 #endif /* __ZX11_USE_PDT */

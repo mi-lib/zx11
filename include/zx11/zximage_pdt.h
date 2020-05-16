@@ -1,11 +1,10 @@
 /* ZX11 - a wrapper for interface library to the X Window System
  * Copyright (C) 1999 Tomomichi Sugihara (Zhidao)
  *
- * zximage_pdt - PDT(graphic format for AVG32) support.
+ * zximage_pdt - PDT (graphic format for AVG32) support.
  *
- * AVG32 is a product by versammeln(an online distribution
- * brand of VisualArt's).
- * Special thanks to JAGARL.
+ * AVG32 is a product by versammeln (an online distribution brand of VisualArt's).
+ * Special thanks to JAGARL (Dr. Kazunori Ueno).
  */
 
 #ifndef __ZX_IMAGE_PDT_H__

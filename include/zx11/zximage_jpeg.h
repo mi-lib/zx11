@@ -1,7 +1,7 @@
 /* ZX11 - a wrapper for interface library to the X Window System
  * Copyright (C) 1999 Tomomichi Sugihara (Zhidao)
  *
- * zximage_jpeg - JPEG support(requires libjpeg)
+ * zximage_jpeg - JPEG support (requires libjpeg)
  */
 
 #ifndef __ZX_IMAGE_JPEG_H__

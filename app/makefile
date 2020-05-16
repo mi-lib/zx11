@@ -24,6 +24,11 @@ ifeq ($(CONFIG_USE_PNG),y)
 	CFLAGS += -D__ZX11_USE_PNG
 endif
 
+ifeq ($(CONFIG_USE_TIFF),y)
+	LINK+=-ltiff
+	CFLAGS += -D__ZX11_USE_TIFF
+endif
+
 ifeq ($(CONFIG_USE_JPEG),y)
 	LINK+=-ljpeg
 	CFLAGS += -D__ZX11_USE_JPEG

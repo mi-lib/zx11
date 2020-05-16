@@ -1,7 +1,7 @@
 /* ZX11 - a wrapper for interface library to the X Window System
  * Copyright (C) 1999 Tomomichi Sugihara (Zhidao)
  *
- * zximage_png - PNG support on zxImage(requires libpng).
+ * zximage_png - PNG support on zxImage (requires libpng).
  */
 
 #include <zx11/zximage_png.h>
@@ -112,8 +112,7 @@ int zxPNGCreateInfo(zxPNG *png)
   return 1;
 }
 
-/* read
- */
+/* read */
 int zxPNGCreateReadInfo(zxPNG *png)
 {
   png->png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING,
@@ -222,8 +221,7 @@ int zxImageReadPNGFile(zxImage *img, char filename[])
   return result;
 }
 
-/* write
- */
+/* write */
 int zxPNGCreateWriteInfo(zxPNG *png)
 {
   png->png_ptr = png_create_write_struct( PNG_LIBPNG_VER_STRING,

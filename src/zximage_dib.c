@@ -1,7 +1,7 @@
 /* ZX11 - a wrapper for interface library to the X Window System
  * Copyright (C) 1999 Tomomichi Sugihara (Zhidao)
  *
- * zximage_dib - Microsoft BMP(Device Independent Bitmap, DIB) support.
+ * zximage_dib - Microsoft BMP (Device Independent Bitmap, DIB) support.
  */
 
 #include <zx11/zximage_dib.h>

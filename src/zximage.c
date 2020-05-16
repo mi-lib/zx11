@@ -817,6 +817,11 @@ int zxImageReadFile(zxImage *img, char filename[])
     return zxImageReadPNGFile( img, filename );
 #endif /* __ZX11_USE_PNG */
 
+#ifdef __ZX11_USE_TIFF
+  if( zxImageFileIsTIFF( filename ) )
+    return zxImageReadTIFFFile( img, filename );
+#endif /* __ZX11_USE_TIFF */
+
 #ifdef __ZX11_USE_JPEG
   if( zxImageFileIsJPEG( filename ) )
     return zxImageReadJPEGFile( img, filename );
