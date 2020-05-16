@@ -103,3 +103,58 @@ int zxImageReadJPEGFile(zxImage *img, char filename[])
   fclose( fp );
   return result;
 }
+
+int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality)
+{
+  struct jpeg_compress_struct cinfo;
+  struct jpeg_error_mgr jerr;
+  JSAMPARRAY buf;
+  zxPixelManip pm;
+  register int i, j;
+  int ret = 1;
+
+  jpeg_create_compress( &cinfo );
+  cinfo.err = jpeg_std_error( &jerr );
+  jpeg_stdio_dest( &cinfo, fp );
+
+  cinfo.image_width  = img->width;
+  cinfo.image_height = img->height;
+  cinfo.input_components = 3;
+  cinfo.in_color_space = JCS_RGB;
+  jpeg_set_defaults( &cinfo );
+  jpeg_set_quality( &cinfo, quality, TRUE );
+
+  jpeg_start_compress( &cinfo, TRUE );
+
+  if( !( buf = (JSAMPARRAY)malloc( sizeof(JSAMPROW)*img->height ) ) ){
+    ret = 0;
+    goto TERMINATE;
+  }
+  zxPixelManipSetDefault( &pm );
+  for( i=0; i<img->height; i++ )
+    if( ( buf[i] = (JSAMPROW)malloc( sizeof(JSAMPLE)*img->width*3 ) ) )
+      for( j=0; j<img->width; j++ )
+        zxImageCellRGB( img, &pm, j, i, &buf[i][j*3], &buf[i][j*3+1], &buf[i][j*3+2] );
+  jpeg_write_scanlines( &cinfo, buf, img->height );
+  for( i=0; i<img->height; i++ ) free( buf[i] );
+
+ TERMINATE:
+  free( buf );
+  jpeg_finish_compress( &cinfo );
+  jpeg_destroy_compress( &cinfo );
+  return ret;
+}
+
+int zxImageWriteJPEGFile(zxImage *img, char filename[], int quality)
+{
+  FILE *fp;
+  int result;
+
+  if( ( fp = fopen( filename, "wb" ) ) == NULL ){ 
+    ZOPENERROR( filename );
+    return 0;
+  }
+  result = zxImageWriteJPEG( fp, img, quality );
+  fclose( fp );
+  return result;
+}

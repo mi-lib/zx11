@@ -15,10 +15,15 @@ __BEGIN_DECLS
 
 #define ZX_JPEG_SUFFIX "jpg"
 
+#define ZX_JPEG_DEFAULT_QUALITY 75
+
 bool zxImageFileIsJPEG(char filename[]);
 
 int zxImageReadJPEG(FILE *fp, zxImage *img);
 int zxImageReadJPEGFile(zxImage *img, char filename[]);
+
+int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality);
+int zxImageWriteJPEGFile(zxImage *img, char filename[], int quality);
 
 __END_DECLS
 
