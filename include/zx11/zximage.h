@@ -137,4 +137,6 @@ int zxImageReadFile(zxImage *img, char filename[]);
 
 __END_DECLS
 
+#include <zx11/zximage_supported.h>
+
 #endif /* __ZX_IMAGE_H__ */

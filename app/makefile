@@ -8,45 +8,47 @@ CC=gcc
 CFLAGS=-ansi -Wall -O3 $(INCLUDE) $(LIB)
 
 LINK=-lzx11
+DEF=
 
 ifeq ($(CONFIG_USE_XEXT),y)
 	LINK+=-lXext
-	CFLAGS += -D__ZX11_USE_XEXT
+	DEF += -D__ZX11_USE_XEXT
 endif
 
 ifeq ($(CONFIG_USE_XPM),y)
 	LINK+=-lXpm
-	CFLAGS += -D__ZX11_USE_XPM
+	DEF += -D__ZX11_USE_XPM
 endif
 
 ifeq ($(CONFIG_USE_PNG),y)
 	LINK+=-lpng -lz
-	CFLAGS += -D__ZX11_USE_PNG
+	DEF += -D__ZX11_USE_PNG
 endif
 
 ifeq ($(CONFIG_USE_TIFF),y)
 	LINK+=-ltiff
-	CFLAGS += -D__ZX11_USE_TIFF
+	DEF += -D__ZX11_USE_TIFF
 endif
 
 ifeq ($(CONFIG_USE_JPEG),y)
 	LINK+=-ljpeg
-	CFLAGS += -D__ZX11_USE_JPEG
+	DEF += -D__ZX11_USE_JPEG
 endif
 
 ifeq ($(CONFIG_USE_DIB),y)
-	CFLAGS += -D__ZX11_USE_BMP
+	DEF += -D__ZX11_USE_BMP
 endif
 
 ifeq ($(CONFIG_USE_MAG),y)
-	CFLAGS += -D__ZX11_USE_MAG
+	DEF += -D__ZX11_USE_MAG
 endif
 
 ifeq ($(CONFIG_USE_PDT),y)
-	CFLAGS += -D__ZX11_USE_PDT
+	DEF += -D__ZX11_USE_PDT
 endif
 
-LINK+=-lX11 `zeda-config -l`
+LINK += -lX11 `zeda-config -l`
+CFLAGS += $(DEF)
 
 COMPILE=$(CC) $(CFLAGS) -o $@ $< $(LINK)
 
@@ -63,7 +65,7 @@ all: $(TARGET)
 $(CONFIG):
 	@echo " GENERATE" $@
 	-@rm -f $@
-	@$(CONFIGGEN) -I $(PREFIX)/include -L $(PREFIX)/lib -l "$(LINK)" -v $(VERSION) > $@
+	@$(CONFIGGEN) -I $(PREFIX)/include -L $(PREFIX)/lib -D "$(DEF)" -l "$(LINK)" -v $(VERSION) > $@
 
 %: %.c
 	@echo " CC	" $<

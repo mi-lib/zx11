@@ -1,3 +1,4 @@
+2020. 5.17. Reflected new specification of zeda-config-gen and included zximage_supported.h in zximage.h. [app, zximage]
 2020. 5.17. Added zximage_tiff. [zximage_tiff, zximage]
 2020. 5.17. Added zxImageWriteJPEG and zxImageWriteJPEGFile. [zximage_jpeg]
 2020. 5.14. Added zxImageAbstRGB. [zximage]

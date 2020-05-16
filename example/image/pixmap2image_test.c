@@ -1,4 +1,4 @@
-#include <zx11/zximage_png.h>
+#include <zx11/zximage.h>
 
 int main(void)
 {
