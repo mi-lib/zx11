@@ -808,6 +808,8 @@ bool zxImageFileIdent(char filename[], const char ident[], int size)
 
 int zxImageReadFile(zxImage *img, char filename[])
 {
+  zxImageInit( img );
+
   /* Portable Bitmap/Graymap/Pixmap */
   if( zxImageFileIsPNM( filename ) )
     return zxImageReadPNMFile( img, filename );
