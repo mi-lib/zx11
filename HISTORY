@@ -1,3 +1,4 @@
+2020. 6.14. Modified specification of zxInit to return the false value if already connected to X server. [zxutil]
 2020. 5.17. Corrected dependency. [config]
 2020. 5.17. Reflected new specification of zeda-config-gen and included zximage_supported.h in zximage.h. [app, zximage]
 2020. 5.17. Added zximage_tiff. [zximage_tiff, zximage]

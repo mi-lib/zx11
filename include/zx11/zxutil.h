@@ -28,7 +28,7 @@ extern XEvent zxevent;
 #define zxScreenHeight()  HeightOfScreen( zxscreen )
 
 /*! \brief initialize X11 system and get information of display and the root window */
-void zxInit(void);
+bool zxInit(void);
 
 /*! \brief exit from connection with X11 system */
 #define zxExit() do{\

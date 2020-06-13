@@ -70,11 +70,11 @@ static Atom zx_wm_delete_window;
 /* basic methods */
 
 /* initialize X11 system and get information of display and the root window */
-void zxInit(void)
+bool zxInit(void)
 {
   if( zxdisplay ){
     ZRUNWARN( "already connected to X server" );
-    return;
+    return false;
   }
   if( !( zxdisplay = XOpenDisplay( NULL ) ) ){
     ZRUNERROR( "cannot connect to X server" );
@@ -88,6 +88,7 @@ void zxInit(void)
 
   zx_wm_protocols = XInternAtom( zxdisplay, "WM_PROTOCOLS", False );
   zx_wm_delete_window = XInternAtom( zxdisplay, "WM_DELETE_WINDOW", False );
+  return true;
 }
 
 /* set default window attributes */
