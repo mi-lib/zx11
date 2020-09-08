@@ -256,22 +256,6 @@ bool zxPixmapGetSize(Drawable drw, int *width, int *height)
     (int *)&x, (int *)&y, (uint *)width, (uint *)height, &border, &depth ) ? true : false;
 }
 
-/* double bufferring */
-
-/* enable double buffering */
-void zxWindowDoubleBufferEnable(zxWindow *win)
-{
-  win->db = zxPixmapCreate( win, zxWindowWidth(win), zxWindowHeight(win) );
-  zxWindowSetCanvas( win, win->db );
-}
-
-/* disable double buffering */
-void zxWindowDoubleBufferDisable(zxWindow *win)
-{
-  zxWindowSetCanvas( win, zxWindowBody(win) );
-  zxPixmapDestroy( win->db );
-}
-
 /* color operation methods */
 
 /* create a color map */

@@ -60,6 +60,8 @@ XFontSet zxFontSetCreate(const char *fontname);
 #define zxFontAscent()  (-zxfontset_extents->max_logical_extent.y )
 #define zxFontDescent() ( zxfontset_extents->max_logical_extent.height - zxFontAscent() )
 
+#define zxWindowSetTitleMB(win,t) XmbSetWMProperties( zxdisplay, zxWindowBody(win), t, NULL, NULL, 0, NULL, NULL, NULL )
+
 void zxTextAreaMB(const char *str, zxRegion *area);
 void zxTextAreaWC(const wchar_t *str, zxRegion *area);
 

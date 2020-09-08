@@ -158,6 +158,8 @@ void zxSpriteDrawAll(zxWindow *win, zxSprite *spr);
 void zxSpriteAppear(zxWindow *win, zxSprite *spr);
 void zxSpriteAppearAll(zxWindow *win, zxSprite *spr);
 
+#define zxWindowDoubleBufferSetSprite(win,spr) zxWindowDoubleBufferSet( win, zxSpriteCanvas(spr) )
+
 /* ********************************************************** */
 /* CLASS: zxsMap
  * ********************************************************** */

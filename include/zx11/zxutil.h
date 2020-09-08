@@ -254,13 +254,27 @@ bool zxPixmapGetSize(Drawable drw, int *width, int *height);
 
 /* double bufferring */
 
-/* enable double buffering */
-void zxWindowDoubleBufferEnable(zxWindow *win);
-/* disable double buffering */
-void zxWindowDoubleBufferDisable(zxWindow *win);
+/* set double-buffer */
+#define zxWindowDoubleBufferSet(win,buf) do{\
+  (win)->db = (buf);\
+  zxWindowSetCanvas( win, (win)->db );\
+} while(0)
 
+/* enable double buffering */
+#define zxWindowDoubleBufferEnable(win) \
+  zxWindowDoubleBufferSet( win, zxPixmapCreate( win, zxWindowWidth(win), zxWindowHeight(win) ) )
+
+/* disable double buffering */
+#define zxWindowDoubleBufferDisable(win) do{\
+  zxWindowSetCanvas( win, zxWindowBody(win) );\
+  zxPixmapDestroy( (win)->db );\
+} while(0)
+
+/* expose double buffer */
 #define zxWindowDoubleBufferAppear(win) \
   zxPixmapDrawDirect( win, (win)->db, 0, 0, zxWindowWidth(win), zxWindowHeight(win), 0, 0 )
+
+/* partially expose double buffer */
 #define zxWindowDoubleBufferPartAppear(win,ox,oy,w,h) \
   zxPixmapDrawDirect( win, (win)->db, ox, oy, w, h, ox, oy )
 
