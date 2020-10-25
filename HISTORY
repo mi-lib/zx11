@@ -1,3 +1,6 @@
+2020.10.25. Modified specifications of zxWindowCreate and zxWindowCreateRoot to automatically connect to X server. [zxutil]
+2020.10.25. Modified specification of zxInit. [zxutil]
+2020.10.25. Added zxlifegame. [app]
 2020. 9. 8. Added zxWindowDoubleBufferSetSprite. [zxsprite]
 2020. 9. 8. Added zxWindowDoubleBufferSet and reimplemented zxWindowDoubleBufferEnable. [zxutil]
 2020. 9. 8. Redefined zxWindowDoubleBufferEnable and zxWindowDoubleBufferDisable as macros. [zxutil]

@@ -74,11 +74,11 @@ bool zxInit(void)
 {
   if( zxdisplay ){
     ZRUNWARN( "already connected to X server" );
-    return false;
+    return true;
   }
   if( !( zxdisplay = XOpenDisplay( NULL ) ) ){
     ZRUNERROR( "cannot connect to X server" );
-    exit( 1 );
+    return false;
   }
   zxrootwindow = DefaultRootWindow( zxdisplay );
   zxscreen     = DefaultScreenOfDisplay( zxdisplay );
@@ -140,6 +140,7 @@ static void _zxWindowCreate(zxWindow *win, Window parent, int x, int y, int w, i
 /* create a primary window */
 void zxWindowCreate(zxWindow *win, int x, int y, int w, int h)
 {
+  if( !zxdisplay && !zxInit() ) return;
   _zxWindowCreate( win, zxrootwindow, x, y, w, h, 2 );
 }
 
@@ -157,6 +158,7 @@ void zxWindowCreateChild(zxWindow *win, zxWindow *parent, int x, int y, int w, i
 /* create a full-size window as a fake root */
 void zxWindowCreateRoot(zxWindow *win)
 {
+  if( !zxdisplay && !zxInit() ) return;
   zxWindowSetParent( win, zxrootwindow );
   zxWindowSetBody( win, zxrootwindow );
   zxWindowSetGeometry( win, 0, 0, zxScreenWidth(), zxScreenHeight() );
