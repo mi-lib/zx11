@@ -117,6 +117,7 @@ static void _zxWindowCreateDefaultGC(zxWindow *win)
   zxWindowDefaultGC(win) = XCreateGC( zxdisplay, zxWindowBody(win), 0, &win->gv );
   zxWindowSetDefaultGC( win );
   zxWindowSetCanvas( win, zxWindowBody(win) );
+  win->db = None;
   win->bgcolor = BlackPixel( zxdisplay, 0 );
   zxWindowSetColor( win, WhitePixel( zxdisplay, 0 ) );
 }
@@ -171,6 +172,7 @@ void zxWindowCreateRoot(zxWindow *win)
 void zxWindowDestroy(zxWindow *win)
 {
   zxWindowClose( win );
+  zxPixmapDestroy( win->db );
   XFreeGC( zxdisplay, zxWindowDefaultGC(win) );
   XDestroyWindow( zxdisplay, zxWindowBody(win) );
 }

@@ -229,8 +229,9 @@ bool zxWindowIsReceivedDeleteMsg(zxWindow *win);
 #define zxPixmapCreateMask(win,w,h) \
   XCreatePixmap( zxdisplay, zxWindowBody(win), (w), (h), 1 )
 /*! \brief destroy a pixmap */
-#define zxPixmapDestroy(p) \
-  XFreePixmap( zxdisplay, (p) )
+#define zxPixmapDestroy(p) do{\
+  if( (p) != None ) XFreePixmap( zxdisplay, (p) );\
+} while(0)
 /*! \brief copy a pixmap to another */
 #define zxPixmapCopy(win,s,d,src_x,src_y,w,h,dest_x,dest_y) \
   XCopyArea( zxdisplay, (s), (d), zxWindowGC(win), (src_x), (src_y), (w), (h), (dest_x), (dest_y) )
@@ -256,8 +257,7 @@ bool zxPixmapGetSize(Drawable drw, int *width, int *height);
 
 /* set double-buffer */
 #define zxWindowDoubleBufferSet(win,buf) do{\
-  (win)->db = (buf);\
-  zxWindowSetCanvas( win, (win)->db );\
+  if( ( (win)->db = (buf) ) != None ) zxWindowSetCanvas( win, (win)->db );\
 } while(0)
 
 /* enable double buffering */

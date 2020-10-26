@@ -57,7 +57,7 @@ UNINSTALL=rm -f
 
 CONFIGGEN=zeda-config-gen
 CONFIG = zx11-config
-TARGET=$(CONFIG) zxmagv zxpdtv zxlifegame
+TARGET=$(CONFIG) zxmagv zxpdtv zxlifegame zxwatch
 
 #####################################################################
 all: $(TARGET)
