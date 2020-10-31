@@ -196,6 +196,11 @@ void zxWindowFill(zxWindow *win, Pixmap pattern);
 #define zxWindowRaise(win) XRaiseWindow( zxdisplay, zxWindowBody(win) )
 /*! \brief lower a window to the bottom of visible stack */
 #define zxWindowLower(win) XLowerWindow( zxdisplay, zxWindowBody(win) )
+/*! \brief set position and size of a window according to event */
+#define zxWindowMoveResizeEvent(win) do{\
+  zxWindowSetPos( win, zxevent.xexpose.x, zxevent.xexpose.y );\
+  zxWindowSetSize( win, zxevent.xexpose.width, zxevent.xexpose.height );\
+} while(0)
 
 /*! \brief update geometry information of a window */
 bool zxWindowUpdateRegion(zxWindow *win);
@@ -217,7 +222,7 @@ void zxWindowBackingStoreDisable(zxWindow *win);
 /*! \brief enable override redirection to avoid the interrupt from window manager */
 void zxWindowOverrideRedirectEnable(zxWindow *win);
 
-/*! \brief receive the event to delete a window */
+/*! \brief receive event to delete a window */
 bool zxWindowIsReceivedDeleteMsg(zxWindow *win);
 
 /* pixmaps */

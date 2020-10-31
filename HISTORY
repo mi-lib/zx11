@@ -1,5 +1,6 @@
+2020.10.31. Added zxWindowMoveResizeEvent. [zxutil]
 2020.10.26. Added zxwatch. [app]
-2020.10.26. Debugged _zxWindowCreateDefaultGC.[zxutil]
+2020.10.26. Debugged _zxWindowCreateDefaultGC. [zxutil]
 2020.10.26. Debugged zxWindowDoubleBufferSet. [zxutil]
 2020.10.26. Modified specification of zxPixmapDestroy. [zxutil]
 2020.10.25. Modified specifications of zxWindowCreate and zxWindowCreateRoot to automatically connect to X server. [zxutil]
