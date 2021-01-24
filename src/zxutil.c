@@ -383,7 +383,18 @@ void zxSetLineJoin(zxWindow *win, int join)
   XChangeGC( zxdisplay, zxWindowGC(win), GCJoinStyle, &win->gv );
 }
 
-/* draw a polygon filled with a pixmap patter */
+/* draw a filled triangle */
+int zxFillTriangle(zxWindow *win, Drawable drw, int x1, int y1, int x2, int y2, int x3, int y3)
+{
+  XPoint v[3];
+
+  v[0].x = x1; v[0].y = y1;
+  v[1].x = x2; v[1].y = y2;
+  v[2].x = x3; v[2].y = y3;
+  return zxFillPolygon( win, drw, v, 3 );
+}
+
+/* draw a polygon filled with a pixmap pattern */
 void zxPixmapPolygon(zxWindow *win, Pixmap canvas, XPoint *points, int n, Pixmap pattern)
 {
   XSetFillStyle( zxdisplay, zxWindowGC(win), FillTiled );

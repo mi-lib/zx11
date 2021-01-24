@@ -407,6 +407,11 @@ void zxSetLineJoin(zxWindow *win, int join);
 #define zxDrawFillPolygonComplex(win,v,n) \
   zxFillPolygonComplex( win, zxWindowCanvas(win), v, n )
 
+/* draw a filled triangle */
+int zxFillTriangle(zxWindow *win, Drawable drw, int x1, int y1, int x2, int y2, int x3, int y3);
+#define zxDrawFillTriangle(win,x1,y1,x2,y2,x3,y3) \
+  zxFillTriangle( win, zxWindowCanvas(win), x1, y1, x2, y2, x3, y3 )
+
 /* draw a polygon filled with a pixmap patter */
 void zxPixmapPolygon(zxWindow *win, Pixmap canvas, XPoint *points, int n, Pixmap pattern);
 #define zxDrawPixmapPolygon(win,v,n,pat) \
