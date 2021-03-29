@@ -24,7 +24,7 @@ long zxw_gauge_e_color;
 long zxw_gauge_d_color;
 long zxw_gauge_g_color;
 long zxw_bar_color;
-long zxw_nob_color;
+long zxw_knob_color;
 long zxw_radio_color;
 
 void zxWidgetInit(zxWindow *win)
@@ -43,7 +43,7 @@ void zxWidgetInit(zxWindow *win)
   zxw_gauge_d_color = zxGetColor( win, "lightgray" );
   zxw_gauge_g_color = zxGetColor( win, "black" );
   zxw_bar_color = zxGetColor( win, "darkgray" );
-  zxw_nob_color = zxGetColor( win, "lightgray" );
+  zxw_knob_color = zxGetColor( win, "lightgray" );
   zxw_radio_color = zxGetColor( win, "black" );
 
   zxWindowSetFont( win, ZXW_DEFAULT_FONT );
@@ -358,7 +358,7 @@ void zxwGaugeSetRate(zxwGauge *gauge, double rate)
   double x;
 
   x = (double)gauge->guide.x + rate * (double)gauge->x_range;
-  zxwNobSetX( gauge, (short)x );
+  zxwKnobSetX( gauge, (short)x );
 }
 
 void zxwGaugeSetValue(zxwGauge *gauge, double val)
@@ -376,8 +376,8 @@ void zxwGaugeMove(zxwGauge *gauge, int x, int y)
   dy = y - gauge->reg.y;
   gauge->reg.x = x;
   gauge->reg.y = y;
-  gauge->nob.x += dx;
-  gauge->nob.y += dy;
+  gauge->knob.x += dx;
+  gauge->knob.y += dy;
   gauge->guide.x += dx;
   gauge->guide.y += dy;
 }
@@ -436,13 +436,13 @@ bool zxwScrollBarReleaseX(zxWindow *win, zxwScrollBar *sb)
   if( sb->inc.pressed ){
     zxwRelease( &sb->inc );
     zxwPixButtonDrawRaise( win, &sb->inc );
-    if( zxwScrollBarDX(sb) > 0 ) zxwNobX(sb)--;
+    if( zxwScrollBarDX(sb) > 0 ) zxwKnobX(sb)--;
     return true;
   }
   if( sb->dec.pressed ){
     zxwRelease( &sb->dec );
     zxwPixButtonDrawRaise( win, &sb->dec );
-    if( zxwNobX(sb) < zxwScrollBarXMax(sb) ) zxwNobX(sb)++;
+    if( zxwKnobX(sb) < zxwScrollBarXMax(sb) ) zxwKnobX(sb)++;
     return true;
   }
   return false;
@@ -453,13 +453,13 @@ bool zxwScrollBarReleaseY(zxWindow *win, zxwScrollBar *sb)
   if( sb->inc.pressed ){
     zxwRelease( &sb->inc );
     zxwPixButtonDrawRaise( win, &sb->inc );
-    if( zxwScrollBarDY(sb) > 0 ) zxwNobY(sb)--;
+    if( zxwScrollBarDY(sb) > 0 ) zxwKnobY(sb)--;
     return true;
   }
   if( sb->dec.pressed ){
     zxwRelease( &sb->dec );
     zxwPixButtonDrawRaise( win, &sb->dec );
-    if( zxwNobY(sb) < zxwScrollBarYMax(sb) ) zxwNobY(sb)++;
+    if( zxwKnobY(sb) < zxwScrollBarYMax(sb) ) zxwKnobY(sb)++;
     return true;
   }
   return false;
@@ -481,9 +481,9 @@ bool zxwScrollRegionCreate(zxWindow *win, zxwScrollRegion *sr, short x, short y,
   zxRegionSet( &sr->fullreg, 0, 0, fullwidth, fullheight );
   zxwBoxSetRegion( sr, x, y, width-ZXW_SCROLLBAR_W, height-ZXW_SCROLLBAR_W );
   zxwScrollBarCreateHoriz( win, sr->hbar, x, y+sr->reg.height, sr->reg.width );
-  zxwScrollBarSetNobHoriz( sr->hbar, width, fullwidth );
+  zxwScrollBarSetKnobHoriz( sr->hbar, width, fullwidth );
   zxwScrollBarCreateVert( win, sr->vbar, x+sr->reg.width, y, sr->reg.height );
-  zxwScrollBarSetNobVert( sr->vbar, height, fullheight );
+  zxwScrollBarSetKnobVert( sr->vbar, height, fullheight );
   sr->draw = draw;
   return true;
 }
@@ -495,7 +495,7 @@ bool zxwScrollRegionCreateHoriz(zxWindow *win, zxwScrollRegion *sr, short x, sho
   zxRegionSet( &sr->fullreg, 0, 0, fullwidth, height );
   zxwBoxSetRegion( sr, x, y, width, height-ZXW_SCROLLBAR_W );
   zxwScrollBarCreateHoriz( win, sr->hbar, x, y+sr->reg.height, sr->reg.width );
-  zxwScrollBarSetNobHoriz( sr->hbar, width, fullwidth );
+  zxwScrollBarSetKnobHoriz( sr->hbar, width, fullwidth );
   sr->draw = draw;
   return true;
 }
@@ -507,7 +507,7 @@ bool zxwScrollRegionCreateVert(zxWindow *win, zxwScrollRegion *sr, short x, shor
   zxRegionSet( &sr->fullreg, 0, 0, width, fullheight );
   zxwBoxSetRegion( sr, x, y, width-ZXW_SCROLLBAR_W, height );
   zxwScrollBarCreateVert( win, sr->vbar, x+sr->reg.width, y, sr->reg.height );
-  zxwScrollBarSetNobVert( sr->vbar, height, fullheight );
+  zxwScrollBarSetKnobVert( sr->vbar, height, fullheight );
   sr->draw = draw;
   return true;
 }

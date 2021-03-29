@@ -14,7 +14,7 @@ void draw(zxWindow *win, zxwScrollRegion *sr, void *dummy)
   zxDrawRegionRect( win, &sr->reg );
 
   zxWindowSetColor( win, zxw_text_e_color );
-  sprintf( str, "(%d,%d): (%d,%d)-(%d,%d)", zxwNobX(sr->hbar), zxwNobY(sr->vbar), zxwScrollBarDX(sr->hbar), zxwScrollBarDY(sr->vbar), zxwScrollBarDX(sr->hbar)+zxwNobWidth(sr->hbar), zxwScrollBarDY(sr->vbar)+zxwNobHeight(sr->vbar) );
+  sprintf( str, "(%d,%d): (%d,%d)-(%d,%d)", zxwKnobX(sr->hbar), zxwKnobY(sr->vbar), zxwScrollBarDX(sr->hbar), zxwScrollBarDY(sr->vbar), zxwScrollBarDX(sr->hbar)+zxwKnobWidth(sr->hbar), zxwScrollBarDY(sr->vbar)+zxwKnobHeight(sr->vbar) );
   zxDrawString( win, sr->reg.x+24, sr->reg.y+24, str );
   sprintf( str, "(%d,%d)-(%d,%d)", zxwScrollRegionX(sr), zxwScrollRegionY(sr), zxwScrollRegionX(sr)+zxwScrollRegionW(sr), zxwScrollRegionY(sr)+zxwScrollRegionH(sr) );
   zxDrawString( win, sr->reg.x+24, sr->reg.y+48, str );
@@ -36,13 +36,13 @@ int main(void)
   zxwScrollRegionDraw( &win, &sr, NULL );
   getchar();
 
-  l = sr.vbar->bar.y + sr.vbar->bar.height - zxwNobHeight(sr.vbar);
-  for( ; zxwNobY(sr.vbar)<l; zxwNobY(sr.vbar)++ ){
+  l = sr.vbar->bar.y + sr.vbar->bar.height - zxwKnobHeight(sr.vbar);
+  for( ; zxwKnobY(sr.vbar)<l; zxwKnobY(sr.vbar)++ ){
     zxwScrollRegionDrawVert( &win, &sr, NULL );
     usleep( 10000 );
   }
-  l = sr.hbar->bar.x + sr.hbar->bar.width - zxwNobWidth(sr.hbar);
-  for( ; zxwNobX(sr.hbar)<l; zxwNobX(sr.hbar)++ ){
+  l = sr.hbar->bar.x + sr.hbar->bar.width - zxwKnobWidth(sr.hbar);
+  for( ; zxwKnobX(sr.hbar)<l; zxwKnobX(sr.hbar)++ ){
     zxwScrollRegionDrawHoriz( &win, &sr, NULL );
     usleep( 10000 );
   }

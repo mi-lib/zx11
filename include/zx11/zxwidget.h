@@ -34,7 +34,7 @@ extern long zxw_gauge_e_color;
 extern long zxw_gauge_d_color;
 extern long zxw_gauge_g_color;
 extern long zxw_bar_color;
-extern long zxw_nob_color;
+extern long zxw_knob_color;
 extern long zxw_radio_color;
 
 #define ZXW_DEFAULT_FONT \
@@ -241,26 +241,26 @@ void _zxwLabelNDrawColor(zxWindow *win, char *label, int n, zxRegion *reg, char 
 #define zxwIsGrabbed(w)  (w)->grabbed
 
 /* ********************************************************** */
-/* nob class
+/* knob class
  * ********************************************************** */
 
-#define ZXW_NOB_CLASS ZXW_GRAB; zxRegion nob
+#define ZXW_KNOB_CLASS ZXW_GRAB; zxRegion knob
 
-#define zxwNob(t)            ( &(t)->nob )
+#define zxwKnob(t)            ( &(t)->knob )
 
-#define zxwNobX(t)           zxwNob(t)->x
-#define zxwNobY(t)           zxwNob(t)->y
-#define zxwNobWidth(t)       zxwNob(t)->width
-#define zxwNobHeight(t)      zxwNob(t)->height
+#define zxwKnobX(t)           zxwKnob(t)->x
+#define zxwKnobY(t)           zxwKnob(t)->y
+#define zxwKnobWidth(t)       zxwKnob(t)->width
+#define zxwKnobHeight(t)      zxwKnob(t)->height
 
-#define zxwNobSet(t,x,y,w,h) zxRegionSet( zxwNob(t), x, y, w, h )
-#define zxwNobSetX(t,x)      ( zxwNobX(t) = (x) )
-#define zxwNobSetY(t,y)      ( zxwNobY(t) = (y) )
-#define zxwNobSetWidth(t,w)  ( zxwNobWidth(t) = (w) )
-#define zxwNobSetHeight(t,h) ( zxwNobHeight(t) = (h) )
+#define zxwKnobSet(t,x,y,w,h) zxRegionSet( zxwKnob(t), x, y, w, h )
+#define zxwKnobSetX(t,x)      ( zxwKnobX(t) = (x) )
+#define zxwKnobSetY(t,y)      ( zxwKnobY(t) = (y) )
+#define zxwKnobSetWidth(t,w)  ( zxwKnobWidth(t) = (w) )
+#define zxwKnobSetHeight(t,h) ( zxwKnobHeight(t) = (h) )
 
-#define zxwNobTryGrab(t,x,y) do{\
-  if( zxRegionIsIn( zxwNob(t), x, y ) ) zxwGrab( t );\
+#define zxwKnobTryGrab(t,x,y) do{\
+  if( zxRegionIsIn( zxwKnob(t), x, y ) ) zxwGrab( t );\
 } while(0)
 
 /* ********************************************************** */
@@ -578,7 +578,7 @@ typedef struct{
   ZXW_BOX_CLASS;
   ZXW_EMBOSS_CLASS;
   zxRegion guide;
-  ZXW_NOB_CLASS;
+  ZXW_KNOB_CLASS;
   short x_range;
   short div;
   double min, max; /* mapped minimum/maximum value */
@@ -587,16 +587,16 @@ typedef struct{
 
 #define ZXWGAUGE_TOP_OFFSET    4
 #define ZXWGAUGE_GUIDE_HEIGHT  8
-#define ZXWGAUGE_NOB_WIDTH     8
-#define ZXWGAUGE_NOB_HEIGHT   16
+#define ZXWGAUGE_KNOB_WIDTH    8
+#define ZXWGAUGE_KNOB_HEIGHT  16
 
 #define ZXWGAUGE_MAX 100
 
 #define zxwGaugeCreate(g,x,y,l,d,mn,mx) do{\
-  zxwBoxSetRegion( g, x, y, l, ZXWGAUGE_NOB_HEIGHT );\
+  zxwBoxSetRegion( g, x, y, l, ZXWGAUGE_KNOB_HEIGHT );\
   zxRegionSet( &(g)->guide, x, y+ZXWGAUGE_TOP_OFFSET, l, ZXWGAUGE_GUIDE_HEIGHT );\
-  zxwNobSet( g, x, y, ZXWGAUGE_NOB_WIDTH, ZXWGAUGE_NOB_HEIGHT );\
-  (g)->x_range = (g)->guide.width - zxwNobWidth(g);\
+  zxwKnobSet( g, x, y, ZXWGAUGE_KNOB_WIDTH, ZXWGAUGE_KNOB_HEIGHT );\
+  (g)->x_range = (g)->guide.width - zxwKnobWidth(g);\
   (g)->div = (d);\
   (g)->min = (mn);\
   (g)->max = (mx);\
@@ -611,16 +611,16 @@ typedef struct{
     register short __zxw_gauge_i, __zxw_gauge_x;\
     zxWindowSetColor( (win), zxw_gauge_g_color );\
     for( __zxw_gauge_i=0; __zxw_gauge_i<=(g)->div; __zxw_gauge_i++ ){\
-      __zxw_gauge_x = zxwGaugeXMin(g) + (g)->nob.width/2 + (g)->x_range * __zxw_gauge_i / (g)->div;\
+      __zxw_gauge_x = zxwGaugeXMin(g) + (g)->knob.width/2 + (g)->x_range * __zxw_gauge_i / (g)->div;\
       zxDrawLine( win, __zxw_gauge_x, (g)->reg.y, __zxw_gauge_x, (g)->guide.y - 1 );\
     }\
   }\
   zxwBoxDrawLower( win, &(g)->guide, (g)->enable ? zxw_gauge_e_color : zxw_gauge_d_color, (g)->emboss );\
-  zxwBoxDrawRaise( win, zxwNob(g), zxw_nob_color, (g)->emboss );\
+  zxwBoxDrawRaise( win, zxwKnob(g), zxw_knob_color, (g)->emboss );\
 } while(0)
 
 #define zxwGaugeValue(g) \
-  ( ( (g)->max - (g)->min ) * ( zxwNobX(g) - (g)->guide.x ) / (g)->x_range + (g)->min )
+  ( ( (g)->max - (g)->min ) * ( zxwKnobX(g) - (g)->guide.x ) / (g)->x_range + (g)->min )
 
 void zxwGaugeSetRate(zxwGauge *gauge, double rate);
 void zxwGaugeSetValue(zxwGauge *gauge, double val);
@@ -633,7 +633,7 @@ void zxwGaugeMove(zxwGauge *gauge, int x, int y);
 #define zxwGaugeSetX(g,v) do{\
   short __zxw_gauge_x_tmp;\
   __zxw_gauge_x_tmp = zLimit( v, zxwGaugeXMin(g), zxwGaugeXMax(g) );\
-  zxwNobSetX( g, ( (g)->div == 0 ) ? __zxw_gauge_x_tmp : zxwGaugeXMin(g) + ( (g)->div * ( __zxw_gauge_x_tmp - zxwGaugeXMin(g) ) / (g)->x_range ) * (g)->x_range / (g)->div );\
+  zxwKnobSetX( g, ( (g)->div == 0 ) ? __zxw_gauge_x_tmp : zxwGaugeXMin(g) + ( (g)->div * ( __zxw_gauge_x_tmp - zxwGaugeXMin(g) ) / (g)->x_range ) * (g)->x_range / (g)->div );\
 } while(0)
 
 /* ********************************************************** */
@@ -643,23 +643,23 @@ void zxwGaugeMove(zxwGauge *gauge, int x, int y);
 
 typedef struct{
   zxRegion bar;
-  ZXW_NOB_CLASS;
+  ZXW_KNOB_CLASS;
   ZXW_EMBOSS_CLASS;
   zxwPixButton inc, dec;
   ZXW_ENABLE;
   short grabx, graby;
 } zxwScrollBar;
 
-#define ZXW_SCROLLBAR_W    16
-#define ZXW_SCROLLNOB_WMIN  3
+#define ZXW_SCROLLBAR_W     16
+#define ZXW_SCROLLKNOB_WMIN  3
 
 #define zxwScrollBarResizeHoriz(s,x,y,l) do{\
   zxRegionSet( &(s)->bar, (x)+ZXW_SCROLLBAR_W, (y), (l)-ZXW_SCROLLBAR_W*2, ZXW_SCROLLBAR_W );\
-  zxwNobSet( s, (s)->bar.x, (s)->bar.y, 0, ZXW_SCROLLBAR_W );\
+  zxwKnobSet( s, (s)->bar.x, (s)->bar.y, 0, ZXW_SCROLLBAR_W );\
 } while(0)
 #define zxwScrollBarResizeVert(s,x,y,l) do{\
   zxRegionSet( &(s)->bar, (x), (y)+ZXW_SCROLLBAR_W, ZXW_SCROLLBAR_W, (l)-ZXW_SCROLLBAR_W*2 );\
-  zxwNobSet( s, (s)->bar.x, (s)->bar.y, ZXW_SCROLLBAR_W, 0 );\
+  zxwKnobSet( s, (s)->bar.x, (s)->bar.y, ZXW_SCROLLBAR_W, 0 );\
 } while(0)
 
 void zxwScrollBarCreateHoriz(zxWindow *win, zxwScrollBar *sb, short x, short y, short length);
@@ -670,38 +670,38 @@ void zxwScrollBarCreateVert(zxWindow *win, zxwScrollBar *sb, short x, short y, s
   zxwPixButtonDestroy( &(s)->dec );\
 } while(0)
 
-#define zxwScrollBarSetNobHoriz(b,w,wf) \
-  zxwNobSetWidth( b, zMax( ( (b)->bar.width + ZXW_SCROLLBAR_W*2 ) * (w)/(wf), ZXW_SCROLLNOB_WMIN ) )
-#define zxwScrollBarSetNobVert(b,h,hf) \
-  zxwNobSetHeight( b, zMax( ( (b)->bar.height + ZXW_SCROLLBAR_W*2 ) * (h)/(hf), ZXW_SCROLLNOB_WMIN ) )
+#define zxwScrollBarSetKnobHoriz(b,w,wf) \
+  zxwKnobSetWidth( b, zMax( ( (b)->bar.width + ZXW_SCROLLBAR_W*2 ) * (w)/(wf), ZXW_SCROLLKNOB_WMIN ) )
+#define zxwScrollBarSetKnobVert(b,h,hf) \
+  zxwKnobSetHeight( b, zMax( ( (b)->bar.height + ZXW_SCROLLBAR_W*2 ) * (h)/(hf), ZXW_SCROLLKNOB_WMIN ) )
 
 #define zxwScrollBarDrawBar(win,s) \
   zxwBoxDrawLower( win, &(s)->bar, zxw_bar_color, (s)->emboss )
-#define zxwScrollBarDrawNob(win,s) \
-  zxwBoxDrawRaise( win, zxwNob(s), zxw_nob_color, (s)->emboss )
+#define zxwScrollBarDrawKnob(win,s) \
+  zxwBoxDrawRaise( win, zxwKnob(s), zxw_knob_color, (s)->emboss )
 
 #define zxwScrollBarDraw(win,s) do{\
   zxwScrollBarDrawBar( win, s );\
-  zxwScrollBarDrawNob( win, s );\
+  zxwScrollBarDrawKnob( win, s );\
   zxwPixButtonDrawRaise( win, &(s)->inc );\
   zxwPixButtonDrawRaise( win, &(s)->dec );\
 } while(0)
 
-#define zxwScrollBarDX(s) ( zxwNobX(s) - (s)->bar.x )
-#define zxwScrollBarDY(s) ( zxwNobY(s) - (s)->bar.y )
+#define zxwScrollBarDX(s) ( zxwKnobX(s) - (s)->bar.x )
+#define zxwScrollBarDY(s) ( zxwKnobY(s) - (s)->bar.y )
 
-#define zxwScrollBarXMax(s) ( (s)->bar.x+(s)->bar.width-(s)->nob.width )
-#define zxwScrollBarYMax(s) ( (s)->bar.y+(s)->bar.height-(s)->nob.height )
+#define zxwScrollBarXMax(s) ( (s)->bar.x+(s)->bar.width-(s)->knob.width )
+#define zxwScrollBarYMax(s) ( (s)->bar.y+(s)->bar.height-(s)->knob.height )
 
 #define zxwScrollBarSetX(s,v) do{\
-  if( (v) > zxwScrollBarXMax(s) ) zxwNobSetX( s, zxwScrollBarXMax(s) ); else\
-  if( (v) < (s)->bar.x ) zxwNobSetX( s, (s)->bar.x ); else\
-  zxwNobSetX( s, v );\
+  if( (v) > zxwScrollBarXMax(s) ) zxwKnobSetX( s, zxwScrollBarXMax(s) ); else\
+  if( (v) < (s)->bar.x ) zxwKnobSetX( s, (s)->bar.x ); else\
+  zxwKnobSetX( s, v );\
 } while(0)
 #define zxwScrollBarSetY(s,v) do{\
-  if( (v) > zxwScrollBarYMax(s) ) zxwNobSetY( s, zxwScrollBarYMax(s) ); else\
-  if( (v) < (s)->bar.y ) zxwNobSetY( s, (s)->bar.y ); else\
-  zxwNobSetY( s, v );\
+  if( (v) > zxwScrollBarYMax(s) ) zxwKnobSetY( s, zxwScrollBarYMax(s) ); else\
+  if( (v) < (s)->bar.y ) zxwKnobSetY( s, (s)->bar.y ); else\
+  zxwKnobSetY( s, v );\
 } while(0)
 
 bool zxwScrollBarPress(zxWindow *win, zxwScrollBar *sb, int x, int y);
@@ -709,7 +709,7 @@ bool zxwScrollBarReleaseX(zxWindow *win, zxwScrollBar *sb);
 bool zxwScrollBarReleaseY(zxWindow *win, zxwScrollBar *sb);
 
 #define zxwScrollBarTryGrab(s,x,y) do{\
-  zxwNobTryGrab( s, x, y );\
+  zxwKnobTryGrab( s, x, y );\
   (s)->grabx = (x);\
   (s)->graby = (y);\
 } while(0)
@@ -739,11 +739,11 @@ bool zxwScrollRegionCreateVert(zxWindow *win, zxwScrollRegion *sr, short x, shor
   zxwBoxSetRegion( s, (s)->reg.x, (s)->reg.y, (w)-ZXW_SCROLLBAR_W, (h)-ZXW_SCROLLBAR_W );\
   if( (s)->vbar ){\
     zxwScrollBarResizeVert( (s)->vbar, (s)->reg.x+(s)->reg.width, (s)->reg.y, (s)->reg.height );\
-    zxwScrollBarSetNobVert( (s)->vbar, (s)->reg.height, hs );\
+    zxwScrollBarSetKnobVert( (s)->vbar, (s)->reg.height, hs );\
   }\
   if( (s)->hbar ){\
     zxwScrollBarResizeHoriz( (s)->hbar, (s)->reg.x, (s)->reg.y+(s)->reg.height, (s)->reg.width );\
-    zxwScrollBarSetNobHoriz( (s)->hbar, (s)->reg.width, ws );\
+    zxwScrollBarSetKnobHoriz( (s)->hbar, (s)->reg.width, ws );\
   }\
 } while(0)
 
@@ -767,9 +767,9 @@ bool zxwScrollRegionCreateVert(zxWindow *win, zxwScrollRegion *sr, short x, shor
 } while(0)
 
 #define zxwScrollRegionX(s) \
-  (int)( (double)zxwScrollBarDX((s)->hbar) * ( (s)->fullreg.width - (s)->reg.width ) / ( (s)->hbar->bar.width - zxwNobWidth((s)->hbar) ) )
+  (int)( (double)zxwScrollBarDX((s)->hbar) * ( (s)->fullreg.width - (s)->reg.width ) / ( (s)->hbar->bar.width - zxwKnobWidth((s)->hbar) ) )
 #define zxwScrollRegionY(s) \
-  (int)( (double)zxwScrollBarDY((s)->vbar) * ( (s)->fullreg.height - (s)->reg.height ) / ( (s)->vbar->bar.height - zxwNobHeight((s)->vbar) ) )
+  (int)( (double)zxwScrollBarDY((s)->vbar) * ( (s)->fullreg.height - (s)->reg.height ) / ( (s)->vbar->bar.height - zxwKnobHeight((s)->vbar) ) )
 #define zxwScrollRegionW(s) ( (s)->reg.width )
 #define zxwScrollRegionH(s) ( (s)->reg.height )
 
@@ -800,12 +800,12 @@ bool zxwScrollRegionCreateVert(zxWindow *win, zxwScrollRegion *sr, short x, shor
 
 #define zxwScrollRegionDrag(w,s,x,y,u) do{\
   if( (s)->hbar && zxwIsGrabbed((s)->hbar) ){\
-    zxwScrollBarSetX( (s)->hbar, zxwNobX((s)->hbar) + (x) - (s)->hbar->grabx );\
+    zxwScrollBarSetX( (s)->hbar, zxwKnobX((s)->hbar) + (x) - (s)->hbar->grabx );\
     (s)->hbar->grabx = (x);\
     zxwScrollRegionDrawHoriz( w, s, u );\
   }\
   if( (s)->vbar && zxwIsGrabbed((s)->vbar) ){\
-    zxwScrollBarSetY( (s)->vbar, zxwNobY((s)->vbar) + (y) - (s)->vbar->graby );\
+    zxwScrollBarSetY( (s)->vbar, zxwKnobY((s)->vbar) + (y) - (s)->vbar->graby );\
     (s)->vbar->graby = y;\
     zxwScrollRegionDrawVert( w, s, u );\
   }\

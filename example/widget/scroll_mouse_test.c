@@ -13,7 +13,7 @@ void draw1(zxWindow *win, zxwScrollRegion *sr, void *dummy)
   zxDrawRegionRect( win, &sr->reg );
 
   zxWindowSetColor( win, zxw_text_e_color );
-  sprintf( str, "(%d,%d): (%d,%d)-(%d,%d)", zxwNobX(sr->hbar), zxwNobY(sr->vbar), zxwScrollBarDX(sr->hbar), zxwScrollBarDY(sr->vbar), zxwScrollBarDX(sr->hbar)+zxwNobWidth(sr->hbar), zxwScrollBarDY(sr->vbar)+zxwNobHeight(sr->vbar) );
+  sprintf( str, "(%d,%d): (%d,%d)-(%d,%d)", zxwKnobX(sr->hbar), zxwKnobY(sr->vbar), zxwScrollBarDX(sr->hbar), zxwScrollBarDY(sr->vbar), zxwScrollBarDX(sr->hbar)+zxwKnobWidth(sr->hbar), zxwScrollBarDY(sr->vbar)+zxwKnobHeight(sr->vbar) );
   zxDrawString( win, sr->reg.x+24, sr->reg.y+24, str );
   sprintf( str, "(%d,%d)-(%d,%d)", zxwScrollRegionX(sr), zxwScrollRegionY(sr), zxwScrollRegionX(sr)+zxwScrollRegionW(sr), zxwScrollRegionY(sr)+zxwScrollRegionH(sr) );
   zxDrawString( win, sr->reg.x+24, sr->reg.y+48, str );
@@ -30,7 +30,7 @@ void draw2(zxWindow *win, zxwScrollRegion *sr, void *dummy)
   zxDrawRegionRect( win, &sr->reg );
 
   zxWindowSetColor( win, zxw_text_e_color );
-  sprintf( str, "%d-%d", zxwScrollBarDX(sr->hbar), zxwScrollBarDX(sr->hbar)+zxwNobWidth(sr->hbar) );
+  sprintf( str, "%d-%d", zxwScrollBarDX(sr->hbar), zxwScrollBarDX(sr->hbar)+zxwKnobWidth(sr->hbar) );
   zxDrawString( win, sr->reg.x+24, sr->reg.y+24, str );
   sprintf( str, "%d-%d", zxwScrollRegionX(sr), zxwScrollRegionX(sr)+zxwScrollRegionW(sr) );
   zxDrawString( win, sr->reg.x+24, sr->reg.y+48, str );
@@ -47,7 +47,7 @@ void draw3(zxWindow *win, zxwScrollRegion *sr, void *dummy)
   zxDrawRegionRect( win, &sr->reg );
 
   zxWindowSetColor( win, zxw_text_e_color );
-  sprintf( str, "%d-%d", zxwScrollBarDY(sr->vbar), zxwScrollBarDY(sr->vbar)+zxwNobHeight(sr->vbar) );
+  sprintf( str, "%d-%d", zxwScrollBarDY(sr->vbar), zxwScrollBarDY(sr->vbar)+zxwKnobHeight(sr->vbar) );
   zxDrawString( win, sr->reg.x+24, sr->reg.y+24, str );
   sprintf( str, "%d-%d", zxwScrollRegionY(sr), zxwScrollRegionY(sr)+zxwScrollRegionH(sr) );
   zxDrawString( win, sr->reg.x+24, sr->reg.y+48, str );

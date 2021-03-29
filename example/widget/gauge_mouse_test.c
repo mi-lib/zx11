@@ -44,8 +44,8 @@ int main(void)
     case KeyPress:
       if( zxKeySymbol() == XK_q ) goto END;
     case ButtonPress:
-      zxwNobTryGrab( &gauge[0], zxMouseX, zxMouseY );
-      zxwNobTryGrab( &gauge[1], zxMouseX, zxMouseY );
+      zxwKnobTryGrab( &gauge[0], zxMouseX, zxMouseY );
+      zxwKnobTryGrab( &gauge[1], zxMouseX, zxMouseY );
       break;
     case ButtonRelease:
       zxwUngrab( &gauge[0] );

@@ -40,9 +40,9 @@ int main(void)
     zxwGaugeSetValue( &gauge[0], val );
     draw( &win, &gauge[0], &eb[0] );
   }
-  for( ; zxwNobX(&gauge[1])<=gauge[1].guide.x+gauge[1].x_range-1; zxwNobX(&gauge[1])+=2 )
+  for( ; zxwKnobX(&gauge[1])<=gauge[1].guide.x+gauge[1].x_range-1; zxwKnobX(&gauge[1])+=2 )
     draw( &win, &gauge[1], &eb[1] );
-  for( ; zxwNobX(&gauge[1])>=gauge[1].guide.x; zxwNobX(&gauge[1])-=2 )
+  for( ; zxwKnobX(&gauge[1])>=gauge[1].guide.x; zxwKnobX(&gauge[1])-=2 )
     draw( &win, &gauge[1], &eb[1] );
   zxwGaugeMove( &gauge[0], 20, 80 );
   zxwBoxSetPos( &eb[0], 240, 80 );
