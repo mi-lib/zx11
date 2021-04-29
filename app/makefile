@@ -1,14 +1,11 @@
 include ../config
 
-INCLUDE=-I$(PREFIX)/include
-LIB=-L$(PREFIX)/lib
+INCLUDE=`zeda-config -I`
+LIB=`zeda-config -L`
+DEF=`zeda-config -D`
 BINDIR=$(PREFIX)/bin
 
-CC=gcc
-CFLAGS=-ansi -Wall -O3 $(INCLUDE) $(LIB)
-
 LINK=-lzx11
-DEF=
 
 ifeq ($(CONFIG_USE_XEXT),y)
 	LINK+=-lXext
@@ -48,7 +45,9 @@ ifeq ($(CONFIG_USE_PDT),y)
 endif
 
 LINK += -lX11 `zeda-config -l`
-CFLAGS += $(DEF)
+
+CC=gcc
+CFLAGS=-ansi -Wall -O3 $(INCLUDE) $(LIB) $(DEF)
 
 COMPILE=$(CC) $(CFLAGS) -o $@ $< $(LINK)
 
@@ -56,7 +55,7 @@ INSTALL=install -m 755
 UNINSTALL=rm -f
 
 CONFIGGEN=zeda-config-gen
-CONFIG = zx11-config
+CONFIG=zx11-config
 TARGET=$(CONFIG) zxmagv zxpdtv zxlifegame zxwatch
 
 #####################################################################
