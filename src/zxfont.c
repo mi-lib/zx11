@@ -10,13 +10,19 @@
 
 XFontStruct *zxfontstruct = NULL;
 
-void zxWindowSetFont(zxWindow *win, char *fontname)
+#define ZX_ERR_FONT_NOTFOUND "font %s not found"
+
+bool zxWindowSetFont(zxWindow *win, char *fontname)
 {
   Font fid;
 
-  fid = XLoadFont( zxdisplay, fontname );
+  if( ( fid = XLoadFont( zxdisplay, fontname ) ) == BadName ){
+    ZRUNERROR( ZX_ERR_FONT_NOTFOUND, fontname );
+    return false;
+  }
   zxfontstruct = XQueryFont( zxdisplay, fid );
   XSetFont( zxdisplay, zxWindowGC(win), fid );
+  return true;
 }
 
 #define ZX_WARN_UNDEF_CHAR "metric undefined for the specified charactor"
