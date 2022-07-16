@@ -1,8 +1,8 @@
 PREFIX=$(HOME)/usr
 PROJNAME=zx11
-VERSION=1.2.7
+VERSION=1.2.8
 
-DEPENDENCY="zeda=1.6.4"
+DEPENDENCY="zeda=1.6.19"
 
 # original widget
 CONFIG_USE_WIDGET=y

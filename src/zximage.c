@@ -485,39 +485,6 @@ zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bim
   return src;
 }
 
-zxImage *zxImageAntialias(zxImage *src, zxImage *dest)
-{
-  register uint x, y, x1, x2, y1, y2;
-  uint w, h;
-  zxPixel p[9];
-  double weight[] = {
-    0.5, 0.083333, 0.083333, 0.083333, 0.083333,
-    0.041667, 0.041667, 0.041667, 0.041667 };
-  zxPixelManip pm;
-
-  zxImageCanvasRange( dest, src, 0, 0, &w, &h );
-  zxPixelManipSetDefault( &pm );
-  for( y=0; y<h; y++ )
-    for( x=0; x<w; x++ ){
-      x1 = x > 0   ? x - 1 : 0;
-      x2 = x < w-1 ? x + 1 : w-1;
-      y1 = y > 0   ? y - 1 : 0;
-      y2 = y < h-1 ? y + 1 : h-1;
-      p[0] = zxImageCellPixel( src, x , y   );
-      p[1] = zxImageCellPixel( src, x1, y   );
-      p[2] = zxImageCellPixel( src, x2, y   );
-      p[3] = zxImageCellPixel( src, x , y1 );
-      p[4] = zxImageCellPixel( src, x , y2 );
-      p[5] = zxImageCellPixel( src, x1, y1 );
-      p[6] = zxImageCellPixel( src, x1, y2 );
-      p[7] = zxImageCellPixel( src, x2, y1 );
-      p[8] = zxImageCellPixel( src, x2, y2 );
-      zxImageCellFromPixel( dest, x, y,
-        zxPixelBlend( &pm, p, weight, 9 ) );
-    }
-  return dest;
-}
-
 zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest)
 {
   register uint i, j;
@@ -533,48 +500,6 @@ zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest)
       r = ( r + g + b ) / 3;
       zxImageCellFromGS( dest, &pm, j, i, r );
     }
-  return dest;
-}
-
-zxImage *zxImageDiff(zxImage *src, zxImage *dest)
-{
-  register uint i, j;
-  uint w, h;
-  ubyte r, g, b, pr, pg, pb;
-  zxPixelManip pm;
-
-  zxImageCanvasRange( dest, src, 0, 0, &w, &h );
-  zxPixelManipSetDefault( &pm );
-  for( i=0; i<h; i++ ){
-    zxImageCellRGB( src, &pm, 0, i, &pr, &pg, &pb );
-    zxImageCellFromRGB( dest, &pm, 0, i, pr, pg, pb );
-    for( j=1; j<w; j++ ){
-      zxImageCellRGB( src, &pm, j, i, &r, &g, &b );
-      zxImageCellFromRGB( dest, &pm, j, i, r-pr, g-pg, b-pb );
-      pr = r; pg = g; pb = b;
-    }
-  }
-  return dest;
-}
-
-zxImage *zxImageIntegral(zxImage *src, zxImage *dest)
-{
-  register uint i, j;
-  uint w, h;
-  ubyte r, g, b, ri, gi, bi;
-  zxPixelManip pm;
-
-  zxImageCanvasRange( dest, src, 0, 0, &w, &h );
-  zxPixelManipSetDefault( &pm );
-  for( i=0; i<h; i++ ){
-    zxImageCellRGB( src, &pm, 0, i, &ri, &gi, &bi );
-    memcpy( zxImageAddr(dest,0,i), zxImageAddr(src,0,i), dest->bpp );
-    for( j=1; j<w; j++ ){
-      zxImageCellRGB( src, &pm, j, i, &r, &g, &b );
-      ri += r; gi += g; bi += b;
-      zxImageCellFromRGB( dest, &pm, j, i, ri, gi, bi );
-    }
-  }
   return dest;
 }
 
@@ -635,9 +560,212 @@ zxImage *zxImageDither(zxImage *src, zxImage *dest)
   return dest;
 }
 
+/* general filter */
+
+zxImage *zxImageFilter(zxImage *src, zxImage *dest, double f[], int size)
+{
+  register uint x, y, sx, sy, j, i, k;
+  uint w, h, s2, sh;
+  zxPixel *p;
+  zxPixelManip pm;
+
+  if( !( p = zAlloc( zxPixel, ( s2 = size * size ) ) ) ) goto TERMINATE;
+  zxImageCanvasRange( dest, src, 0, 0, &w, &h );
+  zxPixelManipSetDefault( &pm );
+  sh = ( size - 1 ) / 2;
+  for( y=0; y<h; y++ )
+    for( x=0; x<w; x++ ){
+      for( k=0, i=0; i<size; i++ ){
+        sy = zLimit( y + i - sh, 0, w-1 );
+        for( j=0; j<size; j++ ){
+          sx = zLimit( x + j - sh, 0, h-1 );
+          p[k++] = zxImageCellPixel( src, sx, sy );
+        }
+      }
+      zxImageCellFromPixel( dest, x, y,
+        zxPixelBlend( &pm, p, f, s2 ) );
+    }
+ TERMINATE:
+  free( p );
+  return dest;
+}
+
+/* blur */
+
+static int _zxImageMedianCmp(void *v1, void *v2, void *dummy)
+{
+  if( *(ubyte*)v1 > *(ubyte*)v2 ) return 1;
+  if( *(ubyte*)v1 < *(ubyte*)v2 ) return -1;
+  return 0;
+}
+
+static void _zxImageMedianFind(zxImage *img, zxPixelManip *pm, int j, int i, ubyte *rs, ubyte *gs, ubyte *bs, int size, ubyte *r, ubyte *g, ubyte *b)
+{
+  register int _i, _j, si, sj, k;
+  int s2, sh;
+
+  s2 = size * size;
+  sh = ( size - 1 ) / 2;
+  for( _i=0; _i<size; _i++ )
+    for( _j=0; _j<size; _j++ ){
+      k = _i*size + _j;
+      if( zxImagePosIsValid( img, ( sj = j+_j-sh ), ( si = i+_i-sh ) ) ){
+        zxImageCellRGB( img, pm, sj, si, r, g, b );
+      } else
+        *r = *g = *b = 0;
+      zInsertSort( rs, r, k, s2, sizeof(ubyte), _zxImageMedianCmp, NULL );
+      zInsertSort( gs, g, k, s2, sizeof(ubyte), _zxImageMedianCmp, NULL );
+      zInsertSort( bs, b, k, s2, sizeof(ubyte), _zxImageMedianCmp, NULL );
+    }
+  sh = ( s2 - 1 ) / 2;
+  *r = rs[sh];
+  *g = gs[sh];
+  *b = bs[sh];
+}
+
+zxImage *zxImageMedian(zxImage *src, zxImage *dest, int size)
+{
+  register int i, j;
+  uint w, h;
+  zxPixelManip pm;
+  ubyte *rs, *gs, *bs, r, g, b;
+
+  rs = zAlloc( ubyte, size * size );
+  gs = zAlloc( ubyte, size * size );
+  bs = zAlloc( ubyte, size * size );
+  if( !rs || !gs || !bs ) goto TERMINATE;
+  zxImageCanvasRange( dest, src, 0, 0, &w, &h );
+  zxPixelManipSet( &pm, zxdepth );
+  for( i=0; i<h; i++ ){
+    for( j=0; j<w; j++ ){
+      _zxImageMedianFind( src, &pm, j, i, rs, gs, bs, size, &r, &g, &b );
+      zxImageCellFromRGB( dest, &pm, j, i, r, g, b );
+    }
+  }
+ TERMINATE:
+  free( rs );
+  free( gs );
+  free( bs );
+  return dest;
+}
+
+zxImage *zxImageAntialias(zxImage *src, zxImage *dest)
+{
+  double weight[] = {
+    0.041667, 0.083333, 0.041667,
+    0.083333, 0.5,      0.083333,
+    0.041667, 0.083333, 0.041667,
+  };
+  return zxImageFilter( src, dest, weight, 3 );
+}
+
+zxImage *zxImageGaussian(zxImage *src, zxImage *dest)
+{
+  double weight[] = {
+    0.0625, 0.1250, 0.0625,
+    0.1250, 0.2500, 0.1250,
+    0.0625, 0.1250, 0.0625,
+  };
+  return zxImageFilter( src, dest, weight, 3 );
+}
+
+/* edge detection */
+
+zxImage *zxImageDiff(zxImage *src, zxImage *dest)
+{
+  register uint i, j;
+  uint w, h;
+  ubyte r, g, b, pr, pg, pb;
+  zxPixelManip pm;
+
+  zxImageCanvasRange( dest, src, 0, 0, &w, &h );
+  zxPixelManipSetDefault( &pm );
+  for( i=0; i<h; i++ ){
+    zxImageCellRGB( src, &pm, 0, i, &pr, &pg, &pb );
+    zxImageCellFromRGB( dest, &pm, 0, i, pr, pg, pb );
+    for( j=1; j<w; j++ ){
+      zxImageCellRGB( src, &pm, j, i, &r, &g, &b );
+      zxImageCellFromRGB( dest, &pm, j, i, r-pr, g-pg, b-pb );
+      pr = r; pg = g; pb = b;
+    }
+  }
+  return dest;
+}
+
+zxImage *zxImageIntegral(zxImage *src, zxImage *dest)
+{
+  register uint i, j;
+  uint w, h;
+  ubyte r, g, b, ri, gi, bi;
+  zxPixelManip pm;
+
+  zxImageCanvasRange( dest, src, 0, 0, &w, &h );
+  zxPixelManipSetDefault( &pm );
+  for( i=0; i<h; i++ ){
+    zxImageCellRGB( src, &pm, 0, i, &ri, &gi, &bi );
+    memcpy( zxImageAddr(dest,0,i), zxImageAddr(src,0,i), dest->bpp );
+    for( j=1; j<w; j++ ){
+      zxImageCellRGB( src, &pm, j, i, &r, &g, &b );
+      ri += r; gi += g; bi += b;
+      zxImageCellFromRGB( dest, &pm, j, i, ri, gi, bi );
+    }
+  }
+  return dest;
+}
+
+zxImage *zxImagePrewittH(zxImage *src, zxImage *dest)
+{
+  double weight[] = {
+   -1.0, 0.0, 1.0,
+   -1.0, 0.0, 1.0,
+   -1.0, 0.0, 1.0,
+  };
+  return zxImageFilter( src, dest, weight, 3 );
+}
+
+zxImage *zxImagePrewittV(zxImage *src, zxImage *dest)
+{
+  double weight[] = {
+   -1.0,-1.0,-1.0,
+    0.0, 0.0, 0.0,
+    1.0, 1.0, 1.0,
+  };
+  return zxImageFilter( src, dest, weight, 3 );
+}
+
+zxImage *zxImageSobelH(zxImage *src, zxImage *dest)
+{
+  double weight[] = {
+   -1.0, 0.0, 1.0,
+   -2.0, 0.0, 2.0,
+   -1.0, 0.0, 1.0,
+  };
+  return zxImageFilter( src, dest, weight, 3 );
+}
+
+zxImage *zxImageSobelV(zxImage *src, zxImage *dest)
+{
+  double weight[] = {
+   -1.0,-2.0,-1.0,
+    0.0, 0.0, 0.0,
+    1.0, 2.0, 1.0,
+  };
+  return zxImageFilter( src, dest, weight, 3 );
+}
+
+zxImage *zxImageLaplacian(zxImage *src, zxImage *dest)
+{
+  double weight[] = {
+    1.0, 1.0, 1.0,
+    1.0,-8.0, 1.0,
+    1.0, 1.0, 1.0,
+  };
+  return zxImageFilter( src, dest, weight, 3 );
+}
+
 /* special effect */
 
-zxPixel zxImageAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h)
+zxPixel zxImageCellAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h)
 {
   register uint i, j;
   zxPixel rl, gl, bl, r, g, b;
@@ -660,14 +788,14 @@ zxPixel zxImageAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, u
   return pm->PixelFromRGB( r, g, b );
 }
 
-zxImage *zxImageAveragate(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h)
+zxImage *zxImageAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h)
 {
   register uint i, j;
   zxPixel p;
 
   w = zMin( img->width - x, w );
   h = zMin( img->height - y, h );
-  p = zxImageAverage( img, pm, x, y, w, h );
+  p = zxImageCellAverage( img, pm, x, y, w, h );
   for( i=0; i<h; i++ )
     for( j=0; j<w; j++ )
       zxImageCellFromPixel( img, x+j, y+i, p );
@@ -686,7 +814,7 @@ zxImage *zxImageMosaic(zxImage *img, uint x, uint y, uint w, uint h, uint nx, ui
   zxPixelManipSetDefault( &pm );
   for( i=y; i<my; i+=dy )
     for( j=x; j<mx; j+=dx )
-      zxImageAveragate( img, &pm, j, i, dx, dy );
+      zxImageAverage( img, &pm, j, i, dx, dy );
   return img;
 }
 

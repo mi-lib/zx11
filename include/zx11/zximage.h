@@ -97,18 +97,35 @@ zxImage *zxImageResize(zxImage *src, zxImage *dest);
 /* color manipulation */
 
 zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bimg);
-zxImage *zxImageAntialias(zxImage *src, zxImage *dest);
 zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest);
-zxImage *zxImageDiff(zxImage *src, zxImage *dest);
-zxImage *zxImageIntegral(zxImage *src, zxImage *dest);
 zxImage *zxImageNegate(zxImage *src, zxImage *dest);
 zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate);
 zxImage *zxImageDither(zxImage *src, zxImage *dest);
 
+/* general filter */
+
+zxImage *zxImageFilter(zxImage *src, zxImage *dest, double f[], int size);
+
+/* blur */
+
+zxImage *zxImageMedian(zxImage *src, zxImage *dest, int size);
+zxImage *zxImageAntialias(zxImage *src, zxImage *dest);
+zxImage *zxImageGaussian(zxImage *src, zxImage *dest);
+
+/* edge detection */
+
+zxImage *zxImageDiff(zxImage *src, zxImage *dest);
+zxImage *zxImageIntegral(zxImage *src, zxImage *dest);
+zxImage *zxImagePrewittH(zxImage *src, zxImage *dest);
+zxImage *zxImagePrewittV(zxImage *src, zxImage *dest);
+zxImage *zxImageSobelH(zxImage *src, zxImage *dest);
+zxImage *zxImageSobelV(zxImage *src, zxImage *dest);
+zxImage *zxImageLaplacian(zxImage *src, zxImage *dest);
+
 /* special effect */
 
-zxPixel zxImageAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h);
-zxImage *zxImageAveragate(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h);
+zxPixel zxImageCellAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h);
+zxImage *zxImageAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h);
 zxImage *zxImageMosaic(zxImage *img, uint x, uint y, uint w, uint h, uint nx, uint ny);
 
 /* drawing */
