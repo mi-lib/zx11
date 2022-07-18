@@ -5,6 +5,7 @@
  */
 
 #include <zx11/zxpixel.h>
+#include <math.h>
 
 /* ********************************************************** */
 /* CLASS: zxPixel
@@ -171,7 +172,7 @@ zxPixel zxPixelBlend(zxPixelManip *pm, zxPixel p[], double w[], uint n)
     gt += (double)g * w[i];
     bt += (double)b * w[i];
   }
-  return pm->PixelFromRGB( (zxPixel)rt, (zxPixel)gt, (zxPixel)bt );
+  return pm->PixelFromRGB( (zxPixel)zLimit(rt,0,0xff), (zxPixel)zLimit(gt,0,0xff), (zxPixel)zLimit(bt,0,0xff) );
 }
 
 zxPixel zxPixelAlphaBlend(zxPixelManip *pm, zxPixel p1, zxPixel p2, double alpha)
@@ -185,6 +186,20 @@ zxPixel zxPixelAlphaBlend(zxPixelManip *pm, zxPixel p1, zxPixel p2, double alpha
   r = r1 + alpha * ( r2 - r1 );
   g = g1 + alpha * ( g2 - g1 );
   b = b1 + alpha * ( b2 - b1 );
+  return pm->PixelFromRGB( r, g, b );
+}
+
+zxPixel zxPixelNorm2(zxPixelManip *pm, zxPixel p1, zxPixel p2)
+{
+  ubyte r1, g1, b1;
+  ubyte r2, g2, b2;
+  double r, g, b;
+
+  pm->PixelRGB( p1, &r1, &g1, &b1 );
+  pm->PixelRGB( p2, &r2, &g2, &b2 );
+  r = sqrt( r1*r1 + r2*r2 );
+  g = sqrt( g1*g1 + g2*g2 );
+  b = sqrt( b1*b1 + b2*b2 );
   return pm->PixelFromRGB( r, g, b );
 }
 

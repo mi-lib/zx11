@@ -100,11 +100,13 @@ zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bim
 zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest);
 zxImage *zxImageNegate(zxImage *src, zxImage *dest);
 zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate);
+zxImage *zxImageEqualize(zxImage *src, zxImage *dest);
 zxImage *zxImageDither(zxImage *src, zxImage *dest);
 
 /* general filter */
 
 zxImage *zxImageFilter(zxImage *src, zxImage *dest, double f[], int size);
+zxImage *zxImageFilter2(zxImage *src, zxImage *dest, double f1[], double f2[], int size);
 
 /* blur */
 
@@ -118,8 +120,10 @@ zxImage *zxImageDiff(zxImage *src, zxImage *dest);
 zxImage *zxImageIntegral(zxImage *src, zxImage *dest);
 zxImage *zxImagePrewittH(zxImage *src, zxImage *dest);
 zxImage *zxImagePrewittV(zxImage *src, zxImage *dest);
+zxImage *zxImagePrewitt(zxImage *src, zxImage *dest);
 zxImage *zxImageSobelH(zxImage *src, zxImage *dest);
 zxImage *zxImageSobelV(zxImage *src, zxImage *dest);
+zxImage *zxImageSobel(zxImage *src, zxImage *dest);
 zxImage *zxImageLaplacian(zxImage *src, zxImage *dest);
 
 /* special effect */

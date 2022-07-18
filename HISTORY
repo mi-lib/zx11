@@ -1,3 +1,8 @@
+2022. 7.18. Added zxImageEqualize. [zximage]
+2022. 7.18. Added zxImageFilter2, zxImagePrewitt and zxImageSobel. [zximage]
+2022. 7.18. Renamed __resize_filter to __zx11_resize_filter. [zximage]
+2022. 7.18. Added zxPixelNorm2. [zxpixel]
+2022. 7.18. Debugged zxPixelBlend. [zxpixel]
 2022. 7.16. Added zxImagePrewittH, zxImagePrewittV, zxImageSobelH, zxImageSobelV and zxImageLaplacian. [zximage]
 2022. 7.16. Reimplemented zxImageAntialias by using zxImageFilter. [zximage]
 2022. 7.16. Added zxImageMedian and zxImageGaussian. [zximage]

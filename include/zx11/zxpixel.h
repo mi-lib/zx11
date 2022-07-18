@@ -46,7 +46,9 @@ zxPixelManip *zxPixelManipSet(zxPixelManip *pm, int depth);
 zxPixel zxPixelConv(zxPixel pixel, zxPixelManip *src, zxPixelManip *dest);
 zxPixel zxPixelBlend(zxPixelManip *pm, zxPixel p[], double w[], uint n);
 zxPixel zxPixelAlphaBlend(zxPixelManip *pm, zxPixel p1, zxPixel p2, double alpha);
+zxPixel zxPixelNorm2(zxPixelManip *pm, zxPixel p1, zxPixel p2);
 #define zxPixelNegate(pm,p) (pm)->PixelNegate( (p) )
+
 zxPixel zxPixelFromGS(zxPixelManip *pm, ubyte intensity);
 zxPixel zxPixelFromFGS(zxPixelManip *pm, float intensity);
 
