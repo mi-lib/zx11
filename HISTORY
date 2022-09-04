@@ -1,3 +1,5 @@
+2022. 9. 4. Reflected new specification of zeda-makefile-gen, and modified src/makefile. [src]
+2022. 9. 4. Removed register keywords. [zxpixel, zxwidget, zxsprite, zximage, zximage_pnm, zximage_dib, zximage_jpeg, zximage_png, zximage_tiff, zximage_mag, zximage_pdt]
 2022. 7.18. Added zxImageEqualize. [zximage]
 2022. 7.18. Added zxImageFilter2, zxImagePrewitt and zxImageSobel. [zximage]
 2022. 7.18. Renamed __resize_filter to __zx11_resize_filter. [zximage]

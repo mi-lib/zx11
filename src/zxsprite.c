@@ -11,8 +11,6 @@
 /* CLASS: zxsPatternList
  * ********************************************************** */
 
-static zxsPattern *_zxsPatternListCreate(zxsPatternList *list, zxPM *pix, int row, int col, int ix, int iy);
-
 zxsPattern *zxsPatternInit(zxsPattern *pat)
 {
   pat->data.pix = NULL;
@@ -28,7 +26,7 @@ void zxsPatternDraw(zxWindow *win, zxsPattern *pat, Pixmap canvas)
     pat->data.cur.ox, pat->data.cur.oy, pat->data.dx, pat->data.dy, pat->data.cur.x, pat->data.cur.y );
 }
 
-zxsPattern *_zxsPatternListCreate(zxsPatternList *list, zxPM *pix, int row, int col, int ix, int iy)
+static zxsPattern *_zxsPatternListCreate(zxsPatternList *list, zxPM *pix, int row, int col, int ix, int iy)
 {
   zxsPattern *pat;
 
@@ -317,7 +315,7 @@ void zxSpriteAppearAll(zxWindow *win, zxSprite *spr)
 
 zxsMap *zxsMapCreate(zxsMap *map, uint width, uint height)
 {
-  register int i;
+  int i;
 
   if( !( map->array = zAlloc( struct _zxs_map_cell*, height ) ) ){
     ZALLOCERROR();
@@ -335,7 +333,7 @@ zxsMap *zxsMapCreate(zxsMap *map, uint width, uint height)
 
 void zxsMapDestroy(zxsMap *map)
 {
-  register int i;
+  int i;
 
   for( i=0; i<map->height; i++ )
     zFree( map->array[i] );
@@ -343,8 +341,7 @@ void zxsMapDestroy(zxsMap *map)
   map->width = map->height = 0;
 }
 
-static ubyte _zxsMapReadInt(FILE *fp);
-ubyte _zxsMapReadInt(FILE *fp)
+static ubyte _zxsMapReadInt(FILE *fp)
 {
   char ch;
 
@@ -355,7 +352,7 @@ ubyte _zxsMapReadInt(FILE *fp)
 bool zxsMapReadArray(zxsMap *map, char filename[])
 {
   FILE *fp;
-  register int i, j;
+  int i, j;
 
   if( !( fp = fopen( filename, "r" ) ) ){
     ZOPENERROR( filename );
@@ -391,7 +388,7 @@ bool zxsMapReadPixData(zxWindow *win, zxsMap *map, char *data[], int row, int co
 
 void zxsMapDraw(zxWindow *win, zxsMap *map, Pixmap canvas)
 {
-  register int i, j, x, y;
+  int i, j, x, y;
   struct _zxs_map_cell *cp;
 
   for( i=0, y=0; i<map->reg.height; i++, y+=map->pat.data.dy )

@@ -38,31 +38,11 @@ typedef struct{
   uint32_t mask_offset;     /* mask (if it exists) */
 } zxPDTInfo;
 
-static ubyte _zxPDTReadByte(FILE *fp);
-static void _zxPDTReadBytes(FILE *fp, ubyte *buf, int size);
-static int _zxPDTCheck(zxPDTInfo *info);
-
-static bool _zxPDTReadHeader(FILE *fp, zxPDTInfo *info);
-
-static void _zxPDTReadPixel(FILE *fp, zxImage *img, ulong offset);
-static void _zxPDTReadMask(FILE *fp, zxImage *img, ulong offset);
-/* indices in PDT11 also consists of one-byte values */
-static void _zxPDTReadIndex(FILE *fp, zxImage *img, ulong offset);
-
-static void _zxPDTReadData(FILE *fp, zxImage *img, void (* read_pixel)(FILE*,zxImage*,ulong), ubyte psize, void (* size_and_index)(FILE*,zxImage*,ulong*,ulong*,ubyte**));
-
-static void _zxPDT10GetPixelSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *index, ubyte **buf);
-static void _zxPDT10GetMaskSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *index, ubyte **buf);
-static void _zxPDT11GetPixelSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *index, ubyte **buf);
-static void _zxPDT10ReadPixelData(FILE *fp, zxImage *img);
-static void _zxPDT10ReadMaskData(FILE *fp, zxImage *img);
-static void _zxPDT11ReadPixelData(FILE *fp, zxImage *img);
-
 /* index table for PDT11 */
 #define ZX_PDT11_INDEX_SIZE 16
 static uint _zx_pdt11_index[ZX_PDT11_INDEX_SIZE];
 
-ubyte _zxPDTReadByte(FILE *fp)
+static ubyte _zxPDTReadByte(FILE *fp)
 {
   if( feof( fp ) ){
     ZRUNERROR( "unexpected EOF" );
@@ -71,15 +51,15 @@ ubyte _zxPDTReadByte(FILE *fp)
   return fgetc( fp );
 }
 
-void _zxPDTReadBytes(FILE *fp, ubyte *buf, int size)
+static void _zxPDTReadBytes(FILE *fp, ubyte *buf, int size)
 {
-  register int i;
+  int i;
 
   for( i=0; i<size; i++ )
     buf[i] = _zxPDTReadByte( fp );
 }
 
-int _zxPDTCheck(zxPDTInfo *info)
+static int _zxPDTCheck(zxPDTInfo *info)
 {
   if( !strncmp( info->ident, "PDT10", 5 ) ) return ZX_PDT10;
   if( !strncmp( info->ident, "PDT11", 5 ) ) return ZX_PDT11;
@@ -87,7 +67,7 @@ int _zxPDTCheck(zxPDTInfo *info)
   return ZX_PDT_INVALID;
 }
 
-bool _zxPDTReadHeader(FILE *fp, zxPDTInfo *info)
+static bool _zxPDTReadHeader(FILE *fp, zxPDTInfo *info)
 {
   _zxPDTReadBytes( fp, (ubyte *)info, ZX_PDT_HEADER_SIZE );
   if( _zxPDTCheck( info ) == ZX_PDT_INVALID ) return false;
@@ -96,7 +76,7 @@ bool _zxPDTReadHeader(FILE *fp, zxPDTInfo *info)
   return true;
 }
 
-void _zxPDTReadPixel(FILE *fp, zxImage *img, ulong offset)
+static void _zxPDTReadPixel(FILE *fp, zxImage *img, ulong offset)
 {
   zxPixel pixel = 0;
 
@@ -105,20 +85,20 @@ void _zxPDTReadPixel(FILE *fp, zxImage *img, ulong offset)
     = zxPixelConv( pixel, &_zx_pdt_pm_src, &_zx_pdt_pm_dest );
 }
 
-void _zxPDTReadMask(FILE *fp, zxImage *img, ulong offset)
+static void _zxPDTReadMask(FILE *fp, zxImage *img, ulong offset)
 {
   img->mask_buf[offset] = _zxPDTReadByte( fp );
 }
 
 /* indices in PDT11 also consists of one-byte values */
-void _zxPDTReadIndex(FILE *fp, zxImage *img, ulong offset)
+static void _zxPDTReadIndex(FILE *fp, zxImage *img, ulong offset)
 {
   img->buf[offset] = _zxPDTReadByte( fp );
 }
 
-void _zxPDTReadData(FILE *fp, zxImage *img, void (* read_pixel)(FILE*,zxImage*,ulong), ubyte psize, void (* size_and_index)(FILE*,zxImage*,ulong*,ulong*,ubyte**))
+static void _zxPDTReadData(FILE *fp, zxImage *img, void (* read_pixel)(FILE*,zxImage*,ulong), ubyte psize, void (* size_and_index)(FILE*,zxImage*,ulong*,ulong*,ubyte**))
 {
-  register byte flag = 0, len = 0;
+  byte flag = 0, len = 0;
   ulong i, size, index, data_size;
   ubyte *bhead, *bp;
 
@@ -142,7 +122,7 @@ void _zxPDTReadData(FILE *fp, zxImage *img, void (* read_pixel)(FILE*,zxImage*,u
   }
 }
 
-void _zxPDT10GetPixelSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *index, ubyte **buf)
+static void _zxPDT10GetPixelSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *index, ubyte **buf)
 {
   uint val = 0;
 
@@ -152,14 +132,14 @@ void _zxPDT10GetPixelSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *in
   *buf = img->buf;
 }
 
-void _zxPDT10GetMaskSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *index, ubyte **buf)
+static void _zxPDT10GetMaskSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *index, ubyte **buf)
 {
   *size = _zxPDTReadByte(fp) + 2;
   *index = ( _zxPDTReadByte(fp) + 1 ) * sizeof(ubyte);
   *buf = img->mask_buf;
 }
 
-void _zxPDT11GetPixelSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *index, ubyte **buf)
+static void _zxPDT11GetPixelSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *index, ubyte **buf)
 {
   ubyte val;
 
@@ -169,7 +149,7 @@ void _zxPDT11GetPixelSizeAndIndex(FILE *fp, zxImage *img, ulong *size, ulong *in
   *buf = img->buf;
 }
 
-void _zxPDT10ReadPixelData(FILE *fp, zxImage *img)
+static void _zxPDT10ReadPixelData(FILE *fp, zxImage *img)
 {
   /* data is compressed by LZ method */
   /* pixel : 24 bit
@@ -179,7 +159,7 @@ void _zxPDT10ReadPixelData(FILE *fp, zxImage *img)
   _zxPDTReadData( fp, img, _zxPDTReadPixel, img->bpp, _zxPDT10GetPixelSizeAndIndex );
 }
 
-void _zxPDT10ReadMaskData(FILE *fp, zxImage *img)
+static void _zxPDT10ReadMaskData(FILE *fp, zxImage *img)
 {
   /* mask is compressed by LZ method */
   /* mask  : 8 bit
@@ -189,7 +169,7 @@ void _zxPDT10ReadMaskData(FILE *fp, zxImage *img)
   _zxPDTReadData( fp, img, _zxPDTReadMask, sizeof(ubyte), _zxPDT10GetMaskSizeAndIndex );
 }
 
-void _zxPDT11ReadPixelData(FILE *fp, zxImage *img)
+static void _zxPDT11ReadPixelData(FILE *fp, zxImage *img)
 {
 #define ZX_PDT11_INDEX_OFFSET 1056
   /* data is compressed by LZ method */
@@ -199,7 +179,7 @@ void _zxPDT11ReadPixelData(FILE *fp, zxImage *img)
    * [Note] the order of size and offset is inversed from PDT10.
    */
   zxImage index_buf;
-  register int i, size;
+  int i, size;
   ubyte *bp;
 
   /* allocate index array */

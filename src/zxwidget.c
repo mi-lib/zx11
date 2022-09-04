@@ -74,7 +74,7 @@ void zxwSepVert(zxWindow *win, short x, short y, short height)
 
 void zxwSepBoxLower(zxWindow *win, short x, short y, short width, short height)
 {
-  register short x2, y2;
+  short x2, y2;
 
   x2 = x + width;
   y2 = y + height;
@@ -88,7 +88,7 @@ void zxwSepBoxLower(zxWindow *win, short x, short y, short width, short height)
 
 void zxwSepBoxRaise(zxWindow *win, short x, short y, short width, short height)
 {
-  register short x2, y2;
+  short x2, y2;
 
   x2 = x + width;
   y2 = y + height;
@@ -110,12 +110,9 @@ void zxwSepBoxRelief(zxWindow *win, short x, short y, short width, short height)
 /* box widget
  * ********************************************************** */
 
-static void _zxwBoxDrawUpperLimb(zxWindow *win, short *x1, short *y1, short *x2, short *y2, long color, int h);
-static void _zxwBoxDrawLowerLimb(zxWindow *win, short *x1, short *y1, short *x2, short *y2, long color, int h);
-
-void _zxwBoxDrawUpperLimb(zxWindow *win, short *x1, short *y1, short *x2, short *y2, long color, int h)
+static void _zxwBoxDrawUpperLimb(zxWindow *win, short *x1, short *y1, short *x2, short *y2, long color, int h)
 {
-  register int i;
+  int i;
 
   zxWindowSetColor( win, color );
   for( i=0; i<h; i++ ){
@@ -126,9 +123,9 @@ void _zxwBoxDrawUpperLimb(zxWindow *win, short *x1, short *y1, short *x2, short 
   }
 }
 
-void _zxwBoxDrawLowerLimb(zxWindow *win, short *x1, short *y1, short *x2, short *y2, long color, int h)
+static void _zxwBoxDrawLowerLimb(zxWindow *win, short *x1, short *y1, short *x2, short *y2, long color, int h)
 {
-  register int i;
+  int i;
 
   zxWindowSetColor( win, color );
   for( i=0; i<h; i++ ){
@@ -178,8 +175,6 @@ void zxwBoxDrawRelief(zxWindow *win, zxRegion *reg, long color, short h)
 /* label class
  * ********************************************************** */
 
-static void _zxwLabelAlign(char *label, int n, short *x, short *y, zxRegion *reg, char halign, char valign, short emboss);
-
 int zxwLabelHeight(short *asc, short *dsc)
 {
   zxRegion reg;
@@ -193,7 +188,7 @@ int zxwLabelHeight(short *asc, short *dsc)
   return reg.height + *dsc + ZXW_TEXTBOX_TEXTBORDER * 2;
 }
 
-void _zxwLabelAlign(char *label, int n, short *x, short *y, zxRegion *reg, char halign, char valign, short emboss)
+static void _zxwLabelAlign(char *label, int n, short *x, short *y, zxRegion *reg, char halign, char valign, short emboss)
 {
   zxRegion txtreg;
 
@@ -235,9 +230,7 @@ void _zxwLabelNDrawColor(zxWindow *win, char *label, int n, zxRegion *reg, char 
  * text box widget
  * ********************************************************** */
 
-static void _zxwTextBoxAlignFlow(zxWindow *win, char *label, short w, char falign, int *first, int *last);
-
-void _zxwTextBoxAlignFlow(zxWindow *win, char *label, short w, char falign, int *first, int *last)
+static void _zxwTextBoxAlignFlow(zxWindow *win, char *label, short w, char falign, int *first, int *last)
 {
   *first = 0;
   *last = strlen(label) - 1;
@@ -270,8 +263,6 @@ void _zxwTextBoxDrawLabel(zxWindow *win, char *label, zxRegion *reg, char halign
  * text edit box widget
  * ********************************************************** */
 
-static int _zxwEditBoxStrLen(zxwEditBox *eb);
-
 void zxwEditBoxSetHeight(zxwEditBox *eb, short height)
 {
   short asc; /* dummy */
@@ -280,7 +271,7 @@ void zxwEditBoxSetHeight(zxwEditBox *eb, short height)
   eb->reg.height = height > 0 ? height : zxwLabelHeight( &asc, &eb->emboss );
 }
 
-int _zxwEditBoxStrLen(zxwEditBox *eb)
+static int _zxwEditBoxStrLen(zxwEditBox *eb)
 {
   return eb->emboss + ZXW_TEXTBOX_TEXTBORDER - 1
     + zxTextNWidth( eb->label + eb->cursor_str_head, eb->cursor_str_tail - eb->cursor_str_head + 2 );
@@ -554,7 +545,7 @@ void zxwPopupAddItemList(zxwPopup *popup, zxwPopupItemEntry *entry)
 
 void zxwPopupDraw(zxwPopup *popup)
 {
-  register int i;
+  int i;
   zxRegion reg;
 
   zxRegionSet( &reg, 0, 0, popup->w.reg.width, popup->w.reg.height );
@@ -570,7 +561,7 @@ void zxwPopupDraw(zxwPopup *popup)
 
 void zxwPopupOpen(zxwPopup *popup, short x, short y)
 {
-  register int i;
+  int i;
 
   zxWindowMove( &popup->w, 0, 0 );
   zxWindowOpen( &popup->w );
@@ -618,7 +609,7 @@ void zxwMenuAddItemList(zxwMenu *menu, zxwMenuItemEntry *entry)
 
 void zxwMenuDraw(zxWindow *win, zxwMenu *menu)
 {
-  register int i;
+  int i;
 
   zxwBoxDraw( win, menu, zxw_back_color );
   for( i=0; i<menu->item_num; i++ ){
@@ -635,7 +626,7 @@ void zxwMenuDraw(zxWindow *win, zxwMenu *menu)
 
 void zxwPixButtonGroupDestroy(zxwPixButtonGroup *pbg)
 {
-  register int i;
+  int i;
 
   for( i=0; i<pbg->item_num; i++ )
     zxwPixButtonDestroy( zxwItem(pbg,i) );
@@ -661,7 +652,7 @@ int zxwPixButtonGroupAdd(zxwPixButtonGroup *pbg, int row, int col)
 
 void zxwPixButtonGroupDraw(zxWindow *win, zxwPixButtonGroup *pbg)
 {
-  register int i;
+  int i;
 
   zxwSepBoxRelief( win, pbg->reg.x - 1, pbg->reg.y - 1,
     pbg->reg.width  + 2, pbg->reg.height + 2 );
@@ -693,7 +684,7 @@ int zxwRadioButtonGroupAdd(zxwRadioButtonGroup *rbg, int x, int y)
 
 void zxwRadioButtonGroupDraw(zxWindow *win, zxwRadioButtonGroup *rbg)
 {
-  register int i;
+  int i;
 
   zxwBoxDrawRelief( win, &rbg->reg, zxw_front_color, 1 );
   for( i=0; i<rbg->item_num; i++ )
@@ -708,7 +699,7 @@ void zxwRadioButtonGroupDraw(zxWindow *win, zxwRadioButtonGroup *rbg)
 int zxwTabGroupAdd(zxwTabGroup *tg, char *label, void *(* f)(void))
 {
   zxwTab *item;
-  register int i, x, xn;
+  int i, x, xn;
 
   if( !( item = zRealloc( tg->item, zxwTab, tg->item_num+1 ) ) ){
     ZALLOCERROR();
@@ -729,7 +720,7 @@ int zxwTabGroupAdd(zxwTabGroup *tg, char *label, void *(* f)(void))
 
 void zxwTabGroupDestroy(zxwTabGroup *tg)
 {
-  register int i;
+  int i;
 
   for( i=0; i<tg->item_num; i++ )
     zxwButtonDestroy( zxwItem(tg,i) );
@@ -738,7 +729,7 @@ void zxwTabGroupDestroy(zxwTabGroup *tg)
 
 void zxwTabGroupDraw(zxWindow *win, zxwTabGroup *tg)
 {
-  register int i;
+  int i;
 
   for( i=0; i<tg->item_num; i++ ){
     if( i == tg->item_active ) continue;

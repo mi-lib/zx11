@@ -19,11 +19,7 @@ bool zxImageFileIsJPEG(char filename[])
   return zxImageFileIdent( filename, __zx_jpeg_ident, ZX_JPEG_IDENT_SIZE );
 }
 
-static void _zx_jpg_error_exit(j_common_ptr cinfo);
-static void _zx_jpg_conv16(zxPixelManip *pm, ubyte *buf, int w, int x, int y, ubyte rgb[]);
-static void _zx_jpg_conv32(zxPixelManip *pm, ubyte *buf, int w, int x, int y, ubyte rgb[]);
-
-void _zx_jpg_error_exit(j_common_ptr cinfo)
+static void _zx_jpg_error_exit(j_common_ptr cinfo)
 {
   sigjmp_buf setjmp_buffer;
 
@@ -31,19 +27,19 @@ void _zx_jpg_error_exit(j_common_ptr cinfo)
   siglongjmp( setjmp_buffer, 1 );
 }
 
-void _zx_jpg_conv16(zxPixelManip *pm, ubyte *buf, int w, int x, int y, ubyte rgb[])
+static void _zx_jpg_conv16(zxPixelManip *pm, ubyte *buf, int w, int x, int y, ubyte rgb[])
 {
   ((uint16_t *)buf)[y*w+x] = pm->PixelFromRGB( rgb[0]>>3, rgb[1]>>3, rgb[2]>>3 );
 }
 
-void _zx_jpg_conv32(zxPixelManip *pm, ubyte *buf, int w, int x, int y, ubyte rgb[])
+static void _zx_jpg_conv32(zxPixelManip *pm, ubyte *buf, int w, int x, int y, ubyte rgb[])
 {
   ((uint32_t *)buf)[y*w+x] = pm->PixelFromRGB( rgb[0], rgb[1], rgb[2] );
 }
 
 int zxImageReadJPEG(FILE *fp, zxImage *img)
 {
-  register int x, y, i;
+  int x, y, i;
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr pub;
   JSAMPARRAY jb;
@@ -110,8 +106,7 @@ int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality)
   struct jpeg_error_mgr jerr;
   JSAMPARRAY buf;
   zxPixelManip pm;
-  register int i, j;
-  int ret = 1;
+  int i, j, ret = 1;
 
   jpeg_create_compress( &cinfo );
   cinfo.err = jpeg_std_error( &jerr );

@@ -23,21 +23,9 @@ typedef struct{
   int compression_type, filter_type;
 } zxPNG;
 
-static ubyte **__zx_png_buf_alloc(zxImage *img);
-
-static void zxPNGInit(zxPNG *png);
-static int zxPNGCreateInfo(zxPNG *png);
-static int zxPNGCreateReadInfo(zxPNG *png);
-static void zxPNGDestroyRead(zxPNG *png);
-static int zxPNGRead(zxImage *img, zxPNG *png, FILE *fp);
-
-static int zxPNGCreateWriteInfo(zxPNG *png);
-static void zxPNGDestroyWrite(zxPNG *png);
-static int zxPNGWrite(zxImage *img, zxPNG *png, FILE *fp);
-
-ubyte **__zx_png_buf_alloc(zxImage *img)
+static ubyte **__zx_png_buf_alloc(zxImage *img)
 {
-  register int i, j;
+  int i, j;
   ubyte **buf, *bp;
   ulong byteperrow, destbpp;
   zxPixel pixel;
@@ -91,13 +79,13 @@ int zxPNGCheckFile(const char filename[])
   return result;
 }
 
-void zxPNGInit(zxPNG *png)
+static void _zxPNGInit(zxPNG *png)
 {
   png->png_ptr = NULL;
   png->info_ptr = png->end_ptr = NULL;
 }
 
-int zxPNGCreateInfo(zxPNG *png)
+static int _zxPNGCreateInfo(zxPNG *png)
 {
   png->info_ptr = png_create_info_struct( png->png_ptr );
   if( png->info_ptr == NULL ){
@@ -113,7 +101,7 @@ int zxPNGCreateInfo(zxPNG *png)
 }
 
 /* read */
-int zxPNGCreateReadInfo(zxPNG *png)
+static int _zxPNGCreateReadInfo(zxPNG *png)
 {
   png->png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING,
     NULL, NULL, NULL );
@@ -121,17 +109,17 @@ int zxPNGCreateReadInfo(zxPNG *png)
     ZRUNERROR( "cannot allocate PNG struct" );
     return 0;
   }
-  return zxPNGCreateInfo( png );
+  return _zxPNGCreateInfo( png );
 }
 
-void zxPNGDestroyRead(zxPNG *png)
+static void _zxPNGDestroyRead(zxPNG *png)
 {
   png_destroy_read_struct( &png->png_ptr, &png->info_ptr, &png->end_ptr );
 }
 
-int zxPNGRead(zxImage *img, zxPNG *png, FILE *fp)
+static int _zxPNGRead(zxImage *img, zxPNG *png, FILE *fp)
 {
-  register int i, j, k;
+  int i, j, k;
   png_uint_32 width, height;
   int byteperrow, bpp;
   png_bytep buf;
@@ -139,7 +127,7 @@ int zxPNGRead(zxImage *img, zxPNG *png, FILE *fp)
   zxPixelManip src, dest;
 
   /* create info */
-  if( zxPNGCreateReadInfo( png ) == 0 )
+  if( _zxPNGCreateReadInfo( png ) == 0 )
     return 0; /* fail to create info struct */
 
   /* read & update info */
@@ -194,15 +182,15 @@ int zxImageReadPNG(FILE *fp, zxImage *img)
   zxPNG png;
   ulong pos;
 
-  zxPNGInit( &png );
+  _zxPNGInit( &png );
   pos = ftell( fp );
   if( !zxPNGCheck( fp ) ){
     ZRUNERROR( "not a PNG file" );
     return 0;
   }
   fseek( fp, pos, SEEK_SET );
-  zxPNGRead( img, &png, fp );
-  zxPNGDestroyRead( &png );
+  _zxPNGRead( img, &png, fp );
+  _zxPNGDestroyRead( &png );
   return 1;
 }
 
@@ -222,7 +210,7 @@ int zxImageReadPNGFile(zxImage *img, char filename[])
 }
 
 /* write */
-int zxPNGCreateWriteInfo(zxPNG *png)
+static int _zxPNGCreateWriteInfo(zxPNG *png)
 {
   png->png_ptr = png_create_write_struct( PNG_LIBPNG_VER_STRING,
     NULL, NULL, NULL );
@@ -230,21 +218,21 @@ int zxPNGCreateWriteInfo(zxPNG *png)
     ZRUNERROR( "cannot allocate PNG struct" );
     return 0;
   }
-  return zxPNGCreateInfo( png );
+  return _zxPNGCreateInfo( png );
 }
 
-void zxPNGDestroyWrite(zxPNG *png)
+static void _zxPNGDestroyWrite(zxPNG *png)
 {
   png_destroy_write_struct( &png->png_ptr, &png->info_ptr );
 }
 
-int zxPNGWrite(zxImage *img, zxPNG *png, FILE *fp)
+static int _zxPNGWrite(zxImage *img, zxPNG *png, FILE *fp)
 {
-  register int i;
+  int i;
   ubyte **buf;
 
   /* create info */
-  if( zxPNGCreateWriteInfo( png ) == 0 )
+  if( _zxPNGCreateWriteInfo( png ) == 0 )
     return 0; /* fail to create info struct */
 
   /* allocate buffer */
@@ -260,7 +248,7 @@ int zxPNGWrite(zxImage *img, zxPNG *png, FILE *fp)
   png_write_info( png->png_ptr, png->info_ptr );
   png_write_image( png->png_ptr, buf );
   png_write_end( png->png_ptr, png->info_ptr );
-  zxPNGDestroyWrite( png );
+  _zxPNGDestroyWrite( png );
 
   for( i=0; i<img->height; i++ )
     free( buf[i] );
@@ -272,8 +260,8 @@ int zxImageWritePNG(FILE *fp, zxImage *img)
 {
   zxPNG png;
 
-  zxPNGInit( &png );
-  return zxPNGWrite( img, &png, fp );
+  _zxPNGInit( &png );
+  return _zxPNGWrite( img, &png, fp );
 }
 
 int zxImageWritePNGFile(zxImage *img, char filename[])

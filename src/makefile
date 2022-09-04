@@ -1,6 +1,6 @@
 MAKEFILEGEN=`which zeda-makefile-gen`
 
 all:
-	@$(MAKEFILEGEN) lib-no-ansi | make -f -
+	@$(MAKEFILEGEN) lib | make -f - STD=
 clean:
-	@$(MAKEFILEGEN) lib-no-ansi | make -f - clean
+	@$(MAKEFILEGEN) lib | make -f - clean

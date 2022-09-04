@@ -33,8 +33,7 @@ int zxImageReadTIFFFile(zxImage *img, char filename[])
   uint *buf, p;
   ubyte r, g, b;
   zxPixelManip pm;
-  register int i, j;
-  int ret = 1;
+  int i, j, ret = 1;
 
   if( !( tiff = TIFFOpen( filename, "r" ) ) ){
     ZOPENERROR( filename );
@@ -78,9 +77,8 @@ int zxImageWriteTIFFFile(zxImage *img, char filename[], int cmpmethod)
   uint bps = 8;
   uint spp = 3;
   ubyte *buf, *p;
-  register int i, j;
+  int i, j, ret = 1;
   zxPixelManip pm;
-  int ret = 1;
 
   if( !( tiff = TIFFOpen( filename, "w" ) ) ){
     ZOPENERROR( filename );

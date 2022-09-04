@@ -12,95 +12,80 @@
  * RGB pixel
  * ********************************************************** */
 
-static void zxPixel16RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b);
-static zxPixel zxPixel16FromRGB(ubyte r, ubyte g, ubyte b);
-static zxPixel zxPixel16FromFRGB(float r, float g, float b);
-static zxPixel zxPixel16Negate(zxPixel p);
-
-static void zxPixel24RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b);
-static zxPixel zxPixel24FromRGB(ubyte r, ubyte g, ubyte b);
-static zxPixel zxPixel24FromFRGB(float r, float g, float b);
-static zxPixel zxPixel24Negate(zxPixel p);
-
-static void zxPixel32RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b);
-static zxPixel zxPixel32FromRGB(ubyte r, ubyte g, ubyte b);
-static zxPixel zxPixel32FromFRGB(float r, float g, float b);
-static zxPixel zxPixel32Negate(zxPixel p);
-
 /* 16 bpp case */
-void zxPixel16RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b)
+static void _zxPixel16RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b)
 {
   *r = ( p >> 11 ) & 0x1f;
   *g = ( p >> 6  ) & 0x1f;
   *b = ( p       ) & 0x1f;
 }
 
-zxPixel zxPixel16FromRGB(ubyte r, ubyte g, ubyte b)
+static zxPixel _zxPixel16FromRGB(ubyte r, ubyte g, ubyte b)
 {
   return ( ( r & 0x1f ) << 11 ) | ( ( g & 0x1f ) << 6 ) | ( b & 0x1f );
 }
 
-zxPixel zxPixel16FromFRGB(float r, float g, float b)
+static zxPixel _zxPixel16FromFRGB(float r, float g, float b)
 {
-  return zxPixel16FromRGB(
+  return _zxPixel16FromRGB(
     (ubyte)( (double)0x1f * r ),
     (ubyte)( (double)0x1f * g ),
     (ubyte)( (double)0x1f * b ) );
 }
 
-zxPixel zxPixel16Negate(zxPixel p)
+static zxPixel _zxPixel16Negate(zxPixel p)
 {
   return ~(p) & 0x0000;
 }
 
 /* 24 bpp case */
-void zxPixel24RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b)
+static void _zxPixel24RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b)
 {
   *r = ( p >> 16 ) & 0xff;
   *g = ( p >>  8 ) & 0xff;
   *b = ( p       ) & 0xff;
 }
 
-zxPixel zxPixel24FromRGB(ubyte r, ubyte g, ubyte b)
+static zxPixel _zxPixel24FromRGB(ubyte r, ubyte g, ubyte b)
 {
   return ( r << 16 ) | ( g << 8 ) | b;
 }
 
-zxPixel zxPixel24FromFRGB(float r, float g, float b)
+static zxPixel _zxPixel24FromFRGB(float r, float g, float b)
 {
-  return zxPixel24FromRGB(
+  return _zxPixel24FromRGB(
     (ubyte)( (double)0xff * r ),
     (ubyte)( (double)0xff * g ),
     (ubyte)( (double)0xff * b ) );
 }
 
-zxPixel zxPixel24Negate(zxPixel p)
+static zxPixel _zxPixel24Negate(zxPixel p)
 {
   return ~(p) & 0x00ffffff;
 }
 
 /* 32 bpp case */
-void zxPixel32RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b)
+static void _zxPixel32RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b)
 {
   *r = ( p >> 24 ) & 0xff;
   *g = ( p >> 16 ) & 0xff;
   *b = ( p >>  8 ) & 0xff;
 }
 
-zxPixel zxPixel32FromRGB(ubyte r, ubyte g, ubyte b)
+static zxPixel _zxPixel32FromRGB(ubyte r, ubyte g, ubyte b)
 {
   return ( r << 24 ) | ( g << 16 ) | ( b << 8 ) | 0xff;
 }
 
-zxPixel zxPixel32FromFRGB(float r, float g, float b)
+static zxPixel _zxPixel32FromFRGB(float r, float g, float b)
 {
-  return zxPixel32FromRGB(
+  return _zxPixel32FromRGB(
     (ubyte)( (double)0xff * r ),
     (ubyte)( (double)0xff * g ),
     (ubyte)( (double)0xff * b ) );
 }
 
-zxPixel zxPixel32Negate(zxPixel p)
+static zxPixel _zxPixel32Negate(zxPixel p)
 {
   return ( ~(p) & 0xffffff00 ) | ( (p) & 0xff );
 }
@@ -111,22 +96,22 @@ zxPixelManip *zxPixelManipSet(zxPixelManip *pm, int depth)
 {
   switch( ( pm->depth = depth ) ){
   case 16:
-    pm->PixelRGB = zxPixel16RGB;
-    pm->PixelFromRGB = zxPixel16FromRGB;
-    pm->PixelFromFRGB = zxPixel16FromFRGB;
-    pm->PixelNegate = zxPixel16Negate;
+    pm->PixelRGB = _zxPixel16RGB;
+    pm->PixelFromRGB = _zxPixel16FromRGB;
+    pm->PixelFromFRGB = _zxPixel16FromFRGB;
+    pm->PixelNegate = _zxPixel16Negate;
     break;
   case 24:
-    pm->PixelRGB = zxPixel24RGB;
-    pm->PixelFromRGB = zxPixel24FromRGB;
-    pm->PixelFromFRGB = zxPixel24FromFRGB;
-    pm->PixelNegate = zxPixel24Negate;
+    pm->PixelRGB = _zxPixel24RGB;
+    pm->PixelFromRGB = _zxPixel24FromRGB;
+    pm->PixelFromFRGB = _zxPixel24FromFRGB;
+    pm->PixelNegate = _zxPixel24Negate;
     break;
   case 32:
-    pm->PixelRGB = zxPixel32RGB;
-    pm->PixelFromRGB = zxPixel32FromRGB;
-    pm->PixelFromFRGB = zxPixel32FromFRGB;
-    pm->PixelNegate = zxPixel32Negate;
+    pm->PixelRGB = _zxPixel32RGB;
+    pm->PixelFromRGB = _zxPixel32FromRGB;
+    pm->PixelFromFRGB = _zxPixel32FromFRGB;
+    pm->PixelNegate = _zxPixel32Negate;
     break;
   case 8 :
   default:
@@ -162,7 +147,7 @@ zxPixel zxPixelConv(zxPixel pixel, zxPixelManip *src, zxPixelManip *dest)
 
 zxPixel zxPixelBlend(zxPixelManip *pm, zxPixel p[], double w[], uint n)
 {
-  register uint i;
+  uint i;
   ubyte r, g, b;
   double rt, gt, bt;
 

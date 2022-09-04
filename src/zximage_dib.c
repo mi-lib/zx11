@@ -6,8 +6,7 @@
 
 #include <zx11/zximage_dib.h>
 
-/* BMP file format checker
- */
+/* BMP file format checker */
 bool zxImageFileIsBMP(char filename[])
 {
   return zxImageFileIdent( filename, "BM", 2 );
@@ -47,29 +46,10 @@ enum{
   BI_RGB = 0, BI_RLE8, BI_RLE4
 };
 
-static uint _zxBMPAlignBPL(uint *bpl);
-
-static ulong _zxBMPReadVal(FILE *fp, uint size);
-static int _zxBMPReadHeader(zxBMPInfo *info);
-static zxPixel *_zxBMPReadPalette(zxBMPInfo *info);
-static int _zxBMPDetectMode(zxBMPInfo *info);
-static void _zxBMPRead_1bit(zxBMPInfo *info, zxImage *img);
-static void _zxBMPRead_4bit(zxBMPInfo *info, zxImage *img);
-static void _zxBMPRead_8bit(zxBMPInfo *info, zxImage *img);
-static void _zxBMPRead_TrueColor(zxBMPInfo *info, zxImage *img);
-static void _zxBMPRead_RLE8(zxBMPInfo *info, zxImage *img);
-static void _zxBMPRead_RLE4(zxBMPInfo *info, zxImage *img);
-static void _zxBMPRead(zxBMPInfo *info, zxImage *img);
-
-static void _zxBMPWriteVal(FILE *fp, uint size, uint32_t val);
-static int _zxBMPWriteHeader(zxBMPInfo *info, zxImage *img);
-static void _zxBMPWrite(zxBMPInfo *info, zxImage *img);
-
 #define ZX_BMP_TCBIT 24
 
-/* BPL(Byte Per Pixel) Alignment
- */
-uint _zxBMPAlignBPL(uint *bpl)
+/* BPL(Byte Per Pixel) Alignment */
+static uint _zxBMPAlignBPL(uint *bpl)
 {
   uint rest;
 
@@ -77,11 +57,10 @@ uint _zxBMPAlignBPL(uint *bpl)
   return *bpl;
 }
 
-/* BMP reader
- */
-ulong _zxBMPReadVal(FILE *fp, uint size)
+/* BMP reader */
+static ulong _zxBMPReadVal(FILE *fp, uint size)
 {
-  register uint i;
+  uint i;
   ulong value = 0;
 
   for( i=0; i<size; i++ ){
@@ -94,7 +73,33 @@ ulong _zxBMPReadVal(FILE *fp, uint size)
   return value;
 }
 
-int _zxBMPReadHeader(zxBMPInfo *info)
+static int _zxBMPDetectMode(zxBMPInfo *info)
+{
+  switch( info->bitcount ){
+  case  1: /* B/W */
+  case  4: /* pseudo color */
+  case  8: /* pseudo color */
+    info->numcolors = 1 << info->bitcount;
+    info->bpp = 1;
+    info->bpl = info->width / ( ZX_BIT_PER_BYTE / info->bitcount )
+      + ( info->width % 2 ? 1 : 0 );
+    _zxBMPAlignBPL( &info->bpl );
+    break;
+  case 24: /* true color */
+  case 32: /* true color */
+    info->numcolors = 0;
+    info->bpp = info->bitcount / ZX_BIT_PER_BYTE;
+    info->bpl = info->width * info->bpp;
+    _zxBMPAlignBPL( &info->bpl );
+    break;
+  default:
+    ZRUNERROR( "unsupported bit count" );
+    return 0;
+  }
+  return 1;
+}
+
+static int _zxBMPReadHeader(zxBMPInfo *info)
 {
 #define ZX_BMP_HEADERSIZE     54
 #define ZX_BMP_INFOHEADERSIZE 40
@@ -138,35 +143,9 @@ int _zxBMPReadHeader(zxBMPInfo *info)
   return 1;
 }
 
-int _zxBMPDetectMode(zxBMPInfo *info)
+static zxPixel *_zxBMPReadPalette(zxBMPInfo *info)
 {
-  switch( info->bitcount ){
-  case  1: /* B/W */
-  case  4: /* pseudo color */
-  case  8: /* pseudo color */
-    info->numcolors = 1 << info->bitcount;
-    info->bpp = 1;
-    info->bpl = info->width / ( ZX_BIT_PER_BYTE / info->bitcount )
-      + ( info->width % 2 ? 1 : 0 );
-    _zxBMPAlignBPL( &info->bpl );
-    break;
-  case 24: /* true color */
-  case 32: /* true color */
-    info->numcolors = 0;
-    info->bpp = info->bitcount / ZX_BIT_PER_BYTE;
-    info->bpl = info->width * info->bpp;
-    _zxBMPAlignBPL( &info->bpl );
-    break;
-  default:
-    ZRUNERROR( "unsupported bit count" );
-    return 0;
-  }
-  return 1;
-}
-
-zxPixel *_zxBMPReadPalette(zxBMPInfo *info)
-{
-  register uint i;
+  uint i;
   ubyte r, g, b;
   zxPixelManip pm;
 
@@ -188,9 +167,9 @@ zxPixel *_zxBMPReadPalette(zxBMPInfo *info)
 }
 
 /* B/W */
-void _zxBMPRead_1bit(zxBMPInfo *info, zxImage *img)
+static void _zxBMPRead_1bit(zxBMPInfo *info, zxImage *img)
 {
-  register int i, j, k;
+  int i, j, k;
   zxPixel pixel, p;
   zxPixelManip src, dest;
 
@@ -208,9 +187,9 @@ void _zxBMPRead_1bit(zxBMPInfo *info, zxImage *img)
 }
 
 /* 16 Pseudo Color */
-void _zxBMPRead_4bit(zxBMPInfo *info, zxImage *img)
+static void _zxBMPRead_4bit(zxBMPInfo *info, zxImage *img)
 {
-  register int i, j, k;
+  int i, j, k;
   ubyte p, p1, p2;
   zxPixelManip src, dest;
 
@@ -232,9 +211,9 @@ void _zxBMPRead_4bit(zxBMPInfo *info, zxImage *img)
 }
 
 /* 256 Pseudo Color */
-void _zxBMPRead_8bit(zxBMPInfo *info, zxImage *img)
+static void _zxBMPRead_8bit(zxBMPInfo *info, zxImage *img)
 {
-  register int i, j;
+  int i, j;
   zxPixel pixel;
   zxPixelManip src, dest;
 
@@ -249,9 +228,9 @@ void _zxBMPRead_8bit(zxBMPInfo *info, zxImage *img)
 }
 
 /* True Color */
-void _zxBMPRead_TrueColor(zxBMPInfo *info, zxImage *img)
+static void _zxBMPRead_TrueColor(zxBMPInfo *info, zxImage *img)
 {
-  register int i, j;
+  int i, j;
   zxPixel pixel;
   zxPixelManip src, dest;
 
@@ -270,9 +249,9 @@ void _zxBMPRead_TrueColor(zxBMPInfo *info, zxImage *img)
 }
 
 /* 8bit run length */
-void _zxBMPRead_RLE8(zxBMPInfo *info, zxImage *img)
+static void _zxBMPRead_RLE8(zxBMPInfo *info, zxImage *img)
 {
-  register int i, j, x;
+  int i, j, x;
   ubyte num, v;
   zxPixelManip src, dest;
 
@@ -311,9 +290,9 @@ void _zxBMPRead_RLE8(zxBMPInfo *info, zxImage *img)
 }
 
 /* 4bit run length */
-void _zxBMPRead_RLE4(zxBMPInfo *info, zxImage *img)
+static void _zxBMPRead_RLE4(zxBMPInfo *info, zxImage *img)
 {
-  register int i, j, x;
+  int i, j, x;
   ubyte num, v, index[2];
   zxPixelManip src, dest;
 
@@ -358,7 +337,7 @@ void _zxBMPRead_RLE4(zxBMPInfo *info, zxImage *img)
   }
 }
 
-void _zxBMPRead(zxBMPInfo *info, zxImage *img)
+static void _zxBMPRead(zxBMPInfo *info, zxImage *img)
 {
   switch( info->comp ){
   case BI_RGB:
@@ -418,9 +397,8 @@ int zxImageReadBMPFile(zxImage *img, char filename[])
   return result;
 }
 
-/* BMP writer
- */
-void _zxBMPWriteVal(FILE *fp, uint size, uint32_t val)
+/* BMP writer */
+static void _zxBMPWriteVal(FILE *fp, uint size, uint32_t val)
 {
   for( ; size>0; size-- ){
     fputc( (ubyte)( val & 0xff ), fp );
@@ -428,7 +406,7 @@ void _zxBMPWriteVal(FILE *fp, uint size, uint32_t val)
   }
 }
 
-int _zxBMPWriteHeader(zxBMPInfo *info, zxImage *img)
+static int _zxBMPWriteHeader(zxBMPInfo *info, zxImage *img)
 {
 #define ZX_BMP_DEFAULT_BPP         3
 #define ZX_BMP_DEFAULT_BITCOUNT    ZX_BMP_TCBIT
@@ -461,9 +439,9 @@ int _zxBMPWriteHeader(zxBMPInfo *info, zxImage *img)
   return 1;
 }
 
-void _zxBMPWrite(zxBMPInfo *info, zxImage *img)
+static void _zxBMPWrite(zxBMPInfo *info, zxImage *img)
 {
-  register int i, j;
+  int i, j;
   zxPixel pixel;
   zxPixelManip src, dest;
 

@@ -91,7 +91,7 @@ zxImage *zxImageAllocMask(zxImage *img)
 
 zxImage *zxImageCreateMask(zxImage *img, zxPixel mask)
 {
-  register uint i, j;
+  uint i, j;
 
   if( !zxImageAllocMask( img ) ) return NULL;
   for( i=0; i<img->height; i++ )
@@ -118,7 +118,7 @@ zxImage *zxImageClear(zxImage *img)
 
 zxImage *zxImageFill(zxImage *img, zxPixel pixel)
 {
-  register int i, j;
+  int i, j;
 
   for( i=0; i<img->height; i++ )
     for( j=0; j<img->width; j++ )
@@ -180,7 +180,7 @@ zxImage *zxImagePut(zxImage *canvas, zxImage *img, uint x, uint y)
 
 zxImage *zxImagePutMasked(zxImage *canvas, zxImage *img, uint x, uint y, zxPixel mask)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
   zxPixel pixel;
 
@@ -194,7 +194,7 @@ zxImage *zxImagePutMasked(zxImage *canvas, zxImage *img, uint x, uint y, zxPixel
 
 zxImage *zxImagePutAlphaBlend(zxImage *canvas, zxImage *img1, zxImage *img2, uint x, uint y, double alpha)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
   zxPixelManip pm;
 
@@ -211,7 +211,7 @@ zxImage *zxImagePutAlphaBlend(zxImage *canvas, zxImage *img1, zxImage *img2, uin
 
 zxImage *zxImagePutAlphaBlendMasked(zxImage *canvas, zxImage *img1, zxImage *img2, uint x, uint y, double alpha, zxPixel mask)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
   zxPixel p1, p2;
   zxPixelManip pm;
@@ -231,7 +231,7 @@ zxImage *zxImagePutAlphaBlendMasked(zxImage *canvas, zxImage *img1, zxImage *img
 
 zxImage *zxImagePutSuperimpose(zxImage *canvas, zxImage *img, uint x, uint y)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
   zxPixel p1, p2;
   zxPixelManip pm;
@@ -267,7 +267,7 @@ zxImage *zxImageGet(zxImage *src, zxImage *dest, uint x, uint y)
 
 zxImage *zxImageVertFlip(zxImage *src, zxImage *dest)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
 
   zxImageCanvasRange( dest, src, 0, 0, &w, &h );
@@ -280,7 +280,7 @@ zxImage *zxImageVertFlip(zxImage *src, zxImage *dest)
 
 zxImage *zxImageHorizFlip(zxImage *src, zxImage *dest)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
 
   zxImageCanvasRange( dest, src, 0, 0, &w, &h );
@@ -293,7 +293,7 @@ zxImage *zxImageHorizFlip(zxImage *src, zxImage *dest)
 
 zxImage *zxImageRotRight(zxImage *src, zxImage *dest)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
 
   w = zMin( src->height, dest->width );
@@ -307,7 +307,7 @@ zxImage *zxImageRotRight(zxImage *src, zxImage *dest)
 
 zxImage *zxImageRotLeft(zxImage *src, zxImage *dest)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
 
   w = zMin( src->height, dest->width );
@@ -321,7 +321,7 @@ zxImage *zxImageRotLeft(zxImage *src, zxImage *dest)
 
 zxImage *zxImageRot(zxImage *src, zxImage *dest, uint ox, uint oy, uint x, uint y, double theta)
 {
-  register uint i, j, k;
+  uint i, j, k;
   double x0, x1, x2, y0, y1, y2;
   int px, py;
   double ct, st;
@@ -352,7 +352,7 @@ zxImage *zxImageRot(zxImage *src, zxImage *dest, uint ox, uint oy, uint x, uint 
 
 zxImage *zxImageRotFilt(zxImage *src, zxImage *dest, uint ox, uint oy, uint x, uint y, double theta)
 {
-  register uint i, j, k;
+  uint i, j, k;
   double x0, x1, x2, y0, y1, y2, px[3], py[3];
   double d[4], w[4], wt;
   double ct, st;
@@ -428,7 +428,7 @@ double __zx11_resize_filter(double x, double y){
 
 zxImage *zxImageResize(zxImage *src, zxImage *dest)
 {
-  register uint i, j;
+  uint i, j;
   ubyte rs, gs, bs;
   double k, l;
   double x0, xs, xe, y0, ys, ye, xl, yl, xrate, yrate;
@@ -467,7 +467,7 @@ zxImage *zxImageResize(zxImage *src, zxImage *dest)
 
 zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bimg)
 {
-  register int i, j;
+  int i, j;
   ubyte r, g, b;
   zxPixelManip pm;
 
@@ -487,7 +487,7 @@ zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bim
 
 zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
   ubyte r, g, b;
   zxPixelManip pm;
@@ -505,7 +505,7 @@ zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest)
 
 zxImage *zxImageNegate(zxImage *src, zxImage *dest)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
   zxPixelManip pm;
 
@@ -519,7 +519,7 @@ zxImage *zxImageNegate(zxImage *src, zxImage *dest)
 
 zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate)
 {
-  register uint i, j;
+  uint i, j;
   ubyte r, g, b;
   zxPixelManip pm;
 
@@ -536,7 +536,7 @@ zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate)
 
 static void _zxImageHistogram(zxImage *img, zxPixelManip *pm, uint h[], double sh[])
 {
-  register int i, j;
+  int i, j;
   ubyte r, g, b;
   double d;
 
@@ -553,7 +553,7 @@ static void _zxImageHistogram(zxImage *img, zxPixelManip *pm, uint h[], double s
 
 zxImage *zxImageEqualize(zxImage *src, zxImage *dest)
 {
-  register int x, y, i;
+  int x, y, i;
   uint w, h;
   uint *hi;
   double *sh, vmin, scalefactor;
@@ -597,7 +597,7 @@ zxImage *zxImageDither(zxImage *src, zxImage *dest)
     12,  4, 14,  6,
      3, 11,  1,  9,
     15,  7, 13,  5 };
-  register int i, j;
+  int i, j;
   uint w, h;
   zxPixelManip pm;
   ubyte r, g, b, th;
@@ -620,7 +620,7 @@ zxImage *zxImageDither(zxImage *src, zxImage *dest)
 
 static void _zxImageFilterPickPixel(zxImage *src, int x, int y, int w, int h, int size, zxPixel p[], uint sh)
 {
-  register int i, j, k, sx, sy;
+  int i, j, k, sx, sy;
 
   for( k=0, i=0; i<size; i++ ){
     sy = zLimit( y + i - sh, 0, w-1 );
@@ -633,7 +633,7 @@ static void _zxImageFilterPickPixel(zxImage *src, int x, int y, int w, int h, in
 
 zxImage *zxImageFilter(zxImage *src, zxImage *dest, double f[], int size)
 {
-  register uint x, y;
+  uint x, y;
   uint w, h, s2, sh;
   zxPixel *p;
   zxPixelManip pm;
@@ -655,7 +655,7 @@ zxImage *zxImageFilter(zxImage *src, zxImage *dest, double f[], int size)
 
 zxImage *zxImageFilter2(zxImage *src, zxImage *dest, double f1[], double f2[], int size)
 {
-  register uint x, y;
+  uint x, y;
   uint w, h, s2, sh;
   zxPixel *p, p1, p2;
   zxPixelManip pm;
@@ -687,7 +687,7 @@ static int _zx11_median_cmp(void *v1, void *v2, void *dummy)
 
 static void _zxImageMedianFind(zxImage *img, zxPixelManip *pm, int j, int i, ubyte *rs, ubyte *gs, ubyte *bs, int size, ubyte *r, ubyte *g, ubyte *b)
 {
-  register int _i, _j, si, sj, k;
+  int _i, _j, si, sj, k;
   int s2, sh;
 
   s2 = size * size;
@@ -711,7 +711,7 @@ static void _zxImageMedianFind(zxImage *img, zxPixelManip *pm, int j, int i, uby
 
 zxImage *zxImageMedian(zxImage *src, zxImage *dest, int size)
 {
-  register int i, j;
+  int i, j;
   uint w, h;
   zxPixelManip pm;
   ubyte *rs, *gs, *bs, r, g, b;
@@ -759,7 +759,7 @@ zxImage *zxImageGaussian(zxImage *src, zxImage *dest)
 
 zxImage *zxImageDiff(zxImage *src, zxImage *dest)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
   ubyte r, g, b, pr, pg, pb;
   zxPixelManip pm;
@@ -780,7 +780,7 @@ zxImage *zxImageDiff(zxImage *src, zxImage *dest)
 
 zxImage *zxImageIntegral(zxImage *src, zxImage *dest)
 {
-  register uint i, j;
+  uint i, j;
   uint w, h;
   ubyte r, g, b, ri, gi, bi;
   zxPixelManip pm;
@@ -883,7 +883,7 @@ zxImage *zxImageLaplacian(zxImage *src, zxImage *dest)
 
 zxPixel zxImageCellAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h)
 {
-  register uint i, j;
+  uint i, j;
   zxPixel rl, gl, bl, r, g, b;
   ubyte rd, gd, bd;
 
@@ -906,7 +906,7 @@ zxPixel zxImageCellAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint 
 
 zxImage *zxImageAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h)
 {
-  register uint i, j;
+  uint i, j;
   zxPixel p;
 
   w = zMin( img->width - x, w );
@@ -920,7 +920,7 @@ zxImage *zxImageAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, 
 
 zxImage *zxImageMosaic(zxImage *img, uint x, uint y, uint w, uint h, uint nx, uint ny)
 {
-  register uint i, j, dx, dy, mx, my;
+  uint i, j, dx, dy, mx, my;
   zxPixelManip pm;
 
   dx = w / nx;
@@ -960,7 +960,7 @@ Pixmap zxImageCreatePixmap(zxWindow *win, zxImage *img)
 
 Pixmap zxImageCreatePixmapMask(zxWindow *win, zxImage *img)
 {
-  register int x, y, z;
+  int x, y, z;
   int bytes_per_row;
   ubyte *buf, flag;
   Pixmap mask;
@@ -1003,7 +1003,7 @@ bool zxImageDrawMask(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w
 {
   zxImage mask;
   zxPixelManip pm;
-  register int i, j;
+  int i, j;
   ubyte val, *mp;
 
   if( !( mp = img->mask_buf ) ) return false;

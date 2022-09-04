@@ -71,7 +71,7 @@ static void _zxImageReadPBMBIN(FILE *fp, zxImage *img, int x, int y)
 {
   static uint k=0;
   static ubyte mask=0x80;
-  register ubyte val;
+  ubyte val;
 
   if( x == 0 ){
     k = 0;
@@ -182,7 +182,7 @@ int zxImageReadPNMHeader(FILE *fp, zxImage *img)
 
 int zxImageReadPNM(FILE *fp, zxImage *img)
 {
-  register int i, j;
+  int i, j;
   ubyte type;
   void (* read_pixel)(FILE *, zxImage *, int, int);
 
@@ -229,8 +229,8 @@ int zxImageReadPNMFile(zxImage *img, char filename[])
 
 int zxImageWritePBM(FILE *fp, zxImage *img)
 {
-  register int i, j;
-  register ubyte mask;
+  int i, j;
+  ubyte mask;
   ubyte r, g, b, val;
 #define _ZX_PBM_THRESHOLD 0x3f
 
@@ -271,7 +271,7 @@ int zxImageWritePBMFile(zxImage *img, char filename[])
 
 int zxImageWritePGM(FILE *fp, zxImage *img)
 {
-  register int i, j;
+  int i, j;
   ubyte r, g, b, val;
 
   fprintf( fp, "P5\n" ); /* magic number for PGM */
@@ -304,7 +304,7 @@ int zxImageWritePGMFile(zxImage *img, char filename[])
 
 int zxImageWritePPM(FILE *fp, zxImage *img)
 {
-  register int i, j;
+  int i, j;
   ubyte r, g, b;
 
   fprintf( fp, "P6\n" ); /* magic number for PPM */

@@ -47,20 +47,7 @@ typedef struct {
   uint32_t pixel_pos;
 } zxMAGInfo;
 
-static char _zxMAGReadByte(FILE *fp);
-static int _zxMAGReadData(FILE *fp, char buf[], int len);
-static int _zxMAGReadString(FILE *fp, char buf[], int len);
-static int _zxMAGReadHeader(zxMAGInfo *info);
-static int _zxMAGReadPalette(zxMAGInfo *info);
-static uint8_t _zxMAGReadFlagA(zxMAGInfo *info);
-static uint8_t _zxMAGReadFlagB(zxMAGInfo *info);
-static uint8_t _zxMAGReadFlag(zxMAGInfo *info, int i, int line);
-static uint16_t _zxMAGReadPixel(zxMAGInfo *info);
-static void _zxImageSetPixelMAG(zxImage *img, zxMAGInfo *info, int x, int y, uint16_t pixelid);
-static void _zxImageCopyPixelMAG(zxImage *img, zxMAGInfo *info, int x, int y, uint8_t flag);
-static int _zxImageReadPixelMAG(zxImage *img, zxMAGInfo *info);
-
-char _zxMAGReadByte(FILE *fp)
+static char _zxMAGReadByte(FILE *fp)
 {
   if( feof( fp ) ){
     ZRUNERROR( "unexpected termination in MAG file" );
@@ -69,16 +56,16 @@ char _zxMAGReadByte(FILE *fp)
   return fgetc( fp );
 }
 
-int _zxMAGReadData(FILE *fp, char buf[], int len)
+static int _zxMAGReadData(FILE *fp, char buf[], int len)
 {
-  register int i;
+  int i;
 
   for( i=0; i<len; i++ )
     buf[i] = _zxMAGReadByte( fp );
   return len;
 }
 
-int _zxMAGReadString(FILE *fp, char buf[], int len)
+static int _zxMAGReadString(FILE *fp, char buf[], int len)
 {
   _zxMAGReadData( fp, buf, len );
   buf[len] = '\0';
@@ -123,7 +110,7 @@ int zxMAGDispCommentFile(const char filename[])
   return result;
 }
 
-int _zxMAGReadComment(FILE *fp)
+static int _zxMAGReadComment(FILE *fp)
 {
   char buf[BUFSIZ];
   char c;
@@ -142,7 +129,7 @@ int _zxMAGReadComment(FILE *fp)
   return 1;
 }
 
-int _zxMAGReadHeader(zxMAGInfo *info)
+static int _zxMAGReadHeader(zxMAGInfo *info)
 {
   info->head = ftell( info->fp );
   _zxMAGReadData( info->fp, (char *)info, 32 );
@@ -152,9 +139,9 @@ int _zxMAGReadHeader(zxMAGInfo *info)
   return 1;
 }
 
-int _zxMAGReadPalette(zxMAGInfo *info)
+static int _zxMAGReadPalette(zxMAGInfo *info)
 {
-  register uint32_t i;
+  uint32_t i;
   uint8_t r, g, b;
   zxPixelManip src, dest;
 
@@ -195,7 +182,7 @@ int _zxMAGReadPalette(zxMAGInfo *info)
   return 1;
 }
 
-uint8_t _zxMAGReadFlagA(zxMAGInfo *info)
+static uint8_t _zxMAGReadFlagA(zxMAGInfo *info)
 {
   uint8_t flag;
 
@@ -214,7 +201,7 @@ uint8_t _zxMAGReadFlagA(zxMAGInfo *info)
   return flag;
 }
 
-uint8_t _zxMAGReadFlagB(zxMAGInfo *info)
+static uint8_t _zxMAGReadFlagB(zxMAGInfo *info)
 {
   fseek( info->fp, info->head+info->boffset+info->flag_b_pos, SEEK_SET );
   if( ++info->flag_b_pos > info->bsize ){
@@ -224,7 +211,7 @@ uint8_t _zxMAGReadFlagB(zxMAGInfo *info)
   return _zxMAGReadByte( info->fp );
 }
 
-uint8_t _zxMAGReadFlag(zxMAGInfo *info, int i, int line)
+static uint8_t _zxMAGReadFlag(zxMAGInfo *info, int i, int line)
 {
   uint8_t b;
 
@@ -233,7 +220,7 @@ uint8_t _zxMAGReadFlag(zxMAGInfo *info, int i, int line)
   return info->flag[i];
 }
 
-uint16_t _zxMAGReadPixel(zxMAGInfo *info)
+static uint16_t _zxMAGReadPixel(zxMAGInfo *info)
 {
   uint16_t buf;
 
@@ -247,9 +234,9 @@ uint16_t _zxMAGReadPixel(zxMAGInfo *info)
   return buf;
 }
 
-void _zxImageSetPixelMAG(zxImage *img, zxMAGInfo *info, int x, int y, uint16_t pixelid)
+static void _zxImageSetPixelMAG(zxImage *img, zxMAGInfo *info, int x, int y, uint16_t pixelid)
 {
-  register int i, j;
+  int i, j;
   uint8_t msb, lsb, dpb /* dot per byte */;
 
   lsb =   pixelid        & 0xff;
@@ -266,7 +253,7 @@ void _zxImageSetPixelMAG(zxImage *img, zxMAGInfo *info, int x, int y, uint16_t p
   }
 }
 
-void _zxImageCopyPixelMAG(zxImage *img, zxMAGInfo *info, int x, int y, uint8_t flag)
+static void _zxImageCopyPixelMAG(zxImage *img, zxMAGInfo *info, int x, int y, uint8_t flag)
 {
   int sx, sy;
   struct {
@@ -287,10 +274,10 @@ void _zxImageCopyPixelMAG(zxImage *img, zxMAGInfo *info, int x, int y, uint8_t f
     img->bpp*info->dpp );
 }
 
-int _zxImageReadPixelMAG(zxImage *img, zxMAGInfo *info)
+static int _zxImageReadPixelMAG(zxImage *img, zxMAGInfo *info)
 {
   uint8_t flag, msb, lsb;
-  register int i, j;
+  int i, j;
 
   info->flag = zAlloc( uint8_t, info->bpl );
   if( info->flag == NULL ){
