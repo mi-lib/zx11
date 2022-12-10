@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
   zxImage dat, rdat, fdat, adat;
 
   zxInit();
-  if( zxImageReadFile( &dat, argc > 1 ? argv[1] : "fig/lena.jpg" ) == 0 )
+  if( zxImageReadFile( &dat, argc > 1 ? argv[1] : "../fig/lena_mini.jpg" ) == 0 )
     exit( 1 );
   zxImageAllocDefault( &rdat, dat.width, dat.height );
   zxImageAllocDefault( &fdat, dat.width, dat.height );
