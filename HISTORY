@@ -1,3 +1,4 @@
+2023. 3.13. Modified zxmagv to reflect redefined zStrToUpper. [app]
 2022. 9. 4. Reflected new specification of zeda-makefile-gen, and modified src/makefile. [src]
 2022. 9. 4. Removed register keywords. [zxpixel, zxwidget, zxsprite, zximage, zximage_pnm, zximage_dib, zximage_jpeg, zximage_png, zximage_tiff, zximage_mag, zximage_pdt]
 2022. 7.18. Added zxImageEqualize. [zximage]

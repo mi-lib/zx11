@@ -196,7 +196,7 @@ void zxmagv_convert(zStrAddrList *filelist, int (* image_write)(zxImage*,char*),
   int ret;
 
   if( opt[ZXMAGV_OPTION_VERBOSE].flag )
-    eprintf( "convert MAG files to %s files.\n", zToUpper(suffix,format) );
+    eprintf( "convert MAG files to %s files.\n", zStrToUpper(suffix,BUFSIZ,format) );
   zListForEach( filelist, cp ){
     if( !zxImageReadMAGFile( &dat, cp->data ) ) continue;
     zGetBasename( cp->data, basename, BUFSIZ );
