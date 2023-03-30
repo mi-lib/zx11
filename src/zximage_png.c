@@ -8,11 +8,10 @@
 
 bool zxImageFileIsPNG(char filename[])
 {
-#define ZX_PNG_IDENT_SIZE 4
-  const char __zx_png_ident[] = {
+  const unsigned char __zx_png_ident[] = {
     0x89, 0x50, 0x4e, 0x47,
   };
-  return zxImageFileIdent( filename, __zx_png_ident, ZX_PNG_IDENT_SIZE );
+  return zxImageFileIdent( filename, __zx_png_ident, sizeof(__zx_png_ident)/sizeof(char) );
 }
 
 typedef struct{
@@ -25,7 +24,7 @@ typedef struct{
 
 static ubyte **__zx_png_buf_alloc(zxImage *img)
 {
-  int i, j;
+  uint i, j;
   ubyte **buf, *bp;
   ulong byteperrow, destbpp;
   zxPixel pixel;
@@ -119,7 +118,7 @@ static void _zxPNGDestroyRead(zxPNG *png)
 
 static int _zxPNGRead(zxImage *img, zxPNG *png, FILE *fp)
 {
-  int i, j, k;
+  uint i, j, k;
   png_uint_32 width, height;
   int byteperrow, bpp;
   png_bytep buf;
@@ -228,7 +227,7 @@ static void _zxPNGDestroyWrite(zxPNG *png)
 
 static int _zxPNGWrite(zxImage *img, zxPNG *png, FILE *fp)
 {
-  int i;
+  uint i;
   ubyte **buf;
 
   /* create info */

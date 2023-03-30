@@ -9,14 +9,13 @@
 
 bool zxImageFileIsJPEG(char filename[])
 {
-#define ZX_JPEG_IDENT_SIZE 2
-  const char __zx_jpeg_ident[] = {
+  const unsigned char __zx_jpeg_ident[] = {
     /*
     0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46,
     */
     0xff, 0xd8,
   };
-  return zxImageFileIdent( filename, __zx_jpeg_ident, ZX_JPEG_IDENT_SIZE );
+  return zxImageFileIdent( filename, __zx_jpeg_ident, sizeof(__zx_jpeg_ident)/sizeof(char) );
 }
 
 static void _zx_jpg_error_exit(j_common_ptr cinfo)
@@ -106,7 +105,8 @@ int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality)
   struct jpeg_error_mgr jerr;
   JSAMPARRAY buf;
   zxPixelManip pm;
-  int i, j, ret = 1;
+  uint i, j;
+  int ret = 1;
 
   jpeg_create_compress( &cinfo );
   cinfo.err = jpeg_std_error( &jerr );

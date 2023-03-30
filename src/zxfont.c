@@ -12,7 +12,7 @@ XFontStruct *zxfontstruct = NULL;
 
 #define ZX_ERR_FONT_NOTFOUND "font %s not found"
 
-bool zxWindowSetFont(zxWindow *win, char *fontname)
+bool zxWindowSetFont(zxWindow *win, const char *fontname)
 {
   Font fid;
 
@@ -32,8 +32,8 @@ XCharStruct *zxCharStruct(char c)
   if( !zxfontstruct->per_char ) /* fixed charactor metric */
     return &zxfontstruct->min_bounds;
   /* variable charactor metric */
-  if( c < zxfontstruct->min_char_or_byte2 ||
-      c > zxfontstruct->max_char_or_byte2 ){
+  if( (uint)c < zxfontstruct->min_char_or_byte2 ||
+      (uint)c > zxfontstruct->max_char_or_byte2 ){
     ZRUNWARN( ZX_WARN_UNDEF_CHAR );
     return NULL;
   }

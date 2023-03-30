@@ -321,7 +321,7 @@ int zxwEditBoxKeyPress(zxWindow *win, zxwEditBox *eb)
   case XK_Home: case XK_Up:  eb->cursor_str_cur = 0;                                                 break;
   case XK_Down: case XK_End: eb->cursor_str_cur = strlen( eb->label );                               break;
   case XK_Left:              if( eb->cursor_str_cur > 0 ) eb->cursor_str_cur--;                      break;
-  case XK_Right:             if( eb->cursor_str_cur < strlen(eb->label) ) eb->cursor_str_cur++;      break;
+  case XK_Right:             if( (size_t)eb->cursor_str_cur < strlen(eb->label) ) eb->cursor_str_cur++;      break;
   case XK_Insert:            zxwCursorInsToggle( eb );                                               break;
   default: ;
     char str[2];

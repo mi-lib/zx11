@@ -8,7 +8,7 @@
 
 bool zxImageFileIsMAG(char filename[])
 {
-  return zxImageFileIdent( filename, "MAKI", 4 );
+  return zxImageFileIdent( filename, (const unsigned char *)"MAKI", 4 );
 }
 
 typedef struct {
@@ -277,7 +277,7 @@ static void _zxImageCopyPixelMAG(zxImage *img, zxMAGInfo *info, int x, int y, ui
 static int _zxImageReadPixelMAG(zxImage *img, zxMAGInfo *info)
 {
   uint8_t flag, msb, lsb;
-  int i, j;
+  uint i, j;
 
   info->flag = zAlloc( uint8_t, info->bpl );
   if( info->flag == NULL ){
@@ -290,7 +290,7 @@ static int _zxImageReadPixelMAG(zxImage *img, zxMAGInfo *info)
   info->flag_b_pos = 0;
   info->pixel_pos = 0;
   for( i=0; i<img->height; i++ ){
-    for( j=0; j<(int)info->bpl; j++ ){
+    for( j=0; j<info->bpl; j++ ){
       flag = _zxMAGReadFlag( info, j, i );
       msb = ( flag >> 4 ) & 0xf;
       lsb =   flag        & 0xf;

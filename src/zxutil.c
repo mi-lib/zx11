@@ -270,7 +270,7 @@ void zxWindowColorMapCreate(zxWindow *win)
 }
 
 /* get color by a name. */
-ulong zxGetColor(zxWindow *win, char color[])
+ulong zxGetColor(zxWindow *win, const char *color)
 {
   XColor c0, c1;
 

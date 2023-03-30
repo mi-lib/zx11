@@ -452,7 +452,7 @@ typedef struct{
 } while(0)
 
 #define zxwPixButtonReadData(win,p,x,y,w,h,d,f) do{\
-  zxPMReadData( (win), &(p)->pic, (d) );\
+  zxPMReadData( (win), &(p)->pic, (char **)(d) );\
   zxwPixButtonCreate( p, x, y, w, h, f );\
 } while(0)
 

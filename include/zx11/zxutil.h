@@ -289,7 +289,7 @@ bool zxPixmapGetSize(Drawable drw, int *width, int *height);
 void zxWindowColorMapCreate(zxWindow *win);
 
 /* get color by a name. */
-ulong zxGetColor(zxWindow *win, char color[]);
+ulong zxGetColor(zxWindow *win, const char *color);
 /* get color by RGB parameters. */
 ulong zxGetColorFromRGB(zxWindow *win, uword red, uword green, uword blue);
 

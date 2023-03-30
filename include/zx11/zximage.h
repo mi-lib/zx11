@@ -152,7 +152,7 @@ zxImage *zxImageFromPixmap(zxImage *img, Pixmap pmap, uint w, uint h);
 
 /* file format checker and generalized I/O */
 
-bool zxImageFileIdent(char filename[], const char ident[], int size);
+bool zxImageFileIdent(char filename[], const unsigned char ident[], uint size);
 
 int zxImageReadFile(zxImage *img, char filename[]);
 

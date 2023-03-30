@@ -43,5 +43,3 @@ ifeq ($(CONFIG_USE_PDT),y)
 	OBJ += zximage_pdt.o
 	CFLAGS += -D__ZX11_USE_PDT
 endif
-
-DLIB=libzx11.so

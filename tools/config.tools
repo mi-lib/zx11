@@ -4,26 +4,31 @@ DEF+=`zeda-config -D`
 
 ifeq ($(CONFIG_USE_XEXT),y)
 	LINK+=-lXext
+	LINKCPP+=-lXext
 	DEF += -D__ZX11_USE_XEXT
 endif
 
 ifeq ($(CONFIG_USE_XPM),y)
 	LINK+=-lXpm
+	LINKCPP+=-lXpm
 	DEF += -D__ZX11_USE_XPM
 endif
 
 ifeq ($(CONFIG_USE_PNG),y)
 	LINK+=-lpng -lz
+	LINKCPP+=-lpng -lz
 	DEF += -D__ZX11_USE_PNG
 endif
 
 ifeq ($(CONFIG_USE_TIFF),y)
 	LINK+=-ltiff
+	LINKCPP+=-ltiff
 	DEF += -D__ZX11_USE_TIFF
 endif
 
 ifeq ($(CONFIG_USE_JPEG),y)
 	LINK+=-ljpeg
+	LINKCPP+=-ljpeg
 	DEF += -D__ZX11_USE_JPEG
 endif
 
@@ -39,4 +44,5 @@ ifeq ($(CONFIG_USE_PDT),y)
 	DEF += -D__ZX11_USE_PDT
 endif
 
-LINK += -lX11 `zeda-config -l`
+LINK+=-lX11 `zeda-config -l`
+LINKCPP+=-lX11 `zeda-config -lcpp`

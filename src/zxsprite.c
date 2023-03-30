@@ -315,17 +315,28 @@ void zxSpriteAppearAll(zxWindow *win, zxSprite *spr)
 
 zxsMap *zxsMapCreate(zxsMap *map, uint width, uint height)
 {
-  int i;
+  uint i;
 
-  if( !( map->array = zAlloc( struct _zxs_map_cell*, height ) ) ){
+#ifdef __cplusplus
+  if( !( map->array = zAlloc( zxsMap::_zxs_map_cell*, height ) ) )
+#else
+  if( !( map->array = zAlloc( struct _zxs_map_cell*, height ) ) )
+#endif /* __cplusplus */
+  {
     ZALLOCERROR();
     return NULL;
   }
-  for( i=0; i<height; i++ )
-    if( !( map->array[i] = zAlloc( struct _zxs_map_cell, width ) ) ){
+  for( i=0; i<height; i++ ){
+#ifdef __cplusplus
+    if( !( map->array[i] = zAlloc( zxsMap::_zxs_map_cell, width ) ) )
+#else
+    if( !( map->array[i] = zAlloc( struct _zxs_map_cell, width ) ) )
+#endif /* __cplusplus */
+    {
       ZALLOCERROR();
       return NULL;
     }
+  }
   map->width = width;
   map->height = height;
   return map;
@@ -333,7 +344,7 @@ zxsMap *zxsMapCreate(zxsMap *map, uint width, uint height)
 
 void zxsMapDestroy(zxsMap *map)
 {
-  int i;
+  uint i;
 
   for( i=0; i<map->height; i++ )
     zFree( map->array[i] );
@@ -352,7 +363,7 @@ static ubyte _zxsMapReadInt(FILE *fp)
 bool zxsMapReadArray(zxsMap *map, char filename[])
 {
   FILE *fp;
-  int i, j;
+  uint i, j;
 
   if( !( fp = fopen( filename, "r" ) ) ){
     ZOPENERROR( filename );
@@ -388,8 +399,12 @@ bool zxsMapReadPixData(zxWindow *win, zxsMap *map, char *data[], int row, int co
 
 void zxsMapDraw(zxWindow *win, zxsMap *map, Pixmap canvas)
 {
-  int i, j, x, y;
+  uint i, j, x, y;
+#ifdef __cplusplus
+  zxsMap::_zxs_map_cell *cp;
+#else
   struct _zxs_map_cell *cp;
+#endif /* __cplusplus */
 
   for( i=0, y=0; i<map->reg.height; i++, y+=map->pat.data.dy )
     for( j=0, x=0; j<map->reg.width; j++, x+=map->pat.data.dx ){

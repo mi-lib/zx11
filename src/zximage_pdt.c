@@ -11,7 +11,7 @@
 
 bool zxImageFileIsPDT(char filename[])
 {
-  return zxImageFileIdent( filename, "PDT", 3 );
+  return zxImageFileIdent( filename, (const unsigned char *)"PDT", 3 );
 }
 
 #define ZX_PDT_HEADER_SIZE 32

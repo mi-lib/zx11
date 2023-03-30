@@ -8,15 +8,14 @@
 
 bool zxImageFileIsTIFF(char filename[])
 {
-#define ZX_TIFF_IDENT_SIZE 4
-  const char __zx_tiff_ident1[] = {
+  const unsigned char __zx_tiff_ident1[] = {
     0x4d, 0x4d, 0x00, 0x2a,
   };
-  const char __zx_tiff_ident2[] = {
+  const unsigned char __zx_tiff_ident2[] = {
     0x49, 0x49, 0x2a, 0x00,
   };
-  return zxImageFileIdent( filename, __zx_tiff_ident1, ZX_TIFF_IDENT_SIZE ) ||
-         zxImageFileIdent( filename, __zx_tiff_ident2, ZX_TIFF_IDENT_SIZE );
+  return zxImageFileIdent( filename, __zx_tiff_ident1, sizeof(__zx_tiff_ident1)/sizeof(char) ) ||
+         zxImageFileIdent( filename, __zx_tiff_ident2, sizeof(__zx_tiff_ident2)/sizeof(char) );
 }
 
 #define zxTIFFError(tiff,msg) do{\
@@ -28,12 +27,12 @@ bool zxImageFileIsTIFF(char filename[])
 int zxImageReadTIFFFile(zxImage *img, char filename[])
 {
   TIFF *tiff;
-  uint length, width;
+  uint i, j, length, width;
   ubyte bps, spp;
   uint *buf, p;
   ubyte r, g, b;
   zxPixelManip pm;
-  int i, j, ret = 1;
+  int ret = 1;
 
   if( !( tiff = TIFFOpen( filename, "r" ) ) ){
     ZOPENERROR( filename );
@@ -77,7 +76,8 @@ int zxImageWriteTIFFFile(zxImage *img, char filename[], int cmpmethod)
   uint bps = 8;
   uint spp = 3;
   ubyte *buf, *p;
-  int i, j, ret = 1;
+  uint i, j;
+  int ret = 1;
   zxPixelManip pm;
 
   if( !( tiff = TIFFOpen( filename, "w" ) ) ){

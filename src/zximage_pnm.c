@@ -12,20 +12,20 @@
 
 bool zxImageFileIsPBM(char filename[])
 {
-  return zxImageFileIdent( filename, "P1", 2 ) ||
-         zxImageFileIdent( filename, "P4", 2 );
+  return zxImageFileIdent( filename, (const unsigned char *)"P1", 2 ) ||
+         zxImageFileIdent( filename, (const unsigned char *)"P4", 2 );
 }
 
 bool zxImageFileIsPGM(char filename[])
 {
-  return zxImageFileIdent( filename, "P2", 2 ) ||
-         zxImageFileIdent( filename, "P5", 2 );
+  return zxImageFileIdent( filename, (const unsigned char *)"P2", 2 ) ||
+         zxImageFileIdent( filename, (const unsigned char *)"P5", 2 );
 }
 
 bool zxImageFileIsPPM(char filename[])
 {
-  return zxImageFileIdent( filename, "P3", 2 ) ||
-         zxImageFileIdent( filename, "P6", 2 );
+  return zxImageFileIdent( filename, (const unsigned char *)"P3", 2 ) ||
+         zxImageFileIdent( filename, (const unsigned char *)"P6", 2 );
 }
 
 bool zxImageFileIsPNM(char filename[])
@@ -182,7 +182,7 @@ int zxImageReadPNMHeader(FILE *fp, zxImage *img)
 
 int zxImageReadPNM(FILE *fp, zxImage *img)
 {
-  int i, j;
+  uint i, j;
   ubyte type;
   void (* read_pixel)(FILE *, zxImage *, int, int);
 
@@ -229,7 +229,7 @@ int zxImageReadPNMFile(zxImage *img, char filename[])
 
 int zxImageWritePBM(FILE *fp, zxImage *img)
 {
-  int i, j;
+  uint i, j;
   ubyte mask;
   ubyte r, g, b, val;
 #define _ZX_PBM_THRESHOLD 0x3f
@@ -271,7 +271,7 @@ int zxImageWritePBMFile(zxImage *img, char filename[])
 
 int zxImageWritePGM(FILE *fp, zxImage *img)
 {
-  int i, j;
+  uint i, j;
   ubyte r, g, b, val;
 
   fprintf( fp, "P5\n" ); /* magic number for PGM */
@@ -304,7 +304,7 @@ int zxImageWritePGMFile(zxImage *img, char filename[])
 
 int zxImageWritePPM(FILE *fp, zxImage *img)
 {
-  int i, j;
+  uint i, j;
   ubyte r, g, b;
 
   fprintf( fp, "P6\n" ); /* magic number for PPM */

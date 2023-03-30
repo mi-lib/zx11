@@ -9,7 +9,7 @@
 /* BMP file format checker */
 bool zxImageFileIsBMP(char filename[])
 {
-  return zxImageFileIdent( filename, "BM", 2 );
+  return zxImageFileIdent( filename, (const unsigned char *)"BM", 2 );
 }
 
 typedef struct{
@@ -104,7 +104,7 @@ static int _zxBMPReadHeader(zxBMPInfo *info)
 #define ZX_BMP_HEADERSIZE     54
 #define ZX_BMP_INFOHEADERSIZE 40
   /* header charactor */
-  if ( fgetc(info->fp)!='B' || fgetc(info->fp)!='M' ){
+  if( fgetc(info->fp) != 'B' || fgetc(info->fp) != 'M' ){
     ZRUNERROR( "not BMP file" );
     return 0;
   }
@@ -114,7 +114,7 @@ static int _zxBMPReadHeader(zxBMPInfo *info)
   info->dataoffset = _zxBMPReadVal( info->fp, 4 ); /* data offset */
   /* info header size */
   if( _zxBMPReadVal( info->fp, 4 ) != ZX_BMP_INFOHEADERSIZE ){
-    ZRUNERROR( "unsupported BMP(parhaps OS/2 bitmap)" );
+    ZRUNERROR( "unsupported BMP (parhaps OS/2 bitmap)" );
     return 0;
   }
   info->width  = _zxBMPReadVal( info->fp, 4 ); /* image width */
@@ -169,18 +169,19 @@ static zxPixel *_zxBMPReadPalette(zxBMPInfo *info)
 /* B/W */
 static void _zxBMPRead_1bit(zxBMPInfo *info, zxImage *img)
 {
-  int i, j, k;
+  uint i, j, k;
   zxPixel pixel, p;
   zxPixelManip src, dest;
 
+  ZECHO( "1bit DIB" );
   zxPixelManipSet( &src, ZX_BMP_TCBIT );
   zxPixelManipSetDefault( &dest );
-  for( i=img->height-1; i>=0; i-- )
+  for( i=0; i<img->height; i++ )
     for( j=0; j<info->bpl; j++ ){
       pixel = _zxBMPReadVal( info->fp, 1 );
       for( k=0; k<ZX_BIT_PER_BYTE; k++ ){
         p = ( pixel >> (ZX_BIT_PER_BYTE-k-1) ) & 0x1;
-        zxImageCellFromPixel( img, j*ZX_BIT_PER_BYTE+k, i,
+        zxImageCellFromPixel( img, j*ZX_BIT_PER_BYTE+k, img->height-i-1,
           zxPixelConv( info->palette[p], &src, &dest ) );
       }
     }
@@ -189,40 +190,44 @@ static void _zxBMPRead_1bit(zxBMPInfo *info, zxImage *img)
 /* 16 Pseudo Color */
 static void _zxBMPRead_4bit(zxBMPInfo *info, zxImage *img)
 {
-  int i, j, k;
+  uint i, _i, j, k;
   ubyte p, p1, p2;
   zxPixelManip src, dest;
 
+  ZECHO( "4bit DIB" );
   zxPixelManipSet( &src, ZX_BMP_TCBIT );
   zxPixelManipSetDefault( &dest );
-  for( i=img->height-1; i>=0; i-- )
+  for( i=0; i<img->height; i++ ){
+    _i = img->height - i - 1;
     for( j=0; j<info->bpl; j++ ){
       p  = _zxBMPReadVal( info->fp, 1 );
       p1 = ( p >> 4 ) & 0xf;
       p2 =   p        & 0xf;
       k = j * 2;
-      if( zxImagePosIsValid( img, k, i ) )
-        zxImageCellFromPixel( img, k, i,
+      if( zxImagePosIsValid( img, k, _i ) )
+        zxImageCellFromPixel( img, k, _i,
           zxPixelConv( info->palette[p1], &src, &dest ) );
-      if( zxImagePosIsValid( img, ++k, i ) )
-        zxImageCellFromPixel( img, k, i,
+      if( zxImagePosIsValid( img, ++k, _i ) )
+        zxImageCellFromPixel( img, k, _i,
           zxPixelConv( info->palette[p2], &src, &dest ) );
     }
+  }
 }
 
 /* 256 Pseudo Color */
 static void _zxBMPRead_8bit(zxBMPInfo *info, zxImage *img)
 {
-  int i, j;
+  uint i, j;
   zxPixel pixel;
   zxPixelManip src, dest;
 
+  ZECHO( "8bit DIB" );
   zxPixelManipSet( &src, ZX_BMP_TCBIT );
   zxPixelManipSetDefault( &dest );
-  for( i=img->height-1; i>=0; i-- )
+  for( i=0; i<img->height; i++ )
     for( j=0; j<info->bpl; j++ ){
       pixel = _zxBMPReadVal( info->fp, 1 );
-      zxImageCellFromPixel( img, j, i,
+      zxImageCellFromPixel( img, j, img->height-i-1,
         zxPixelConv( info->palette[pixel], &src, &dest ) );
     }
 }
@@ -230,16 +235,17 @@ static void _zxBMPRead_8bit(zxBMPInfo *info, zxImage *img)
 /* True Color */
 static void _zxBMPRead_TrueColor(zxBMPInfo *info, zxImage *img)
 {
-  int i, j;
+  uint i, j;
   zxPixel pixel;
   zxPixelManip src, dest;
 
+  ZECHO( "TrueColor DIB" );
   zxPixelManipSet( &src, info->bitcount );
   zxPixelManipSetDefault( &dest );
-  for( i=img->height-1; i>=0; i-- ){
+  for( i=0; i<img->height; i++ ){
     for( j=0; j<info->width; j++ ){
       pixel = _zxBMPReadVal( info->fp, info->bpp );
-      zxImageCellFromPixel( img, j, i,
+      zxImageCellFromPixel( img, j, img->height-i-1,
         zxPixelConv( pixel, &src, &dest ) );
     }
     /* alignment */
@@ -251,13 +257,14 @@ static void _zxBMPRead_TrueColor(zxBMPInfo *info, zxImage *img)
 /* 8bit run length */
 static void _zxBMPRead_RLE8(zxBMPInfo *info, zxImage *img)
 {
-  int i, j, x;
+  uint i, j, x;
   ubyte num, v;
   zxPixelManip src, dest;
 
+  ZECHO( "DIB RLE8" );
   zxPixelManipSet( &src, ZX_BMP_TCBIT );
   zxPixelManipSetDefault( &dest );
-  for( i=img->height-1; i>=0; i-- ){
+  for( i=0; i<img->height; i++ ){
     for( x=0; ; ){
       num = _zxBMPReadVal( info->fp, 1 );
       if( num == 0x00 ){
@@ -267,12 +274,12 @@ static void _zxBMPRead_RLE8(zxBMPInfo *info, zxImage *img)
         case 0x01: return;    /* EOF */
         case 0x02:
           x += _zxBMPReadVal( info->fp, 1 );
-          i -= _zxBMPReadVal( info->fp, 1 );
+          i += _zxBMPReadVal( info->fp, 1 );
           break;
         default:
           for( j=0; j<num; j++ ){
             v = _zxBMPReadVal( info->fp, 1 );
-            zxImageCellFromPixel( img, x++, i,
+            zxImageCellFromPixel( img, x++, img->height-i-1,
               zxPixelConv( info->palette[v], &src, &dest ) );
           }
           if( num % 2 )
@@ -281,7 +288,7 @@ static void _zxBMPRead_RLE8(zxBMPInfo *info, zxImage *img)
       } else{
         v = _zxBMPReadVal( info->fp, 1 );
         for( j=0; j<num; j++ )
-          zxImageCellFromPixel( img, x++, i,
+          zxImageCellFromPixel( img, x++, img->height-i-1,
             zxPixelConv( info->palette[v], &src, &dest ) );
       }
     }
@@ -292,13 +299,14 @@ static void _zxBMPRead_RLE8(zxBMPInfo *info, zxImage *img)
 /* 4bit run length */
 static void _zxBMPRead_RLE4(zxBMPInfo *info, zxImage *img)
 {
-  int i, j, x;
+  uint i, j, x;
   ubyte num, v, index[2];
   zxPixelManip src, dest;
 
+  ZECHO( "DIB RLE4" );
   zxPixelManipSet( &src, ZX_BMP_TCBIT );
   zxPixelManipSetDefault( &dest );
-  for( i=img->height-1; i>=0; i-- ){
+  for( i=0; i<img->height; i++ ){
     for( x=0; ; ){
       num = _zxBMPReadVal( info->fp, 1 );
       if( num == 0x00 ){
@@ -308,7 +316,7 @@ static void _zxBMPRead_RLE4(zxBMPInfo *info, zxImage *img)
         case 0x01: return;    /* EOF */
         case 0x02:
           x += _zxBMPReadVal( info->fp, 1 );
-          i -= _zxBMPReadVal( info->fp, 1 );
+          i += _zxBMPReadVal( info->fp, 1 );
           break;
         default:
           index[0] = index[1] = 0;
@@ -318,7 +326,7 @@ static void _zxBMPRead_RLE4(zxBMPInfo *info, zxImage *img)
               index[0] = ( v >> 4 ) & 0xf;
               index[1] =   v        & 0xf;
             }
-            zxImageCellFromPixel( img, x++, i,
+            zxImageCellFromPixel( img, x++, img->height-i-1,
               zxPixelConv( info->palette[index[j%2]], &src, &dest ) );
           }
           if( ( num / 2 + num % 2 ) % 2 )
@@ -329,7 +337,7 @@ static void _zxBMPRead_RLE4(zxBMPInfo *info, zxImage *img)
         index[0] = ( v >> 4 ) & 0xf;
         index[1] =   v        & 0xf;
         for( j=0; j<num; j++ )
-          zxImageCellFromPixel( img, x++, i,
+          zxImageCellFromPixel( img, x++, img->height-i-1,
             zxPixelConv( info->palette[index[j%2]], &src, &dest ) );
       }
     }
@@ -441,7 +449,7 @@ static int _zxBMPWriteHeader(zxBMPInfo *info, zxImage *img)
 
 static void _zxBMPWrite(zxBMPInfo *info, zxImage *img)
 {
-  int i, j;
+  uint i, j;
   zxPixel pixel;
   zxPixelManip src, dest;
 

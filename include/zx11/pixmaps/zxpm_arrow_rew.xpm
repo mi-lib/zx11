@@ -1,4 +1,4 @@
-char *__zxpm_arrow_rew[] = {
+const char *__zxpm_arrow_rew[] = {
 "12 12 4 1",/* width height num_colors chars_per_pixel */
 " 	s None	c None",/* colors */
 ".	c gray60",

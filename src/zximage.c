@@ -118,7 +118,7 @@ zxImage *zxImageClear(zxImage *img)
 
 zxImage *zxImageFill(zxImage *img, zxPixel pixel)
 {
-  int i, j;
+  uint i, j;
 
   for( i=0; i<img->height; i++ )
     for( j=0; j<img->width; j++ )
@@ -323,7 +323,7 @@ zxImage *zxImageRot(zxImage *src, zxImage *dest, uint ox, uint oy, uint x, uint 
 {
   uint i, j, k;
   double x0, x1, x2, y0, y1, y2;
-  int px, py;
+  uint px, py;
   double ct, st;
 
   ct = cos( theta );
@@ -467,7 +467,7 @@ zxImage *zxImageResize(zxImage *src, zxImage *dest)
 
 zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bimg)
 {
-  int i, j;
+  uint i, j;
   ubyte r, g, b;
   zxPixelManip pm;
 
@@ -536,7 +536,7 @@ zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate)
 
 static void _zxImageHistogram(zxImage *img, zxPixelManip *pm, uint h[], double sh[])
 {
-  int i, j;
+  uint i, j;
   ubyte r, g, b;
   double d;
 
@@ -553,7 +553,7 @@ static void _zxImageHistogram(zxImage *img, zxPixelManip *pm, uint h[], double s
 
 zxImage *zxImageEqualize(zxImage *src, zxImage *dest)
 {
-  int x, y, i;
+  uint x, y, i;
   uint w, h;
   uint *hi;
   double *sh, vmin, scalefactor;
@@ -597,7 +597,7 @@ zxImage *zxImageDither(zxImage *src, zxImage *dest)
     12,  4, 14,  6,
      3, 11,  1,  9,
     15,  7, 13,  5 };
-  int i, j;
+  uint i, j;
   uint w, h;
   zxPixelManip pm;
   ubyte r, g, b, th;
@@ -685,9 +685,9 @@ static int _zx11_median_cmp(void *v1, void *v2, void *dummy)
   return 0;
 }
 
-static void _zxImageMedianFind(zxImage *img, zxPixelManip *pm, int j, int i, ubyte *rs, ubyte *gs, ubyte *bs, int size, ubyte *r, ubyte *g, ubyte *b)
+static void _zxImageMedianFind(zxImage *img, zxPixelManip *pm, int j, int i, ubyte *rs, ubyte *gs, ubyte *bs, uint size, ubyte *r, ubyte *g, ubyte *b)
 {
-  int _i, _j, si, sj, k;
+  uint _i, _j, si, sj, k;
   int s2, sh;
 
   s2 = size * size;
@@ -711,7 +711,7 @@ static void _zxImageMedianFind(zxImage *img, zxPixelManip *pm, int j, int i, uby
 
 zxImage *zxImageMedian(zxImage *src, zxImage *dest, int size)
 {
-  int i, j;
+  uint i, j;
   uint w, h;
   zxPixelManip pm;
   ubyte *rs, *gs, *bs, r, g, b;
@@ -960,8 +960,8 @@ Pixmap zxImageCreatePixmap(zxWindow *win, zxImage *img)
 
 Pixmap zxImageCreatePixmapMask(zxWindow *win, zxImage *img)
 {
-  int x, y, z;
-  int bytes_per_row;
+  uint x, y, z;
+  uint bytes_per_row;
   ubyte *buf, flag;
   Pixmap mask;
 
@@ -1003,7 +1003,7 @@ bool zxImageDrawMask(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w
 {
   zxImage mask;
   zxPixelManip pm;
-  int i, j;
+  uint i, j;
   ubyte val, *mp;
 
   if( !( mp = img->mask_buf ) ) return false;
@@ -1036,7 +1036,7 @@ zxImage *zxImageFromPixmap(zxImage *img, Pixmap pmap, uint w, uint h)
 
 /* file format checker and generalized I/O */
 
-bool zxImageFileIdent(char filename[], const char ident[], int size)
+bool zxImageFileIdent(char filename[], const unsigned char ident[], uint size)
 {
   FILE *fp;
   char buf[BUFSIZ];
