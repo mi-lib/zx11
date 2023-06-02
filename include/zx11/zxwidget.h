@@ -7,11 +7,7 @@
 #ifndef __ZX_WIDGET_H__
 #define __ZX_WIDGET_H__
 
-#ifndef __ZX11_USE_XPM
-#define __ZX11_USE_XPM
-#endif /* __ZX11_USE_XPM */
 #include <zx11/zxpm.h>
-
 #include <zx11/zxinput.h>
 
 __BEGIN_DECLS

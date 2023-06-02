@@ -1,17 +1,16 @@
 OBJ=zxutil.o zxfont.o zxinput.o\
-	zxpixel.o zximage.o zximage_pnm.o
-
-ifeq ($(CONFIG_USE_WIDGET),y)
-	OBJ += zxwidget.o
-endif
+	zxpixel.o zxpm.o zximage.o zximage_pnm.o
 
 ifeq ($(CONFIG_USE_XEXT),y)
 	CFLAGS += -D__ZX11_USE_XEXT
 endif
 
 ifeq ($(CONFIG_USE_XPM),y)
-	OBJ += zxpm.o zxsprite.o
+	OBJ += zxsprite.o
 	CFLAGS += -D__ZX11_USE_XPM
+ifeq ($(CONFIG_USE_WIDGET),y)
+	OBJ += zxwidget.o
+endif
 endif
 
 ifeq ($(CONFIG_USE_PNG),y)

@@ -1,3 +1,4 @@
+2023. 6. 1. Modified config.lib to exclude zxwidget when CONFIG_USE_XPM is not enabled (thanks to Mr. Kenta Imanishi). [src, zxpm, zxwidget]
 2023. 5.16. Modified src/makefile. [src]
 2023. 3.30. Modified _zxBMPRead_1bit, _zxBMPRead_4bit, _zxBMPRead_8bit, _zxBMPRead_TrueColor, _zxBMPRead_RLE8, and _zxBMPRead_RLE4 to read lines by unsigned int. [zximage_dib]
 2023. 3.30. Modified zxImageFileIdent to accept identifier string as an array of unsigned char. [zximage, zximage_pnm, zximage_png, zximage_tiff, zximage_jpeg, zximage_dib, zximage_mag, zximage_pdt]

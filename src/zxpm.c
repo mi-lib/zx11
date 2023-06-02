@@ -53,6 +53,8 @@ void zxPMClipShape(zxWindow *win, zxPM *pm)
 }
 #endif /* __ZX11_USE_XEXT */
 
+#ifdef __ZX11_USE_XPM
+
 #define _zxPMSetAttr(a) do{\
   (a)->valuemask = XpmCloseness;\
   (a)->depth = zxdepth;\
@@ -113,6 +115,8 @@ int zxPMWriteData(zxPM *pm, char **data[])
   _zxPMAssert( status );
   return status;
 }
+
+#endif /* __ZX11_USE_XPM */
 
 void zxImageToPM(zxWindow *win, zxImage *img, zxPM *pm)
 {
