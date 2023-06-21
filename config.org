@@ -1,8 +1,4 @@
-PREFIX=$(HOME)/usr
-PROJNAME=zx11
-VERSION=1.2.14
-
-DEPENDENCY="zeda=1.6.45"
+PREFIX=${HOME}/usr
 
 # X extension include
 # (libXext required)
