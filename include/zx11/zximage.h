@@ -40,10 +40,13 @@ void zxImageCellFromPixelCheck(zxImage *img, uint x, uint y, zxPixel pixel);
 
 #define zxImageCellRGB(img,pm,x,y,r,g,b) \
   (pm)->PixelRGB( zxImageCellPixel(img,x,y), r, g, b )
+ubyte zxImageCellGS(zxImage *img, zxPixelManip *pm, uint x, uint y);
 #define zxImageCellFromRGB(img,pm,x,y,r,g,b) \
   zxImageCellFromPixel( img, x, y, (pm)->PixelFromRGB(r,g,b) )
 #define zxImageCellFromGS(img,pm,x,y,v) \
   zxImageCellFromPixel( img, x, y, zxPixelFromGS(pm,v) )
+#define zxImageCellFromFRGB(img,pm,x,y,r,g,b) \
+  zxImageCellFromPixel( img, x, y, (pm)->PixelFromFRGB(r,g,b) )
 #define zxImageCellNegate(img,pm,x,y) \
   zxPixelNegate( pm, zxImageCellPixel(img,x,y) )
 
@@ -125,6 +128,12 @@ zxImage *zxImageSobelH(zxImage *src, zxImage *dest);
 zxImage *zxImageSobelV(zxImage *src, zxImage *dest);
 zxImage *zxImageSobel(zxImage *src, zxImage *dest);
 zxImage *zxImageLaplacian(zxImage *src, zxImage *dest);
+
+/* normal map */
+
+#define _zxNormalize(x) ( 0.5 * ( (x) + 1.0 ) )
+void zxImageNormalVec(zxImage *img, zxPixelManip *pm, uint j, uint i, double *x, double *y, double *z);
+zxImage *zxImageNormalMap(zxImage *src, zxImage *dest);
 
 /* special effect */
 

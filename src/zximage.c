@@ -41,6 +41,14 @@ void zxImageCellFromPixelCheck(zxImage *img, uint x, uint y, zxPixel pixel)
     zxImageCellFromPixel( img, x, y, pixel );
 }
 
+ubyte zxImageCellGS(zxImage *img, zxPixelManip *pm, uint x, uint y)
+{
+  ubyte r, g, b;
+
+  zxImageCellRGB( img, pm, x, y, &r, &g, &b );
+  return ( r + g + b ) / 3;
+}
+
 ubyte zxImageBPP(ubyte depth)
 {
   switch( depth ){
@@ -877,6 +885,81 @@ zxImage *zxImageLaplacian(zxImage *src, zxImage *dest)
     1.0, 1.0, 1.0,
   };
   return zxImageFilter( src, dest, weight, 3 );
+}
+
+/* normal map */
+
+/* tangent of a height map along x-axis */
+static double _zxImageNormalDX(zxImage *img, zxPixelManip *pm, uint j, uint i)
+{
+  ubyte v1, v2, v3;
+
+  if( j <= 0 ){
+    v1 = zxImageCellGS( img, pm, 0, i );
+    v2 = zxImageCellGS( img, pm, 1, i );
+    v3 = zxImageCellGS( img, pm, 2, i );
+    return -0.5 * (double)v1 + 2 * (double)v2 / 3 - (double)v3 / 6;
+  }
+  if( j + 1 >= img->width ){
+    v1 = zxImageCellGS( img, pm, img->width-3, i );
+    v2 = zxImageCellGS( img, pm, img->width-2, i );
+    v3 = zxImageCellGS( img, pm, img->width-1, i );
+    return (double)v1 / 6 - 2 * (double)v2 / 3 + 0.5 * (double)v3;
+  }
+  v1 = zxImageCellGS( img, pm, j-1, i );
+  v3 = zxImageCellGS( img, pm, j+1, i );
+  return (double)( v3 - v1 ) / 6;
+}
+
+/* tangent of a height map along y-axis */
+static double _zxImageNormalDY(zxImage *img, zxPixelManip *pm, uint j, uint i)
+{
+  ubyte v1, v2, v3;
+
+  if( i <= 0 ){
+    v1 = zxImageCellGS( img, pm, j, 0 );
+    v2 = zxImageCellGS( img, pm, j, 1 );
+    v3 = zxImageCellGS( img, pm, j, 2 );
+    return -0.5 * (double)v1 + 2 * (double)v2 / 3 - (double)v3 / 6;
+  }
+  if( i + 1 >= img->height ){
+    v1 = zxImageCellGS( img, pm, j, img->height-3 );
+    v2 = zxImageCellGS( img, pm, j, img->height-2 );
+    v3 = zxImageCellGS( img, pm, j, img->height-1 );
+    return (double)v1 / 6 - 2 * (double)v2 / 3 + 0.5 * (double)v3;
+  }
+  v1 = zxImageCellGS( img, pm, j, i-1 );
+  v3 = zxImageCellGS( img, pm, j, i+1 );
+  return (double)( v3 - v1 ) / 6;
+}
+
+void zxImageNormalVec(zxImage *img, zxPixelManip *pm, uint j, uint i, double *x, double *y, double *z)
+{
+  double dx, dy, l;
+
+  dx = _zxImageNormalDX( img, pm, j, i );
+  dy = _zxImageNormalDY( img, pm, j, i );
+  l = sqrt( dx*dx + dy*dy + 1 );
+  *x = _zxNormalize( -dx / l );
+  *y = _zxNormalize( -dy / l );
+  *z = _zxNormalize( 1.0 / l );
+}
+
+zxImage *zxImageNormalMap(zxImage *src, zxImage *dest)
+{
+  uint i, j;
+  uint w, h;
+  double x, y, z;
+  zxPixelManip pm;
+
+  zxImageCanvasRange( dest, src, 0, 0, &w, &h );
+  zxPixelManipSetDefault( &pm );
+  for( i=0; i<h; i++ )
+    for( j=0; j<w; j++ ){
+      zxImageNormalVec( src, &pm, j, i, &x, &y, &z );
+      zxImageCellFromFRGB( dest, &pm, j, i, x, y, z );
+    }
+  return dest;
 }
 
 /* special effect */

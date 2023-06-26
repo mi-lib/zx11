@@ -1,3 +1,6 @@
+2023. 6.26. Added zxImageNormalVec and zxImageNormalMap. [zximage]
+2023. 6.26. Added zxImageCellFromFRGB. [zximage]
+2023. 6.26. Added zxImageCellGS. [zximage]
 2023. 6.21. Separated config and libinfo. [all]
 2023. 6. 1. Modified config.lib to exclude zxwidget when CONFIG_USE_XPM is not enabled (thanks to Mr. Kenta Imanishi). [src, zxpm, zxwidget]
 2023. 5.16. Modified src/makefile. [src]
