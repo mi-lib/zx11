@@ -933,19 +933,19 @@ static double _zxImageNormalDY(zxImage *img, zxPixelManip *pm, uint j, uint i)
   return (double)( v3 - v1 ) / 6;
 }
 
-void zxImageNormalVec(zxImage *img, zxPixelManip *pm, uint j, uint i, double *x, double *y, double *z)
+void zxImageNormalVec(zxImage *img, zxPixelManip *pm, double depth, uint j, uint i, double *x, double *y, double *z)
 {
   double dx, dy, l;
 
   dx = _zxImageNormalDX( img, pm, j, i );
   dy = _zxImageNormalDY( img, pm, j, i );
-  l = sqrt( dx*dx + dy*dy + 1 );
+  l = sqrt( dx*dx + dy*dy + 1.0/(depth*depth) );
   *x = _zxNormalize( -dx / l );
   *y = _zxNormalize( -dy / l );
   *z = _zxNormalize( 1.0 / l );
 }
 
-zxImage *zxImageNormalMap(zxImage *src, zxImage *dest)
+zxImage *zxImageNormalMap(zxImage *src, double depth, zxImage *dest)
 {
   uint i, j;
   uint w, h;
@@ -956,7 +956,7 @@ zxImage *zxImageNormalMap(zxImage *src, zxImage *dest)
   zxPixelManipSetDefault( &pm );
   for( i=0; i<h; i++ )
     for( j=0; j<w; j++ ){
-      zxImageNormalVec( src, &pm, j, i, &x, &y, &z );
+      zxImageNormalVec( src, &pm, depth, j, i, &x, &y, &z );
       zxImageCellFromFRGB( dest, &pm, j, i, x, y, z );
     }
   return dest;

@@ -43,6 +43,8 @@ void test_bump_random(zxImage *img, int n)
 #define WIDTH  256
 #define HEIGHT 256
 
+#define DEPTH  1.0
+
 #define N 20
 
 int main(int argc, char *argv[])
@@ -56,7 +58,7 @@ int main(int argc, char *argv[])
   zxImageAllocDefault( &src, WIDTH, HEIGHT );
   test_bump_random( &src, N );
   zxImageAllocDefault( &nvm, src.width, src.height );
-  zxImageNormalMap( &src, &nvm );
+  zxImageNormalMap( &src, argc > 1 ? atof( argv[1] ) : DEPTH, &nvm );
 
   zxImageDrawAll( &win, &src, 0, 0 );
   zxImageDrawAll( &win, &nvm, src.width, 0 );

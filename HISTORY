@@ -1,3 +1,4 @@
+2023. 6.26. Modified specification of zxImageNormalVec and zxImageNormalMap to accept the image depth. [zximage]
 2023. 6.26. Added zxImageNormalVec and zxImageNormalMap. [zximage]
 2023. 6.26. Added zxImageCellFromFRGB. [zximage]
 2023. 6.26. Added zxImageCellGS. [zximage]

@@ -132,8 +132,8 @@ zxImage *zxImageLaplacian(zxImage *src, zxImage *dest);
 /* normal map */
 
 #define _zxNormalize(x) ( 0.5 * ( (x) + 1.0 ) )
-void zxImageNormalVec(zxImage *img, zxPixelManip *pm, uint j, uint i, double *x, double *y, double *z);
-zxImage *zxImageNormalMap(zxImage *src, zxImage *dest);
+void zxImageNormalVec(zxImage *img, zxPixelManip *pm, double depth, uint j, uint i, double *x, double *y, double *z);
+zxImage *zxImageNormalMap(zxImage *src, double depth, zxImage *dest);
 
 /* special effect */
 
