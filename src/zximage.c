@@ -1174,3 +1174,41 @@ int zxImageReadFile(zxImage *img, char filename[])
   ZRUNERROR( "unknown format" );
   return 0;
 }
+
+int zxImageWriteFile(zxImage *img, char filename[])
+{
+  char *suffix, suffix_lower[BUFSIZ];
+
+  if( !( suffix = zGetSuffix( filename ) ) ) goto ZXIMAGE_WRITE_ERROR;
+  zStrToLower( suffix, BUFSIZ, suffix_lower );
+  if( strcmp( suffix_lower, "pbm" ) == 0 ) /* Portable Bitmap */
+    return zxImageWritePBMFile( img, filename );
+  if( strcmp( suffix_lower, "pgm" ) == 0 ) /* Portable Graymap */
+    return zxImageWritePGMFile( img, filename );
+  if( strcmp( suffix_lower, "ppm" ) == 0 ) /* Portable Pixmap */
+    return zxImageWritePPMFile( img, filename );
+
+#ifdef __ZX11_USE_PNG
+  if( strcmp( suffix_lower, "png" ) == 0 )
+    return zxImageWritePNGFile( img, filename );
+#endif /* __ZX11_USE_PNG */
+
+#ifdef __ZX11_USE_TIFF
+  if( strcmp( suffix_lower, "tiff" ) == 0 )
+    return zxImageWriteTIFFFileDefault( img, filename );
+#endif /* __ZX11_USE_TIFF */
+
+#ifdef __ZX11_USE_JPEG
+  if( strcmp( suffix_lower, "jpeg" ) == 0 )
+    return zxImageWriteJPEGFileDefault( img, filename );
+#endif /* __ZX11_USE_JPEG */
+
+#ifdef __ZX11_USE_BMP
+  if( strcmp( suffix_lower, "bmp" ) == 0 )
+    return zxImageWriteBMPFile( img, filename );
+#endif /* __ZX11_USE_BMP */
+
+ ZXIMAGE_WRITE_ERROR:
+  ZRUNERROR( "cannot identify image format to save" );
+  return 0;
+}

@@ -121,3 +121,8 @@ int zxImageWriteTIFFFile(zxImage *img, char filename[], int cmpmethod)
   TIFFClose( tiff );
   return ret;
 }
+
+int zxImageWriteTIFFFileDefault(zxImage *img, char filename[])
+{
+  return zxImageWriteTIFFFile( img, filename, COMPRESSION_NONE );
+}

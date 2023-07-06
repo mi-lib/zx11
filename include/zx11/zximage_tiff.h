@@ -22,6 +22,7 @@ bool zxImageFileIsTIFF(char filename[]);
 
 int zxImageReadTIFFFile(zxImage *img, char filename[]);
 int zxImageWriteTIFFFile(zxImage *img, char filename[], int cmpmethod);
+int zxImageWriteTIFFFileDefault(zxImage *img, char filename[]);
 
 __END_DECLS
 

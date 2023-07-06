@@ -153,3 +153,8 @@ int zxImageWriteJPEGFile(zxImage *img, char filename[], int quality)
   fclose( fp );
   return result;
 }
+
+int zxImageWriteJPEGFileDefault(zxImage *img, char filename[])
+{
+  return zxImageWriteJPEGFile( img, filename, ZX_JPEG_DEFAULT_QUALITY );
+}

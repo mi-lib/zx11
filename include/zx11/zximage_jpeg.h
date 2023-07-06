@@ -24,6 +24,7 @@ int zxImageReadJPEGFile(zxImage *img, char filename[]);
 
 int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality);
 int zxImageWriteJPEGFile(zxImage *img, char filename[], int quality);
+int zxImageWriteJPEGFileDefault(zxImage *img, char filename[]);
 
 __END_DECLS
 

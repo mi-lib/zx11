@@ -29,6 +29,9 @@ typedef struct{
                      * 0 = BI_RGB : no compression
                      * 1 = BI_RLE8: 8bit RLE encoding
                      * 2 = BI_RLE4: 4bit RLE encoding
+                     * 3 = BI_BITFIELDS (unsupported)
+                     * 4 = BI_JPEG (unsupported)
+                     * 5 = BI_PNG (unsupported)
                      */
   uint32_t imagesize;  /* image size */
   uint32_t xppm;       /* X pixels/meter */
@@ -41,12 +44,15 @@ typedef struct{
   zxPixel *palette; /* palette */
 } zxBMPInfo;
 
-/* type of compression */
-enum{
-  BI_RGB = 0, BI_RLE8, BI_RLE4
-};
+/* type of compression (BI_BITFIELDS - BI_PNG unsupported) */
+#define BI_RGB            0
+#define BI_RLE8           1
+#define BI_RLE4           2
+#define BI_BITFIELDS      3
+#define BI_JPEG           4
+#define BI_PNG            5
 
-#define ZX_BMP_TCBIT 24
+#define ZX_BMP_TCBIT     24
 
 /* BPL(Byte Per Pixel) Alignment */
 static uint _zxBMPAlignBPL(uint *bpl)
@@ -173,7 +179,6 @@ static void _zxBMPRead_1bit(zxBMPInfo *info, zxImage *img)
   zxPixel pixel, p;
   zxPixelManip src, dest;
 
-  ZECHO( "1bit DIB" );
   zxPixelManipSet( &src, ZX_BMP_TCBIT );
   zxPixelManipSetDefault( &dest );
   for( i=0; i<img->height; i++ )
@@ -194,7 +199,6 @@ static void _zxBMPRead_4bit(zxBMPInfo *info, zxImage *img)
   ubyte p, p1, p2;
   zxPixelManip src, dest;
 
-  ZECHO( "4bit DIB" );
   zxPixelManipSet( &src, ZX_BMP_TCBIT );
   zxPixelManipSetDefault( &dest );
   for( i=0; i<img->height; i++ ){
@@ -221,7 +225,6 @@ static void _zxBMPRead_8bit(zxBMPInfo *info, zxImage *img)
   zxPixel pixel;
   zxPixelManip src, dest;
 
-  ZECHO( "8bit DIB" );
   zxPixelManipSet( &src, ZX_BMP_TCBIT );
   zxPixelManipSetDefault( &dest );
   for( i=0; i<img->height; i++ )
@@ -239,7 +242,6 @@ static void _zxBMPRead_TrueColor(zxBMPInfo *info, zxImage *img)
   zxPixel pixel;
   zxPixelManip src, dest;
 
-  ZECHO( "TrueColor DIB" );
   zxPixelManipSet( &src, info->bitcount );
   zxPixelManipSetDefault( &dest );
   for( i=0; i<img->height; i++ ){
@@ -261,7 +263,6 @@ static void _zxBMPRead_RLE8(zxBMPInfo *info, zxImage *img)
   ubyte num, v;
   zxPixelManip src, dest;
 
-  ZECHO( "DIB RLE8" );
   zxPixelManipSet( &src, ZX_BMP_TCBIT );
   zxPixelManipSetDefault( &dest );
   for( i=0; i<img->height; i++ ){
@@ -303,7 +304,6 @@ static void _zxBMPRead_RLE4(zxBMPInfo *info, zxImage *img)
   ubyte num, v, index[2];
   zxPixelManip src, dest;
 
-  ZECHO( "DIB RLE4" );
   zxPixelManipSet( &src, ZX_BMP_TCBIT );
   zxPixelManipSetDefault( &dest );
   for( i=0; i<img->height; i++ ){
@@ -405,6 +405,38 @@ int zxImageReadBMPFile(zxImage *img, char filename[])
   return result;
 }
 
+/* for debug */
+void zxBMPPrintType(const char *filename)
+{
+  zxBMPInfo info;
+
+  memset( &info, 0, sizeof(zxBMPInfo) ); /* clear BMPInfo instance */
+  if( !( info.fp = fopen( filename, "rb" ) ) ){
+    ZOPENERROR( filename );
+    return;
+  }
+  _zxBMPReadHeader( &info );
+  switch( info.comp ){
+  case BI_RGB:
+    switch( info.bitcount ){
+    case  1: ZECHO( "1bit DIB" ); break;
+    case  4: ZECHO( "4bit DIB" ); break;
+    case  8: ZECHO( "8bit DIB" ); break;
+    case 24:
+    case 32: ZECHO( "TrueColor DIB" ); break;
+    default: ZECHO( "DIB unsupported bitcount" );
+    }
+    break;
+  case BI_RLE8:
+    ZECHO( "DIB RLE8" ); break;
+  case BI_RLE4:
+    ZECHO( "DIB RLE4" ); break;
+  default:
+    ZECHO( "DIB unsupported compression type" );
+  }
+  fclose( info.fp );
+}
+
 /* BMP writer */
 static void _zxBMPWriteVal(FILE *fp, uint size, uint32_t val)
 {
@@ -455,9 +487,9 @@ static void _zxBMPWrite(zxBMPInfo *info, zxImage *img)
 
   zxPixelManipSetDefault( &src );
   zxPixelManipSet( &dest, ZX_BMP_DEFAULT_BITCOUNT );
-  for( i=img->height-1; i>=0; i-- ){
+  for( i=0; i<img->height; i++ ){
     for( j=0; j<info->width; j++ ){
-      pixel = zxPixelConv( zxImageCellPixel( img, j, i ), &src, &dest );
+      pixel = zxPixelConv( zxImageCellPixel( img, j, img->height-i-1 ), &src, &dest );
       _zxBMPWriteVal( info->fp, info->bpp, pixel );
     }
     /* alignment */
