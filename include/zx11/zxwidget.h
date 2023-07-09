@@ -16,27 +16,32 @@ __BEGIN_DECLS
 /* default color and font set
  * ********************************************************** */
 
-extern long zxw_front_color;
-extern long zxw_back_color;
-extern long zxw_back_rev_color;
-extern long zxw_hilit_color;
-extern long zxw_shade_color;
-extern long zxw_edit_e_color;
-extern long zxw_edit_d_color;
-extern long zxw_text_e_color;
-extern long zxw_text_d_color;
-extern long zxw_text_rev_color;
-extern long zxw_gauge_e_color;
-extern long zxw_gauge_d_color;
-extern long zxw_gauge_g_color;
-extern long zxw_bar_color;
-extern long zxw_knob_color;
-extern long zxw_radio_color;
+typedef struct{
+  long color_front;
+  long color_back;
+  long color_back_rev;
+  long color_hilit;
+  long color_shade;
+  long color_edit_e;
+  long color_edit_d;
+  long color_text_e;
+  long color_text_d;
+  long color_text_rev;
+  long color_gauge_e;
+  long color_gauge_d;
+  long color_gauge_g;
+  long color_bar;
+  long color_knob;
+  long color_radio;
+} zxWidgetTheme;
+extern zxWidgetTheme *zxw_theme, zxw_default_theme;
 
 #define ZXW_DEFAULT_FONT \
   "-misc-fixed-medium-*-normal-*-14-*-*-*-*-*-*-*"
 
 void zxWidgetInit(zxWindow *win);
+#define zxWidgetSetTheme(t)       ( zxw_theme = (t) )
+#define zxWidgetSetDefaultTheme() zxWidgetSetTheme( &zxw_default_theme )
 
 /* ********************************************************** */
 /* shade/hilight bar
@@ -74,9 +79,9 @@ void zxwSepBoxRelief(zxWindow *win, short x, short y, short width, short height)
 
 void zxwBoxDrawShade(zxWindow *win, zxRegion *reg, long color, long limb1, long limb2, short h);
 #define zxwBoxDrawRaise(win,r,c,h) \
-  zxwBoxDrawShade( (win), r, (c), zxw_hilit_color, zxw_shade_color, h )
+  zxwBoxDrawShade( (win), r, (c), zxw_theme->color_hilit, zxw_theme->color_shade, h )
 #define zxwBoxDrawLower(win,r,c,h) \
-  zxwBoxDrawShade( (win), r, (c), zxw_shade_color, zxw_hilit_color, h )
+  zxwBoxDrawShade( (win), r, (c), zxw_theme->color_shade, zxw_theme->color_hilit, h )
 void zxwBoxDrawRelief(zxWindow *win, zxRegion *reg, long color, short h);
 
 /* ********************************************************** */
@@ -90,9 +95,9 @@ void zxwBoxDrawRelief(zxWindow *win, zxRegion *reg, long color, short h);
 #define zxwEmbossSetDefault(w) zxwEmbossSet( w, ZXW_EMBOSS_H )
 
 #define zxwEmbossDrawRaise(win,e,c) \
-  zxwBoxDrawShade( (win), &(e)->reg, (c), zxw_hilit_color, zxw_shade_color, (e)->emboss )
+  zxwBoxDrawShade( (win), &(e)->reg, (c), zxw_theme->color_hilit, zxw_theme->color_shade, (e)->emboss )
 #define zxwEmbossDrawLower(win,e,c) \
-  zxwBoxDrawShade( (win), &(e)->reg, (c), zxw_shade_color, zxw_hilit_color, (e)->emboss )
+  zxwBoxDrawShade( (win), &(e)->reg, (c), zxw_theme->color_shade, zxw_theme->color_hilit, (e)->emboss )
 
 /* ********************************************************** */
 /* alignment class
@@ -119,7 +124,7 @@ enum{
 
 #define ZXW_ALIGN_INVALID (-1)
 
-#define ZXW_ALIGN char align_v, align_h, align_flow
+#define ZXW_ALIGN byte align_v, align_h, align_flow
 
 #define zxwAlignV(w)      (w)->align_v
 #define zxwAlignH(w)      (w)->align_h
@@ -400,28 +405,28 @@ typedef struct{
 #define _zxwButtonDrawLabel(win,b) zxwTextBoxDrawLabel( win, b )
 
 #define zxwButtonDrawLabel(win,b) do{\
-  zxWindowSetColor( win, (b)->enable ? zxw_text_e_color:zxw_text_d_color );\
+  zxWindowSetColor( win, (b)->enable ? zxw_theme->color_text_e : zxw_theme->color_text_d );\
   _zxwButtonDrawLabel( win, b );\
 } while(0)
 #define zxwButtonDrawLabelRev(win,b) do{\
-  zxWindowSetColor( win, zxw_text_rev_color );\
+  zxWindowSetColor( win, zxw_theme->color_text_rev );\
   _zxwButtonDrawLabel( win, b );\
 } while(0)
 
 #define zxwButtonDrawFlat(win,b) do{\
-  zxwBoxDraw( win, b, zxw_back_color );\
+  zxwBoxDraw( win, b, zxw_theme->color_back );\
   zxwButtonDrawLabel( win, b );\
 } while(0)
 #define zxwButtonDrawRev(win,b) do{\
-  zxwBoxDraw( win, b, zxw_back_rev_color );\
+  zxwBoxDraw( win, b, zxw_theme->color_back_rev );\
   zxwButtonDrawLabelRev( win, b );\
 } while(0)
 #define zxwButtonDrawLower(win,b) do{\
-  zxwEmbossDrawLower( win, b, zxw_front_color );\
+  zxwEmbossDrawLower( win, b, zxw_theme->color_front );\
   zxwButtonDrawLabel( win, b );\
 } while(0)
 #define zxwButtonDrawRaise(win,b) do{\
-  zxwEmbossDrawRaise( win, b, zxw_front_color );\
+  zxwEmbossDrawRaise( win, b, zxw_theme->color_front );\
   zxwButtonDrawLabel( win, b );\
 } while(0)
 
@@ -493,15 +498,15 @@ typedef struct{
   int __x, __y;\
   __x = (b)->reg.x + ZXW_RADIOBUTTON_R;\
   __y = (b)->reg.y + ZXW_RADIOBUTTON_R;\
-  zxwBoxDraw( win, b, zxw_front_color );\
-  zxWindowSetColor( win, zxw_shade_color );\
+  zxwBoxDraw( win, b, zxw_theme->color_front );\
+  zxWindowSetColor( win, zxw_theme->color_shade );\
   zxDrawFillArc( win, (b)->reg.x, (b)->reg.y, (b)->reg.width, (b)->reg.height, 45, 180 ); \
-  zxWindowSetColor( win, zxw_hilit_color );\
+  zxWindowSetColor( win, zxw_theme->color_hilit );\
   zxDrawFillArc( win, (b)->reg.x, (b)->reg.y, (b)->reg.width, (b)->reg.height, 225, 180 ); \
-  zxWindowSetColor( win, (b)->enable ? zxw_hilit_color:zxw_back_color );\
+  zxWindowSetColor( win, (b)->enable ? zxw_theme->color_hilit : zxw_theme->color_back );\
   zxDrawFillCircle( win, __x, __y, ZXW_RADIOBUTTON_R-2 );\
   if( (b)->pressed ){\
-    zxWindowSetColor( win, (b)->enable ? zxw_radio_color:zxw_shade_color );\
+    zxWindowSetColor( win, (b)->enable ? zxw_theme->color_radio : zxw_theme->color_shade );\
     zxDrawFillCircle( win, __x, __y, ZXW_RADIOBUTTON_R-4 );\
   }\
 } while(0)
@@ -526,14 +531,14 @@ typedef struct{
 } while(0)
 
 #define zxwCheckBoxDraw(win,b) do{\
-  zxwBoxDrawLower(win,&(b)->reg,(b)->enable ? zxw_hilit_color:zxw_back_color,2);\
+  zxwBoxDrawLower( win, &(b)->reg, (b)->enable ? zxw_theme->color_hilit : zxw_theme->color_back, 2 );\
   if( (b)->pressed ){\
-    zxWindowSetColor( win, (b)->enable ? zxw_radio_color:zxw_shade_color );\
-    zxDrawLine(win,(b)->reg.x+3,(b)->reg.y+8,(b)->reg.x+6,(b)->reg.y+11);\
-    zxDrawLine(win,(b)->reg.x+3,(b)->reg.y+9,(b)->reg.x+6,(b)->reg.y+13);\
-    zxDrawLine(win,(b)->reg.x+6,(b)->reg.y+11,(b)->reg.x+13,(b)->reg.y+4);\
-    zxDrawLine(win,(b)->reg.x+6,(b)->reg.y+12,(b)->reg.x+13,(b)->reg.y+4);\
-    zxDrawLine(win,(b)->reg.x+6,(b)->reg.y+13,(b)->reg.x+13,(b)->reg.y+4);\
+    zxWindowSetColor( win, (b)->enable ? zxw_theme->color_radio : zxw_theme->color_shade );\
+    zxDrawLine( win, (b)->reg.x+3, (b)->reg.y+8,  (b)->reg.x+6,  (b)->reg.y+11 );\
+    zxDrawLine( win, (b)->reg.x+3, (b)->reg.y+9,  (b)->reg.x+6,  (b)->reg.y+13 );\
+    zxDrawLine( win, (b)->reg.x+6, (b)->reg.y+11, (b)->reg.x+13, (b)->reg.y+4 );\
+    zxDrawLine( win, (b)->reg.x+6, (b)->reg.y+12, (b)->reg.x+13, (b)->reg.y+4 );\
+    zxDrawLine( win, (b)->reg.x+6, (b)->reg.y+13, (b)->reg.x+13, (b)->reg.y+4 );\
   }\
 } while(0)
 
@@ -560,8 +565,8 @@ typedef struct{
 } while(0)
 
 #define zxwProgressBarDraw(win,b) do{\
-  zxwBoxDrawLower( win, &(b)->reg, zxw_front_color, 1 );\
-  zxWindowSetColor( (win), zxGetColor(win,"darkblue") );\
+  zxwBoxDrawLower( win, &(b)->reg, zxw_theme->color_front, 1 );\
+  zxWindowSetColor( (win), zxGetColor( win, "darkblue" ) );\
   zxDrawRegionFillRect( (win), &(b)->fillreg );\
 } while(0)
 
@@ -602,17 +607,17 @@ typedef struct{
 } while(0)
 
 #define zxwGaugeDraw(win,g) do{\
-  zxwBoxDraw( win, g, zxw_back_color );\
+  zxwBoxDraw( win, g, zxw_theme->color_back );\
   if( (g)->div != 0 ){ /* draw discrete gauge */\
     register short __zxw_gauge_i, __zxw_gauge_x;\
-    zxWindowSetColor( (win), zxw_gauge_g_color );\
+    zxWindowSetColor( (win), zxw_theme->color_gauge_g );\
     for( __zxw_gauge_i=0; __zxw_gauge_i<=(g)->div; __zxw_gauge_i++ ){\
       __zxw_gauge_x = zxwGaugeXMin(g) + (g)->knob.width/2 + (g)->x_range * __zxw_gauge_i / (g)->div;\
       zxDrawLine( win, __zxw_gauge_x, (g)->reg.y, __zxw_gauge_x, (g)->guide.y - 1 );\
     }\
   }\
-  zxwBoxDrawLower( win, &(g)->guide, (g)->enable ? zxw_gauge_e_color : zxw_gauge_d_color, (g)->emboss );\
-  zxwBoxDrawRaise( win, zxwKnob(g), zxw_knob_color, (g)->emboss );\
+  zxwBoxDrawLower( win, &(g)->guide, (g)->enable ? zxw_theme->color_gauge_e : zxw_theme->color_gauge_d, (g)->emboss );\
+  zxwBoxDrawRaise( win, zxwKnob(g), zxw_theme->color_knob, (g)->emboss );\
 } while(0)
 
 #define zxwGaugeValue(g) \
@@ -672,9 +677,9 @@ void zxwScrollBarCreateVert(zxWindow *win, zxwScrollBar *sb, short x, short y, s
   zxwKnobSetHeight( b, zMax( ( (b)->bar.height + ZXW_SCROLLBAR_W*2 ) * (h)/(hf), ZXW_SCROLLKNOB_WMIN ) )
 
 #define zxwScrollBarDrawBar(win,s) \
-  zxwBoxDrawLower( win, &(s)->bar, zxw_bar_color, (s)->emboss )
+  zxwBoxDrawLower( win, &(s)->bar, zxw_theme->color_bar, (s)->emboss )
 #define zxwScrollBarDrawKnob(win,s) \
-  zxwBoxDrawRaise( win, zxwKnob(s), zxw_knob_color, (s)->emboss )
+  zxwBoxDrawRaise( win, zxwKnob(s), zxw_theme->color_knob, (s)->emboss )
 
 #define zxwScrollBarDraw(win,s) do{\
   zxwScrollBarDrawBar( win, s );\
@@ -840,7 +845,6 @@ bool zxwScrollRegionCreateVert(zxWindow *win, zxwScrollRegion *sr, short x, shor
   zxwItemInit( w );\
 } while(0)
 
-
 #define zxwItem(w,i)           ( &(w)->item[(i)] )
 #define zxwItemNum(w)          ( (w)->item_num )
 #define zxwItemActivate(w,i)   ( (w)->item_active = (i) )
@@ -924,8 +928,8 @@ typedef struct{
   zxwPopupRegSync( p );\
   zxWindowSetBorderWidth( &(p)->w, 0 );\
   zxWindowOverrideRedirectEnable( &(p)->w );\
-  zxWindowSetColor( &(p)->w, zxw_front_color );\
-  zxWindowSetBGColor( &(p)->w, zxw_back_color );\
+  zxWindowSetColor( &(p)->w, zxw_theme->color_front );\
+  zxWindowSetBGColor( &(p)->w, zxw_theme->color_back );\
   zxwItemInit( p );\
 } while(0)
 
@@ -1237,12 +1241,12 @@ typedef struct{
 #define ZXW_TAB_H  16
 
 #define zxwTabDraw(w,t) do{\
-  zxWindowSetColor( w, zxw_back_color );\
+  zxWindowSetColor( w, zxw_theme->color_back );\
   zxDrawRegionFillRect( w, &(t)->reg );\
-  zxWindowSetColor( w, zxw_hilit_color );\
+  zxWindowSetColor( w, zxw_theme->color_hilit );\
   zxDrawLine( w, (t)->reg.x, (t)->reg.y+(t)->reg.height-1, (t)->reg.x+ZXW_TAB_DW, (t)->reg.y );\
   zxDrawLine( w, (t)->reg.x+ZXW_TAB_DW, (t)->reg.y, (t)->reg.x+(t)->reg.width-ZXW_TAB_DW, (t)->reg.y );\
-  zxWindowSetColor( w, zxw_shade_color );\
+  zxWindowSetColor( w, zxw_theme->color_shade );\
   zxDrawLine( w, (t)->reg.x+(t)->reg.width-ZXW_TAB_DW, (t)->reg.y, (t)->reg.x+(t)->reg.width, (t)->reg.y+(t)->reg.height-1 );\
   zxwButtonDrawLabel(w,t);\
 } while(0)
@@ -1277,7 +1281,7 @@ void zxwTabGroupDraw(zxWindow *win, zxwTabGroup *tg);
   if( zxwItemActive(t) ){\
     zxwSelect( t );\
     zxwTabDrawSelected( w, zxwItemSelected(t) );\
-    zxWindowSetColor( w, zxw_hilit_color );\
+    zxWindowSetColor( w, zxw_theme->color_hilit );\
     zxDrawLine( w, (t)->reg.x, (t)->reg.y+(t)->reg.height-1, zxwItemSelected(t)->reg.x, (t)->reg.y+(t)->reg.height-1 );\
     zxDrawLine( w, zxwItemSelected(t)->reg.x+zxwItemSelected(t)->reg.width, (t)->reg.y+(t)->reg.height-1, (t)->reg.x+(t)->reg.width, (t)->reg.y+(t)->reg.height-1 );\
   }\

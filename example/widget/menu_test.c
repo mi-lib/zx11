@@ -51,7 +51,7 @@ void popup_op(zxwMenuItem *mi, zxwPopup *pp)
 int main(void)
 {
   zxwMenuItem *mi;
-  int i, j;
+  int j;
 
   zxInit();
   zxWindowCreateAndOpen( &win, 1000, 50, 300, 80 );
@@ -67,19 +67,17 @@ int main(void)
   zxFlush();
   getchar();
 
-  for( i=0; i<3; i++ ){
-    for( j=0; j<zxwItemNum(&menu); j++ ){
-      zxwItemActivateNext( &menu );
-      zxwMenuDrawMove( &win, &menu );
-      getchar();
-      zxwMenuDrawPress( &win, &menu );
-      if( ( mi = zxwItemActive( &menu ) )->popup )
-        popup_op( mi, mi->popup );
-      getchar();
-      zxwBackupActive( &menu );
-    }
-    zxwUnactivate( &menu );
+  for( j=0; j<zxwItemNum(&menu); j++ ){
+    zxwItemActivateNext( &menu );
+    zxwMenuDrawMove( &win, &menu );
+    getchar();
+    zxwMenuDrawPress( &win, &menu );
+    if( ( mi = zxwItemActive( &menu ) )->popup )
+      popup_op( mi, mi->popup );
+    getchar();
+    zxwBackupActive( &menu );
   }
+  zxwUnactivate( &menu );
 
   zxwPopupDestroy( &popup1 );
   zxwPopupDestroy( &popup2 );

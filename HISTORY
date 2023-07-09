@@ -1,3 +1,7 @@
+2023. 7. 9. Unified some examples of widgets into widget_test.c and widget_mouse_test.c. [example]
+2023. 7. 8. Changed type of ZXW_ALIGN from char to byte. [zxwidget]
+2023. 7. 8. Abolished global variables to store colors for widgets, and reimplemented zxWidgetInit. [zxwidget]
+2023. 7. 8. Defined zxWidgetTheme, zxw_theme, and zxw_theme_default. [zxwidget]
 2023. 7. 6. Added zxImageWriteFile. [zximage]
 2023. 7. 6. Added zxImageWriteJPEGFileDefault. [zximage_jpeg]
 2023. 7. 6. Added zxImageWriteTIFFFileDefault. [zximage_tiff]

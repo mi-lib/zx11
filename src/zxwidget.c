@@ -10,44 +10,30 @@
 /* default color set
  * ********************************************************** */
 
-long zxw_front_color;
-long zxw_back_color;
-long zxw_back_rev_color;
-long zxw_hilit_color;
-long zxw_shade_color;
-long zxw_edit_e_color;
-long zxw_edit_d_color;
-long zxw_text_e_color;
-long zxw_text_d_color;
-long zxw_text_rev_color;
-long zxw_gauge_e_color;
-long zxw_gauge_d_color;
-long zxw_gauge_g_color;
-long zxw_bar_color;
-long zxw_knob_color;
-long zxw_radio_color;
+zxWidgetTheme *zxw_theme, zxw_default_theme;
 
 void zxWidgetInit(zxWindow *win)
 {
-  zxw_front_color = zxGetColor( win, "lightgray" );
-  zxw_back_color = zxGetColor( win, "lightgray" );
-  zxw_back_rev_color = zxGetColor( win, "midnightblue" );
-  zxw_hilit_color = zxGetColor( win, "white" );
-  zxw_shade_color = zxGetColor( win, "darkgray" );
-  zxw_edit_e_color = zxGetColor( win, "white" );
-  zxw_edit_d_color = zxGetColor( win, "lightgray" );
-  zxw_text_e_color = zxGetColor( win, "black" );
-  zxw_text_d_color = zxGetColor( win, "darkgray" );
-  zxw_text_rev_color = zxGetColor( win, "white" );
-  zxw_gauge_e_color = zxGetColor( win, "white" );
-  zxw_gauge_d_color = zxGetColor( win, "lightgray" );
-  zxw_gauge_g_color = zxGetColor( win, "black" );
-  zxw_bar_color = zxGetColor( win, "darkgray" );
-  zxw_knob_color = zxGetColor( win, "lightgray" );
-  zxw_radio_color = zxGetColor( win, "black" );
+  zxw_default_theme.color_front    = zxGetColor( win, "lightgray" );
+  zxw_default_theme.color_back     = zxGetColor( win, "lightgray" );
+  zxw_default_theme.color_back_rev = zxGetColor( win, "midnightblue" );
+  zxw_default_theme.color_hilit    = zxGetColor( win, "white" );
+  zxw_default_theme.color_shade    = zxGetColor( win, "darkgray" );
+  zxw_default_theme.color_edit_e   = zxGetColor( win, "white" );
+  zxw_default_theme.color_edit_d   = zxGetColor( win, "lightgray" );
+  zxw_default_theme.color_text_e   = zxGetColor( win, "black" );
+  zxw_default_theme.color_text_d   = zxGetColor( win, "darkgray" );
+  zxw_default_theme.color_text_rev = zxGetColor( win, "white" );
+  zxw_default_theme.color_gauge_e  = zxGetColor( win, "white" );
+  zxw_default_theme.color_gauge_d  = zxGetColor( win, "lightgray" );
+  zxw_default_theme.color_gauge_g  = zxGetColor( win, "black" );
+  zxw_default_theme.color_bar      = zxGetColor( win, "darkgray" );
+  zxw_default_theme.color_knob     = zxGetColor( win, "lightgray" );
+  zxw_default_theme.color_radio    = zxGetColor( win, "black" );
+  zxWidgetSetDefaultTheme();
+  zxWindowSetBGColor( win, zxw_theme->color_back );
 
   zxWindowSetFont( win, ZXW_DEFAULT_FONT );
-  zxWindowSetBGColor( win, zxw_back_color );
 }
 
 /* ********************************************************** */
@@ -56,18 +42,18 @@ void zxWidgetInit(zxWindow *win)
 
 void zxwSepHoriz(zxWindow *win, short x, short y, short width)
 {
-  zxWindowSetColor( win, zxw_shade_color );
+  zxWindowSetColor( win, zxw_theme->color_shade );
   zxDrawLine( win, x, y, x+width-1, y );
   y++;
-  zxWindowSetColor( win, zxw_hilit_color );
+  zxWindowSetColor( win, zxw_theme->color_hilit );
   zxDrawLine( win, x, y, x+width-1, y );
 }
 
 void zxwSepVert(zxWindow *win, short x, short y, short height)
 {
-  zxWindowSetColor( win, zxw_shade_color );
+  zxWindowSetColor( win, zxw_theme->color_shade );
   zxDrawLine( win, x, y, x, y+height-1 );
-  zxWindowSetColor( win, zxw_hilit_color );
+  zxWindowSetColor( win, zxw_theme->color_hilit );
   x++;
   zxDrawLine( win, x, y, x, y+height-1 );
 }
@@ -78,10 +64,10 @@ void zxwSepBoxLower(zxWindow *win, short x, short y, short width, short height)
 
   x2 = x + width;
   y2 = y + height;
-  zxWindowSetColor( win, zxw_shade_color );
+  zxWindowSetColor( win, zxw_theme->color_shade );
   zxDrawLine( win, x,  y,  x2, y );
   zxDrawLine( win, x,  y,  x, y2 );
-  zxWindowSetColor( win, zxw_hilit_color );
+  zxWindowSetColor( win, zxw_theme->color_hilit );
   zxDrawLine( win, x+1,  y2,  x2, y2 );
   zxDrawLine( win, x2,  y,  x2,  y2-1 );
 }
@@ -92,10 +78,10 @@ void zxwSepBoxRaise(zxWindow *win, short x, short y, short width, short height)
 
   x2 = x + width;
   y2 = y + height;
-  zxWindowSetColor( win, zxw_hilit_color );
+  zxWindowSetColor( win, zxw_theme->color_hilit );
   zxDrawLine( win, x,  y,  x2, y );
   zxDrawLine( win, x,  y,  x, y2 );
-  zxWindowSetColor( win, zxw_shade_color );
+  zxWindowSetColor( win, zxw_theme->color_shade );
   zxDrawLine( win, x+1,  y2,  x2, y2 );
   zxDrawLine( win, x2,  y,  x2,  y2-1 );
 }
@@ -161,14 +147,14 @@ void zxwBoxDrawRelief(zxWindow *win, zxRegion *reg, long color, short h)
   y2 = ( y1 = reg->y ) + reg->height - 1;
 
   zxSetLineWidth( win, 0 );
-  _zxwBoxDrawUpperLimb( win, &x1, &y1, &x2, &y2, zxw_shade_color, h );
-  _zxwBoxDrawUpperLimb( win, &x1, &y1, &x2, &y2, zxw_hilit_color, h );
+  _zxwBoxDrawUpperLimb( win, &x1, &y1, &x2, &y2, zxw_theme->color_shade, h );
+  _zxwBoxDrawUpperLimb( win, &x1, &y1, &x2, &y2, zxw_theme->color_hilit, h );
 
   zxWindowSetColor( win, color );
   zxDrawFillRect( win, x1, y1, reg->width-h*4, reg->height-h*4 );
 
-  _zxwBoxDrawLowerLimb( win, &x1, &y1, &x2, &y2, zxw_shade_color, h );
-  _zxwBoxDrawLowerLimb( win, &x1, &y1, &x2, &y2, zxw_hilit_color, h );
+  _zxwBoxDrawLowerLimb( win, &x1, &y1, &x2, &y2, zxw_theme->color_shade, h );
+  _zxwBoxDrawLowerLimb( win, &x1, &y1, &x2, &y2, zxw_theme->color_hilit, h );
 }
 
 /* ********************************************************** */
@@ -295,9 +281,9 @@ void zxwEditBoxDraw(zxWindow *win, zxwEditBox *eb)
          eb->cursor_str_head-- );
   }
   /* draw */
-  zxwEmbossDrawLower( win, eb, eb->enable ? zxw_edit_e_color : zxw_edit_d_color );
+  zxwEmbossDrawLower( win, eb, eb->enable ? zxw_theme->color_edit_e : zxw_theme->color_edit_d );
   if( eb->enable ){
-    zxWindowSetColor( win, zxw_text_e_color );
+    zxWindowSetColor( win, zxw_theme->color_text_e );
     if( zxwCursorIsVisible( eb ) ){
       x = eb->reg.x + eb->emboss + ZXW_TEXTBOX_TEXTBORDER - 1
         + zxTextNWidth( eb->label + eb->cursor_str_head, eb->cursor_str_cur - eb->cursor_str_head );
@@ -305,7 +291,7 @@ void zxwEditBoxDraw(zxWindow *win, zxwEditBox *eb)
       zxDrawLine( win, x, y, x, y + eb->reg.height - 2 * ( eb->emboss + ZXW_TEXTBOX_TEXTBORDER ) );
     }
   } else{
-    zxWindowSetColor( win, zxw_text_d_color );
+    zxWindowSetColor( win, zxw_theme->color_text_d );
   }
   if( !eb->label ) return;
   x = eb->reg.x + eb->emboss + ZXW_TEXTBOX_TEXTBORDER;
@@ -549,7 +535,7 @@ void zxwPopupDraw(zxwPopup *popup)
   zxRegion reg;
 
   zxRegionSet( &reg, 0, 0, popup->w.reg.width, popup->w.reg.height );
-  zxwBoxDrawRaise( &popup->w, &reg, zxw_back_color, ZXW_EMBOSS_H );
+  zxwBoxDrawRaise( &popup->w, &reg, zxw_theme->color_back, ZXW_EMBOSS_H );
   for( i=0; i<popup->item_num; i++ ){
     if( zxwPopupItemIsSep( zxwItem( popup, i ) ) )
       zxwSepHoriz( &popup->w, zxwItem(popup,i)->reg.x, zxwItem(popup,i)->reg.y+ZXWPOPUPITEM_H/2, zxwItem(popup,i)->reg.width );
@@ -611,7 +597,7 @@ void zxwMenuDraw(zxWindow *win, zxwMenu *menu)
 {
   int i;
 
-  zxwBoxDraw( win, menu, zxw_back_color );
+  zxwBoxDraw( win, menu, zxw_theme->color_back );
   for( i=0; i<menu->item_num; i++ ){
     zxwButtonDrawFlat( win, zxwItem(menu,i) );
     if( zxwItem(menu,i)->reg.x > menu->reg.width ) break;
@@ -686,7 +672,7 @@ void zxwRadioButtonGroupDraw(zxWindow *win, zxwRadioButtonGroup *rbg)
 {
   int i;
 
-  zxwBoxDrawRelief( win, &rbg->reg, zxw_front_color, 1 );
+  zxwBoxDrawRelief( win, &rbg->reg, zxw_theme->color_front, 1 );
   for( i=0; i<rbg->item_num; i++ )
     zxwRadioButtonDraw( win, zxwItem(rbg,i) );
 }
