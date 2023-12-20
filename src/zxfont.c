@@ -12,16 +12,33 @@ XFontStruct *zxfontstruct = NULL;
 
 #define ZX_ERR_FONT_NOTFOUND "font %s not found"
 
+#define ZX_DEFAULT_FONT "-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
+
+bool zxFontSet(const char *fontname)
+{
+  if( fontname ){
+    if( ( zxfontstruct = XLoadQueryFont( zxdisplay, fontname ) ) )
+      return true;
+    ZRUNWARN( ZX_ERR_FONT_NOTFOUND, fontname );
+  }
+  if( ( zxfontstruct = XLoadQueryFont( zxdisplay, ZX_DEFAULT_FONT ) ) )
+    return true;
+  ZRUNERROR( ZX_ERR_FONT_NOTFOUND, ZX_DEFAULT_FONT );
+  return false;
+}
+
+void zxFontUnset(void)
+{
+  if( zxfontstruct ){
+    XFreeFont( zxdisplay, zxfontstruct );
+    zxfontstruct = NULL;
+  }
+}
+
 bool zxWindowSetFont(zxWindow *win, const char *fontname)
 {
-  Font fid;
-
-  if( ( fid = XLoadFont( zxdisplay, fontname ) ) == BadName ){
-    ZRUNERROR( ZX_ERR_FONT_NOTFOUND, fontname );
-    return false;
-  }
-  zxfontstruct = XQueryFont( zxdisplay, fid );
-  XSetFont( zxdisplay, zxWindowGC(win), fid );
+  if( !zxFontSet( fontname ) ) return false;
+  XSetFont( zxdisplay, zxWindowGC(win), zxfontstruct->fid );
   return true;
 }
 

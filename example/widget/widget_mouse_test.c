@@ -9,130 +9,8 @@
 /* tab group */
 zxwTabGroup tabgroup;
 
-/* gauge */
-zxwGauge gauge[2];
-zxwEditBox editbox[2];
+/* button & pixmap button group */
 
-void draw_gauge(zxWindow *win, zxwGauge *gauge, zxwEditBox *eb)
-{
-  char buf[BUFSIZ];
-
-  zxwGaugeDraw( win, gauge );
-  sprintf( buf, "%f", zxwGaugeValue( gauge ) );
-  zxwEditBoxSetString( eb, buf );
-  zxwEditBoxDraw( win, eb );
-}
-
-void draw_tab_gauge(zxWindow *win)
-{
-  zxRegion reg;
-
-  zxRegionSet( &reg, 20, 40, 600, 420 );
-  zxwBoxDrawRelief( win, &reg, zxw_theme->color_front, 2 );
-  draw_gauge( win, &gauge[0], &editbox[0] );
-  draw_gauge( win, &gauge[1], &editbox[1] );
-  zxFlush();
-}
-
-void button_press_tab_gauge(zxWindow *win)
-{
-  zxwKnobTryGrab( &gauge[0], zxMouseX, zxMouseY );
-  zxwKnobTryGrab( &gauge[1], zxMouseX, zxMouseY );
-}
-
-void button_release_tab_gauge(zxWindow *win)
-{
-  zxwUngrab( &gauge[0] );
-  zxwUngrab( &gauge[1] );
-}
-
-void motion_notify_tab_gauge(zxWindow *win)
-{
-  if( zxwIsGrabbed( &gauge[0] ) ){
-    zxwGaugeSetX( &gauge[0], zxMouseX );
-    draw_gauge( win, &gauge[0], &editbox[0] );
-  }
-  if( zxwIsGrabbed( &gauge[1] ) ){
-    zxwGaugeSetX( &gauge[1], zxMouseX );
-    draw_gauge( win, &gauge[1], &editbox[1] );
-  }
-}
-
-void init_gauge(zxWindow *win)
-{
-  /* gauge */
-  zxwGaugeCreate( &gauge[0], 40, 60, 200,  0, -2, 2 );
-  zxwGaugeCreate( &gauge[1], 40, 90, 200, 10, -2, 2 );
-
-  zxwEditBoxCreate( &editbox[0], 0, 280, 60, 80, 0 );
-  zxwAlignRight( &editbox[0] );
-  zxwAlignFlowRight( &editbox[0] );
-
-  zxwEditBoxCreate( &editbox[1], 0, 280, 90, 80, 0 );
-  zxwAlignRight( &editbox[1] );
-  zxwAlignFlowRight( &editbox[1] );
-}
-
-void destroy_gauge(void)
-{
-  zxwEditBoxDestroy( &editbox[0] );
-  zxwEditBoxDestroy( &editbox[1] );
-}
-
-/* radio button group */
-zxwRadioButtonGroup radiobuttongroup1;
-zxwRadioButtonGroup radiobuttongroup2;
-
-void draw_tab_radiobutton(zxWindow *win)
-{
-  zxRegion reg;
-
-  zxRegionSet( &reg, 20, 40, 600, 420 );
-  zxwBoxDrawRelief( win, &reg, zxw_theme->color_front, 2 );
-  zxwRadioButtonGroupDraw( win, &radiobuttongroup1 );
-  zxwRadioButtonGroupDraw( win, &radiobuttongroup2 );
-  zxFlush();
-}
-
-void button_press_tab_radiobutton(zxWindow *win)
-{
-  bool judge;
-
-  zxwRadioButtonGroupPress( win, &radiobuttongroup1, &judge );
-  zxwRadioButtonGroupPress( win, &radiobuttongroup2, &judge );
-}
-
-void button_release_tab_radiobutton(zxWindow *win){}
-void motion_notify_tab_radiobutton(zxWindow *win){}
-
-void add_radiobutton(zxwRadioButtonGroup *radiobuttongroup)
-{
-  zxwRadioButtonGroupAdd( radiobuttongroup,  16, 16 );
-  zxwRadioButtonGroupAdd( radiobuttongroup,  64, 16 );
-  zxwRadioButtonGroupAdd( radiobuttongroup, 112, 16 );
-  zxwRadioButtonGroupAdd( radiobuttongroup, 160, 16 );
-}
-
-void init_radiobutton(zxWindow *win)
-{
-  /* radio button group */
-  zxwRadioButtonGroupInit( &radiobuttongroup1, 50, 60, 200, 48 );
-  add_radiobutton( &radiobuttongroup1 );
-  zxwRadioButtonGroupActivate( &radiobuttongroup1, 0 );
-
-  zxwRadioButtonGroupInit( &radiobuttongroup2, 50, 120, 200, 48 );
-  add_radiobutton( &radiobuttongroup2 );
-  zxwRadioButtonGroupActivate( &radiobuttongroup2, 0 );
-  zxwGroupSetToggle( &radiobuttongroup2 );
-}
-
-void destroy_radiobutton(void)
-{
-  zxwRadioButtonGroupDestroy( &radiobuttongroup1 );
-  zxwRadioButtonGroupDestroy( &radiobuttongroup2 );
-}
-
-/* pixmap button group */
 zxwPixButtonGroup pixbuttongroup[3];
 
 void *x(void){     return NULL; }
@@ -140,6 +18,41 @@ void *cut(void){   return NULL; }
 void *cross(void){ return NULL; }
 void *line(void){  return NULL; }
 void *zoom(void){  return NULL; }
+
+void init_pixbutton(zxWindow *win)
+{
+  /* pixbutton group */
+  zxwPixButtonGroupInit( &pixbuttongroup[0], 50, 60, 20, 20 );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[0], 0, 0, mini_x_xpm, x );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[0], 0, 1, cut_xpm, cut );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[0], 0, 2, mini_cross_xpm, cross );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[0], 0, 3, line_xpm, line );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[0], 0, 4, zoom_xpm, zoom );
+
+  zxwPixButtonGroupInit( &pixbuttongroup[1], 50, 90, 20, 20 );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[1], 0, 0, mini_x_xpm, x );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[1], 0, 1, cut_xpm, cut );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[1], 0, 2, mini_cross_xpm, cross );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[1], 0, 3, line_xpm, line );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[1], 0, 4, zoom_xpm, zoom );
+  zxwGroupSetToggle( &pixbuttongroup[1] );
+  zxwGroupSetExclusive( &pixbuttongroup[1] );
+
+  zxwPixButtonGroupInit( &pixbuttongroup[2], 50, 120, 20, 20 );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[2], 0, 0, mini_x_xpm, x );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[2], 0, 1, cut_xpm, cut );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[2], 0, 2, mini_cross_xpm, cross );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[2], 0, 3, line_xpm, line );
+  zxwPixButtonGroupAddData( win, &pixbuttongroup[2], 0, 4, zoom_xpm, zoom );
+  zxwItemSelect( &pixbuttongroup[2], 0 );
+}
+
+void destroy_pixbutton(void)
+{
+  zxwPixButtonGroupDestroy( &pixbuttongroup[0] );
+  zxwPixButtonGroupDestroy( &pixbuttongroup[1] );
+  zxwPixButtonGroupDestroy( &pixbuttongroup[2] );
+}
 
 void draw_tab_pixbutton(zxWindow *win)
 {
@@ -185,39 +98,128 @@ void motion_notify_tab_pixbutton(zxWindow *win)
   if( judge ) return;
 }
 
-void init_pixbutton(zxWindow *win)
+/* radio button group */
+zxwRadioButtonGroup radiobuttongroup1;
+zxwRadioButtonGroup radiobuttongroup2;
+zxwCheckBox checkbox[4];
+
+void add_radiobutton(zxwRadioButtonGroup *radiobuttongroup)
 {
-  /* pixbutton group */
-  zxwPixButtonGroupInit( &pixbuttongroup[0], 50, 60, 20, 20 );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[0], 0, 0, mini_x_xpm, x );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[0], 0, 1, cut_xpm, cut );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[0], 0, 2, mini_cross_xpm, cross );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[0], 0, 3, line_xpm, line );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[0], 0, 4, zoom_xpm, zoom );
-
-  zxwPixButtonGroupInit( &pixbuttongroup[1], 50, 90, 20, 20 );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[1], 0, 0, mini_x_xpm, x );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[1], 0, 1, cut_xpm, cut );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[1], 0, 2, mini_cross_xpm, cross );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[1], 0, 3, line_xpm, line );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[1], 0, 4, zoom_xpm, zoom );
-  zxwGroupSetToggle( &pixbuttongroup[1] );
-  zxwGroupSetExclusive( &pixbuttongroup[1] );
-
-  zxwPixButtonGroupInit( &pixbuttongroup[2], 50, 120, 20, 20 );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[2], 0, 0, mini_x_xpm, x );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[2], 0, 1, cut_xpm, cut );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[2], 0, 2, mini_cross_xpm, cross );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[2], 0, 3, line_xpm, line );
-  zxwPixButtonGroupAddData( win, &pixbuttongroup[2], 0, 4, zoom_xpm, zoom );
-  zxwItemSelect( &pixbuttongroup[2], 0 );
+  zxwRadioButtonGroupAdd( radiobuttongroup,  16, 16 );
+  zxwRadioButtonGroupAdd( radiobuttongroup,  64, 16 );
+  zxwRadioButtonGroupAdd( radiobuttongroup, 112, 16 );
+  zxwRadioButtonGroupAdd( radiobuttongroup, 160, 16 );
 }
 
-void destroy_pixbutton(void)
+void init_radiobutton(zxWindow *win)
 {
-  zxwPixButtonGroupDestroy( &pixbuttongroup[0] );
-  zxwPixButtonGroupDestroy( &pixbuttongroup[1] );
-  zxwPixButtonGroupDestroy( &pixbuttongroup[2] );
+  /* radio button group */
+  zxwRadioButtonGroupInit( &radiobuttongroup1, 50, 60, 200, 48 );
+  add_radiobutton( &radiobuttongroup1 );
+  zxwRadioButtonGroupActivate( &radiobuttongroup1, 0 );
+
+  zxwRadioButtonGroupInit( &radiobuttongroup2, 50, 120, 200, 48 );
+  add_radiobutton( &radiobuttongroup2 );
+  zxwRadioButtonGroupActivate( &radiobuttongroup2, 0 );
+  zxwGroupSetToggle( &radiobuttongroup2 );
+}
+
+void destroy_radiobutton(void)
+{
+  zxwRadioButtonGroupDestroy( &radiobuttongroup1 );
+  zxwRadioButtonGroupDestroy( &radiobuttongroup2 );
+}
+
+void draw_tab_radiobutton(zxWindow *win)
+{
+  zxRegion reg;
+
+  zxRegionSet( &reg, 20, 40, 600, 420 );
+  zxwBoxDrawRelief( win, &reg, zxw_theme->color_front, 2 );
+  zxwRadioButtonGroupDraw( win, &radiobuttongroup1 );
+  zxwRadioButtonGroupDraw( win, &radiobuttongroup2 );
+  zxFlush();
+}
+
+void button_press_tab_radiobutton(zxWindow *win)
+{
+  bool judge;
+
+  zxwRadioButtonGroupPress( win, &radiobuttongroup1, &judge );
+  zxwRadioButtonGroupPress( win, &radiobuttongroup2, &judge );
+}
+
+void button_release_tab_radiobutton(zxWindow *win){}
+void motion_notify_tab_radiobutton(zxWindow *win){}
+
+/* gauge */
+zxwGauge gauge[2];
+zxwEditBox editbox[2];
+
+void init_gauge(zxWindow *win)
+{
+  /* gauge */
+  zxwGaugeCreate( &gauge[0], 40, 60, 200,  0, -2, 2 );
+  zxwGaugeCreate( &gauge[1], 40, 90, 200, 10, -2, 2 );
+
+  zxwEditBoxCreate( &editbox[0], 0, 280, 60, 80, 0 );
+  zxwAlignRight( &editbox[0] );
+  zxwAlignFlowRight( &editbox[0] );
+
+  zxwEditBoxCreate( &editbox[1], 0, 280, 90, 80, 0 );
+  zxwAlignRight( &editbox[1] );
+  zxwAlignFlowRight( &editbox[1] );
+}
+
+void destroy_gauge(void)
+{
+  zxwEditBoxDestroy( &editbox[0] );
+  zxwEditBoxDestroy( &editbox[1] );
+}
+
+void draw_gauge(zxWindow *win, zxwGauge *gauge, zxwEditBox *eb)
+{
+  char buf[BUFSIZ];
+
+  zxwGaugeDraw( win, gauge );
+  sprintf( buf, "%f", zxwGaugeValue( gauge ) );
+  zxwEditBoxSetString( eb, buf );
+  zxwEditBoxDraw( win, eb );
+}
+
+void draw_tab_gauge(zxWindow *win)
+{
+  zxRegion reg;
+
+  zxRegionSet( &reg, 20, 40, 600, 420 );
+  zxwBoxDrawRelief( win, &reg, zxw_theme->color_front, 2 );
+  draw_gauge( win, &gauge[0], &editbox[0] );
+  draw_gauge( win, &gauge[1], &editbox[1] );
+  zxFlush();
+}
+
+void button_press_tab_gauge(zxWindow *win)
+{
+  zxwKnobTryGrab( &gauge[0], zxMouseX, zxMouseY );
+  zxwKnobTryGrab( &gauge[1], zxMouseX, zxMouseY );
+}
+
+void button_release_tab_gauge(zxWindow *win)
+{
+  zxwUngrab( &gauge[0] );
+  zxwUngrab( &gauge[1] );
+}
+
+void motion_notify_tab_gauge(zxWindow *win)
+{
+  if( zxwIsGrabbed( &gauge[0] ) ){
+    zxwGaugeSetX( &gauge[0], zxMouseX );
+    draw_gauge( win, &gauge[0], &editbox[0] );
+  }
+  if( zxwIsGrabbed( &gauge[1] ) ){
+    zxwGaugeSetX( &gauge[1], zxMouseX );
+    draw_gauge( win, &gauge[1], &editbox[1] );
+  }
 }
 
 /* scroll regions */
@@ -323,17 +325,17 @@ void destroy_scrollregion(void)
 
 /* tab group */
 
-void (* draw_tab)(zxWindow *win) = draw_tab_gauge;
-void (* button_press_tab)(zxWindow *win) = button_press_tab_gauge;
-void (* button_release_tab)(zxWindow *win) = button_release_tab_gauge;
-void (* motion_notify_tab)(zxWindow *win) = motion_notify_tab_gauge;
+void (* draw_tab)(zxWindow *win) = draw_tab_pixbutton;
+void (* button_press_tab)(zxWindow *win) = button_press_tab_pixbutton;
+void (* button_release_tab)(zxWindow *win) = button_release_tab_pixbutton;
+void (* motion_notify_tab)(zxWindow *win) = motion_notify_tab_pixbutton;
 
-void *select_tab_gauge(void)
+void *select_tab_pixbutton(void)
 {
-  draw_tab = draw_tab_gauge;
-  button_press_tab = button_press_tab_gauge;
-  button_release_tab = button_release_tab_gauge;
-  motion_notify_tab = motion_notify_tab_gauge;
+  draw_tab = draw_tab_pixbutton;
+  button_press_tab = button_press_tab_pixbutton;
+  button_release_tab = button_release_tab_pixbutton;
+  motion_notify_tab = motion_notify_tab_pixbutton;
   return NULL;
 }
 
@@ -346,12 +348,12 @@ void *select_tab_radiobutton(void)
   return NULL;
 }
 
-void *select_tab_pixbutton(void)
+void *select_tab_gauge(void)
 {
-  draw_tab = draw_tab_pixbutton;
-  button_press_tab = button_press_tab_pixbutton;
-  button_release_tab = button_release_tab_pixbutton;
-  motion_notify_tab = motion_notify_tab_pixbutton;
+  draw_tab = draw_tab_gauge;
+  button_press_tab = button_press_tab_gauge;
+  button_release_tab = button_release_tab_gauge;
+  motion_notify_tab = motion_notify_tab_gauge;
   return NULL;
 }
 
@@ -375,17 +377,17 @@ int main(void)
   zxWindowMouseEnable( &win );
   zxWidgetInit( &win );
 
-  init_gauge( &win );
-  init_radiobutton( &win );
   init_pixbutton( &win );
+  init_radiobutton( &win );
+  init_gauge( &win );
   init_scrollregion( &win );
 
   /* tab group */
   zxwTabGroupInit( &tabgroup, 20, 20, 280 );
-  zxwTabGroupAdd( &tabgroup, "Gauge", select_tab_gauge );
-  zxwTabGroupAdd( &tabgroup, "Radio", select_tab_radiobutton );
   zxwTabGroupAdd( &tabgroup, "Button", select_tab_pixbutton );
-  zxwTabGroupAdd( &tabgroup, "tab D", select_tab_scrollregion );
+  zxwTabGroupAdd( &tabgroup, "Radio", select_tab_radiobutton );
+  zxwTabGroupAdd( &tabgroup, "Gauge", select_tab_gauge );
+  zxwTabGroupAdd( &tabgroup, "Scroll", select_tab_scrollregion );
   zxwTabGroupDraw( &win, &tabgroup );
   draw_tab( &win );
   zxFlush();
@@ -403,9 +405,9 @@ int main(void)
 
  END:
   zxwTabGroupDestroy( &tabgroup );
-  destroy_gauge();
-  destroy_radiobutton();
   destroy_pixbutton();
+  destroy_radiobutton();
+  destroy_gauge();
   destroy_scrollregion();
   zxExit();
   return 0;

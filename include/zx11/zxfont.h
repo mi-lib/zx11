@@ -18,8 +18,10 @@ __BEGIN_DECLS
 
 extern XFontStruct *zxfontstruct;
 
+bool zxFontSet(const char *fontname);
+void zxFontUnset(void);
 bool zxWindowSetFont(zxWindow *win, const char *fontname);
-#define zxUnsetFont()     ( zxfontstruct = NULL )
+
 #define zxTextNWidth(s,n) ( zxfontstruct ? XTextWidth( zxfontstruct, (s), (n) ) : 0 )
 #define zxTextWidth(s)    zxTextNWidth( s, strlen(s) )
 

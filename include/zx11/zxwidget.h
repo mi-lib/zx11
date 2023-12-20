@@ -37,7 +37,7 @@ typedef struct{
 extern zxWidgetTheme *zxw_theme, zxw_default_theme;
 
 #define ZXW_DEFAULT_FONT \
-  "-misc-fixed-medium-*-normal-*-14-*-*-*-*-*-*-*"
+  "-misc-fixed-medium-r-normal-*-14-*-*-*-*-*-*-*"
 
 void zxWidgetInit(zxWindow *win);
 #define zxWidgetSetTheme(t)       ( zxw_theme = (t) )
