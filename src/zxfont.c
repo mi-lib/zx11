@@ -161,3 +161,82 @@ void zxTextAreaWC(const wchar_t *str, zxRegion *area)
   area->x = -area->x;
   area->y = -area->y;
 }
+
+/* Xft and fontconfig support */
+#ifdef __ZX11_USE_XFT
+
+const int zxft_weight[] = {
+  XFT_WEIGHT_MEDIUM,
+  XFT_WEIGHT_BOLD,
+  XFT_WEIGHT_LIGHT,
+};
+
+const int zxft_slant[] = {
+  XFT_SLANT_ROMAN,
+  XFT_SLANT_ITALIC,
+  XFT_SLANT_OBLIQUE,
+};
+
+bool zxFTCreate(zxFTData *data, zxWindow *win, const char *fontname, double size, zxFTWeight weight, zxFTSlant slant)
+{
+  FcChar8 *fontname_match;
+
+  if( fontname ){
+    fontname_match = (FcChar8 *)fontname;
+  } else{ /* need to find default font */
+    FcPattern *pat, *pat_default;
+    FcResult result;
+
+    FcInit();
+    pat = FcPatternCreate();
+    FcConfigSubstitute( 0, pat, FcMatchPattern );
+    FcDefaultSubstitute( pat );
+    pat_default = FcFontMatch( 0, pat, &result );
+    if( result == FcResultNoMatch ){
+      ZRUNERROR( "default font is unavailable" );
+      return false;
+    }
+    FcPatternGetString( pat_default, "file", 0, &fontname_match );
+    FcPatternDestroy( pat );
+    FcPatternDestroy( pat_default );
+    FcFini();
+  }
+  data->font = XftFontOpen( zxdisplay, 0,
+    XFT_FAMILY, XftTypeString,  fontname_match,
+    XFT_SIZE,   XftTypeDouble,  size,
+    XFT_WEIGHT, XftTypeInteger, zxft_weight[weight],
+    XFT_SLANT,  XftTypeInteger, zxft_slant[slant],
+    NULL );
+  if( !( data->draw = XftDrawCreate( zxdisplay, zxWindowBody(win), zxvisual, zxcmap ) ) ){
+    ZRUNERROR( "cannot create drawable for a string" );
+    return false;
+  }
+  return true;
+}
+
+void zxFTDestroy(zxFTData *data)
+{
+  XftDrawDestroy( data->draw );
+  XftFontClose( zxdisplay, data->font );
+}
+
+static XRenderColor *_zxSetRenderColor(XRenderColor *rc, ubyte red, ubyte green, ubyte blue, ubyte alpha)
+{
+  rc->red   = ( red   << 8 ) | red;
+  rc->green = ( green << 8 ) | green;
+  rc->blue  = ( blue  << 8 ) | blue;
+  rc->alpha = ( alpha << 8 ) | alpha;
+  return rc;
+}
+
+bool zxFTDrawString(zxWindow *win, zxFTData *data, int x, int y, const char *string, ubyte red, ubyte green, ubyte blue, ubyte alpha)
+{
+  XRenderColor rc;
+  XftColor color;
+
+  XftColorAllocValue( zxdisplay, zxvisual, zxcmap, _zxSetRenderColor( &rc, red, green, blue, alpha ), &color );
+  XftDrawStringUtf8( data->draw, &color, data->font, x, y, (FcChar8*)string, strlen(string) );
+  return true;
+}
+
+#endif /* __ZX11_USE_XFT */

@@ -1,3 +1,4 @@
+2024. 1.20. Added Xft interfaces. [zxfont]
 2023.12.20. Added zxFontSet and zxFontUnset, and reimplemented zxWindowSetFont. [zxfont]
 2023. 7. 9. Unified some examples of widgets into widget_test.c and widget_mouse_test.c. [example]
 2023. 7. 8. Changed type of ZXW_ALIGN from char to byte. [zxwidget]

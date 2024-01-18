@@ -4,6 +4,10 @@ PREFIX=${HOME}/usr
 # (libXext required)
 CONFIG_USE_XEXT=y
 
+# Xft and fontconfig support
+# (libfontconfig and libXft required)
+CONFIG_USE_XFT=y
+
 # X pixmap support
 # (libxpm required)
 CONFIG_USE_XPM=y

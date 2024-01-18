@@ -6,6 +6,13 @@ ifeq ($(CONFIG_USE_XEXT),y)
 	LINK+=-lXext
 	LINKCPP+=-lXext
 	DEF += -D__ZX11_USE_XEXT
+ifeq ($(CONFIG_USE_XFT),y)
+	INCLUDE+=`pkg-config --cflags-only-I --libs xft`
+	LINK+=`pkg-config --cflags-only-I --libs xft fontconfig`
+	LINKCPP+=`pkg-config --cflags-only-I --libs xft fontconfig`
+	DEF += -D__ZX11_USE_XFT
+	CONFIG_USE_PNG=y
+endif
 endif
 
 ifeq ($(CONFIG_USE_XPM),y)

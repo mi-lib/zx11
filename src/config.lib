@@ -3,6 +3,9 @@ OBJ=zxutil.o zxfont.o zxinput.o\
 
 ifeq ($(CONFIG_USE_XEXT),y)
 	CFLAGS += -D__ZX11_USE_XEXT
+ifeq ($(CONFIG_USE_XFT),y)
+	CFLAGS += -D__ZX11_USE_XFT `pkg-config --cflags --libs xft`
+endif
 endif
 
 ifeq ($(CONFIG_USE_XPM),y)

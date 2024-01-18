@@ -75,6 +75,40 @@ void zxTextAreaWC(const wchar_t *str, zxRegion *area);
   XwcDrawString( zxdisplay, zxWindowCanvas(win), zxfontset, zxWindowGC(win), (x), (y), (s), (n) )
 #define zxDrawStringMWC(win,x,y,s) zxDrawNStringWC( win, x, y, s, strlen(s) )
 
+/* Xft and fontconfig support */
+#ifdef __ZX11_USE_XFT
+
+#include <X11/Xft/Xft.h>
+
+typedef struct{
+  XftFont *font;
+  XftDraw *draw;
+} zxFTData;
+
+extern const int zxft_weight[];
+typedef enum{
+  ZXFT_MEDIUM = 0,
+  ZXFT_BOLD,
+  ZXFT_LIGHT,
+} zxFTWeight;
+
+extern const int zxft_slant[];
+typedef enum{
+  ZXFT_ROMAN = 0,
+  ZXFT_ITALIC,
+  ZXFT_OBLIQUE,
+} zxFTSlant;
+
+bool zxFTCreate(zxFTData *data, zxWindow *win, const char *fontname, double size, zxFTWeight weight, zxFTSlant slant);
+#define zxFTCreateSimple(data,win,fontname,size) \
+  zxFTCreate( data, win, fontname, size, ZXFT_MEDIUM, ZXFT_ROMAN )
+
+void zxFTDestroy(zxFTData *data);
+
+bool zxFTDrawString(zxWindow *win, zxFTData *data, int x, int y, const char *string, ubyte red, ubyte green, ubyte blue, ubyte alpha);
+
+#endif /* __ZX11_USE_XFT */
+
 __END_DECLS
 
 #endif /* __ZX_FONT_H__ */
