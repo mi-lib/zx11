@@ -168,6 +168,11 @@ int zxImageWriteFile(zxImage *img, char filename[]);
 
 __END_DECLS
 
+/* Freetype2 support available together with Xft */
+#ifdef __ZX11_USE_XFT
+#include <zx11/zximage_freetype.h>
+#endif /* __ZX11_USE_XFT */
+
 #include <zx11/zximage_supported.h>
 
 #endif /* __ZX_IMAGE_H__ */
