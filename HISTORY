@@ -1,3 +1,5 @@
+2024. 2.20. Replaced zxDequeueEvent with zxCheckEvent in the main loop of zxwatch. [app]
+2024. 2.20. Replaced time and localtime to clock_gettime and localtime_r, respectively, in zxwatch. [app]
 2024. 1.20. Added zximage_freetype to support drawing strings in zxImage. [zximage, zximage_freetype, src, tools]
 2024. 1.20. Modified config.org, src/config.lib and tools/config.tools to make libxft available. [config, src, tools]
 2024. 1.20. Added Xft interfaces. [zxfont]

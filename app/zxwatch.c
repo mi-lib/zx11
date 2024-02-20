@@ -5,13 +5,13 @@
  -image    <image file> put an <image file> on the background of the watch
  -geometry WIDTHxHEIGHT+X+Y
                         set geometry of the watch
- -offset   +X+Y         set the offset coordinate of the background image
+ -clip     +X+Y         set the clip coordinate of the background image
  -color    <color>      set the color of digit segments
                         refer /etc/X11/rgb.txt for <color>
  -h                     show how to use this
 
  * 2002. 4.18. Created.
- * 2020.10.26. Last updated.
+ * 2024. 2.20. Last updated.
  */
 
 #define _POSIX_C_SOURCE 199309L
@@ -45,12 +45,17 @@ enum{
 
 #define ZW_BUFSIZ ZW_LAST
 
+#define ZW_INTERVAL_MS 1000
+
 void zwGetTime(char str[])
 {
+  struct timespec ts;
+  struct tm tmp;
   time_t now;
 
-  time( &now );
-  strftime( str, ZW_BUFSIZ, "%Y%m%d%H%M%S%U", localtime( &now ) );
+  clock_gettime( CLOCK_REALTIME, &ts );
+  now = ts.tv_sec;
+  strftime( str, ZW_BUFSIZ, "%Y%m%d%H%M%S%U", localtime_r( &now, &tmp ) );
 }
 
 /* digital display */
@@ -158,25 +163,25 @@ enum{
   ZW_HELP = 0,
   ZW_IMAGE,
   ZW_GEOMETRY,
-  ZW_OFFSET,
+  ZW_CLIP,
   ZW_COLOR,
   ZW_INVALID,
 };
 zOption option[] = {
   { "h",        "help",     NULL,               "show how to use this",    NULL, false },
   { "image",    "image",    "<image file>",     "background image file",   NULL, false },
-  { "geometry", "geometry", "WIDTHxHEIGHT+X+Y", "window geometry",         "260x80+0+0", false },
-  { "offset",   "offset",   "+X+Y",             "offset coordinate",       "0x0+0+0", false },
-  { "color",    "color",    "<color>",          "color of digit segments", "white", false },
+  { "geometry", "geometry", "WIDTHxHEIGHT+X+Y", "geometry of the main window", "260x80+0+0", false },
+  { "clip",     "clip",     "+X+Y",             "clipping geometry of the background image", "0x0+0+0", false },
+  { "color",    "color",    "<color>",          "color of digit segments (refer /etc/X11/rgb.txt for <color>)", "white", false },
   { NULL, NULL, NULL, NULL, false },
 };
 
 void zwUsage(char *arg)
 {
-  ZECHO( "Usage: %s [options]", arg );
-  ZECHO( "Options:" );
+  eprintf( "Usage: %s [options]\n", arg );
+  eprintf( "Options:\n" );
   zOptionHelp( option );
-  ZECHO( "JPEG, PNG, BMP, PDT, MAG and PNM are available for the image." );
+  eprintf( "JPEG, PNG, BMP, PDT, MAG and PNM are available for the background image.\n" );
   exit( 1 );
 }
 
@@ -190,10 +195,10 @@ void zwInit(int argc, char **argv)
   img = None;
 
   zListInit( &arglist );
-  zOptionRead( option, argv, &arglist );
+  zOptionRead( option, argv+1, &arglist );
   if( option[ZW_HELP].flag ) zwUsage( argv[0] );
   zxParseGeometry( option[ZW_GEOMETRY].arg, &winreg );
-  zxParseGeometry( option[ZW_OFFSET].arg, &imgreg );
+  zxParseGeometry( option[ZW_CLIP].arg, &imgreg );
   if( option[ZW_IMAGE].flag )
     zxImageReadFile( &image, option[ZW_IMAGE].arg );
   zwAlign( image.width, image.height );
@@ -213,15 +218,15 @@ void zwInit(int argc, char **argv)
 int main(int argc, char *argv[])
 {
   char str[ZW_BUFSIZ+1];
-  struct timespec ts = { 0, 500 * 1000 * 1000 };
+  struct timespec ts = { 0, ZW_INTERVAL_MS * 1000 * 1000 };
   bool quit_flag = false;
 
-  zwInit( argc, argv+1 );
+  zwInit( argc, argv );
   while( !quit_flag ){
     zwGetTime( str );
     zwDisplay( str );
     nanosleep( &ts, NULL );
-    if( zxDequeueEvent() == KeyPress ){
+    if( zxCheckEvent( KeyPress ) ){
       switch( zxKeySymbol() ){
       case XK_q: case XK_Q: case XK_Escape: quit_flag = true; break;
       default: ;
