@@ -64,7 +64,7 @@ void zxFTImageUnloadFont(zxFTImage *font)
 static void _zxFTImagePutChar(zxImage *img, zxPixelManip *pm, zxFTImage *font, uword c, float red, float green, float blue)
 {
   FT_GlyphSlot slot;
-  FT_Int i, j, x, y;
+  FT_UInt i, j, x, y;
   ubyte val;
 
   slot = font->face->glyph;
