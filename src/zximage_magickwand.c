@@ -77,6 +77,7 @@ MagickWand *zxImageToMagickWand(zxImage *img, MagickWand *wand)
     return NULL;
   }
   MagickNewImage( wand, img->width, img->height, dummy_pixel );
+  DestroyPixelWand( dummy_pixel );
   if( !( iterator = NewPixelIterator( wand ) ) ){
     _MagickWandThrowException( wand );
     return NULL;
@@ -91,7 +92,6 @@ MagickWand *zxImageToMagickWand(zxImage *img, MagickWand *wand)
     PixelSyncIterator( iterator );
   }
   DestroyPixelIterator( iterator );
-  DestroyPixelWand( dummy_pixel );
   return wand;
 }
 

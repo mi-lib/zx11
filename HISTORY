@@ -1,3 +1,4 @@
+2024. 4.30. Added not in zxImageToPixmap (without any functional modifications). [zximage]
 2024. 4.30. Added MagickWand support. [zximage, zximage_magickwand, tools]
 2024. 4.30. Added zxImageCellFRGB. [zximage]
 2024. 4.30. Added PixelFRGB member to zxPixelManip, and modified zxPixelManipSet. [zxpixel]

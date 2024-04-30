@@ -1027,6 +1027,8 @@ Pixmap zxImageToPixmap(zxWindow *win, zxImage *img, Pixmap pmap, uint src_x, uin
           16, (char *)img->buf, img->width, img->height,
           img->bpp<<3, img->bpp*img->width ) ) ){
     XPutImage( zxdisplay, pmap, zxWindowGC(win), ip, src_x, src_y, dest_x, dest_y, w, h );
+    /* Note the asymmetry of XCreateImage and XDestroyImage. */
+    /* Never call XDestroyImage since it frees memory allocated for pixel data, which is managed in zxImage. */
     free( ip );
   }
   return pmap;
