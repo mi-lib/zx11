@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
   zxWindow win;
 
   zxInit();
-  zxImageReadFile( &src, argc > 1 ? argv[1] : "fig/lena.jpg" );
+  zxImageReadFile( &src, argc > 1 ? argv[1] : "../fig/lena.jpg" );
   zxWindowCreateAndOpen( &win, 1000, 0, src.width, src.height );
 
   printf( "%d x %d", src.width, src.height );

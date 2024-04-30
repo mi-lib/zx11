@@ -20,6 +20,16 @@ static void _zxPixel16RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b)
   *b = ( p       ) & 0x1f;
 }
 
+static void _zxPixel16FRGB(zxPixel p, float *r, float *g, float *b)
+{
+  ubyte _r, _g, _b;
+
+  _zxPixel16RGB( p, &_r, &_g, &_b );
+  *r = (double)_r / (double)0x1f;
+  *g = (double)_g / (double)0x1f;
+  *b = (double)_b / (double)0x1f;
+}
+
 static zxPixel _zxPixel16FromRGB(ubyte r, ubyte g, ubyte b)
 {
   return ( ( r & 0x1f ) << 11 ) | ( ( g & 0x1f ) << 6 ) | ( b & 0x1f );
@@ -44,6 +54,16 @@ static void _zxPixel24RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b)
   *r = ( p >> 16 ) & 0xff;
   *g = ( p >>  8 ) & 0xff;
   *b = ( p       ) & 0xff;
+}
+
+static void _zxPixel24FRGB(zxPixel p, float *r, float *g, float *b)
+{
+  ubyte _r, _g, _b;
+
+  _zxPixel24RGB( p, &_r, &_g, &_b );
+  *r = (double)_r / (double)0xff;
+  *g = (double)_g / (double)0xff;
+  *b = (double)_b / (double)0xff;
 }
 
 static zxPixel _zxPixel24FromRGB(ubyte r, ubyte g, ubyte b)
@@ -72,6 +92,16 @@ static void _zxPixel32RGB(zxPixel p, ubyte *r, ubyte *g, ubyte *b)
   *b = ( p >>  8 ) & 0xff;
 }
 
+static void _zxPixel32FRGB(zxPixel p, float *r, float *g, float *b)
+{
+  ubyte _r, _g, _b;
+
+  _zxPixel32RGB( p, &_r, &_g, &_b );
+  *r = (double)_r / (double)0xff;
+  *g = (double)_g / (double)0xff;
+  *b = (double)_b / (double)0xff;
+}
+
 static zxPixel _zxPixel32FromRGB(ubyte r, ubyte g, ubyte b)
 {
   return ( r << 24 ) | ( g << 16 ) | ( b << 8 ) | 0xff;
@@ -97,28 +127,32 @@ zxPixelManip *zxPixelManipSet(zxPixelManip *pm, int depth)
   switch( ( pm->depth = depth ) ){
   case 16:
     pm->PixelRGB = _zxPixel16RGB;
+    pm->PixelFRGB = _zxPixel16FRGB;
     pm->PixelFromRGB = _zxPixel16FromRGB;
     pm->PixelFromFRGB = _zxPixel16FromFRGB;
     pm->PixelNegate = _zxPixel16Negate;
     break;
   case 24:
     pm->PixelRGB = _zxPixel24RGB;
+    pm->PixelFRGB = _zxPixel24FRGB;
     pm->PixelFromRGB = _zxPixel24FromRGB;
     pm->PixelFromFRGB = _zxPixel24FromFRGB;
     pm->PixelNegate = _zxPixel24Negate;
     break;
   case 32:
     pm->PixelRGB = _zxPixel32RGB;
+    pm->PixelFRGB = _zxPixel32FRGB;
     pm->PixelFromRGB = _zxPixel32FromRGB;
     pm->PixelFromFRGB = _zxPixel32FromFRGB;
     pm->PixelNegate = _zxPixel32Negate;
     break;
   case 8 :
   default:
-    /* functions are less significant, because most of
-     * 8 bit graphics systems prepare 'Pseudo Color' mode.
+    /* functions are less significant, because most of 8-bit graphics systems
+     * prepare 'Pseudo Color' mode.
      */
     pm->PixelRGB = NULL;
+    pm->PixelFRGB = NULL;
     pm->PixelFromRGB = NULL;
     pm->PixelFromFRGB = NULL;
     pm->PixelNegate = NULL;

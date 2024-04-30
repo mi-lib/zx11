@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
   zxWindow win;
   zxImage dat1, dat2, blend;
-  register double alpha;
+  double alpha;
   char *file1 = argc > 1 ? argv[1] : "../fig/lena.jpg";
   char *file2 = argc > 2 ? argv[2] : "../fig/lena_flop.jpg";
 

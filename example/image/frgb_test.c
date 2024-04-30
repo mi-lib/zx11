@@ -5,7 +5,7 @@ double myabs(double x){ return x >= 0 ? x : -x; }
 
 void brightR(zxPixelManip *pm, zxImage *img, double brightness)
 {
-  register int i, j;
+  int i, j;
 
   for( i=0; i<img->height; i++ )
     for( j=0; j<img->width; j++ )
@@ -15,7 +15,7 @@ void brightR(zxPixelManip *pm, zxImage *img, double brightness)
 
 void brightG(zxPixelManip *pm, zxImage *img, double brightness)
 {
-  register int i, j;
+  int i, j;
 
   for( i=0; i<img->height; i++ )
     for( j=0; j<img->width; j++ )
@@ -25,7 +25,7 @@ void brightG(zxPixelManip *pm, zxImage *img, double brightness)
 
 void brightB(zxPixelManip *pm, zxImage *img, double brightness)
 {
-  register int i, j;
+  int i, j;
 
   for( i=0; i<img->height; i++ )
     for( j=0; j<img->width; j++ )
@@ -35,7 +35,7 @@ void brightB(zxPixelManip *pm, zxImage *img, double brightness)
 
 void bright(zxPixelManip *pm, zxImage *img, double brightness)
 {
-  register int i, j;
+  int i, j;
 
   for( i=0; i<img->height; i++ )
     for( j=0; j<img->width; j++ )
@@ -48,9 +48,9 @@ int main(void)
 {
   zxWindow win;
   zxImage dat;
-  register int i;
   double alpha;
   zxPixelManip pm;
+  int i;
 
   zxInit();
   zxImageAllocDefault( &dat, 300, 300 );

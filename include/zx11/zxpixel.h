@@ -35,6 +35,7 @@ typedef struct{
 typedef struct{
   int depth;
   void (*PixelRGB)(zxPixel p, ubyte *r, ubyte *g, ubyte *b);
+  void (*PixelFRGB)(zxPixel p, float *r, float *g, float *b);
   zxPixel (*PixelFromRGB)(ubyte r, ubyte g, ubyte b);
   zxPixel (*PixelFromFRGB)(float r, float g, float b);
   zxPixel (*PixelNegate)(zxPixel p);

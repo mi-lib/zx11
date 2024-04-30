@@ -5,7 +5,7 @@ ifeq ($(CONFIG_USE_XEXT),y)
 	CFLAGS += -D__ZX11_USE_XEXT
 ifeq ($(CONFIG_USE_XFT),y)
 	OBJ += zximage_freetype.o
-	CFLAGS += -D__ZX11_USE_XFT `pkg-config --cflags --libs xft`
+	CFLAGS += -D__ZX11_USE_XFT `pkg-config --cflags xft`
 endif
 endif
 
@@ -15,6 +15,11 @@ ifeq ($(CONFIG_USE_XPM),y)
 ifeq ($(CONFIG_USE_WIDGET),y)
 	OBJ += zxwidget.o
 endif
+endif
+
+ifeq ($(CONFIG_USE_MAGICKWAND),y)
+	OBJ += zximage_magickwand.o
+	CFLAGS += -D__ZX11_USE_MAGICKWAND `pkg-config --cflags MagickWand`
 endif
 
 ifeq ($(CONFIG_USE_PNG),y)

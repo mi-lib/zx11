@@ -40,6 +40,8 @@ void zxImageCellFromPixelCheck(zxImage *img, uint x, uint y, zxPixel pixel);
 
 #define zxImageCellRGB(img,pm,x,y,r,g,b) \
   (pm)->PixelRGB( zxImageCellPixel(img,x,y), r, g, b )
+#define zxImageCellFRGB(img,pm,x,y,r,g,b) \
+  (pm)->PixelFRGB( zxImageCellPixel(img,x,y), r, g, b )
 ubyte zxImageCellGS(zxImage *img, zxPixelManip *pm, uint x, uint y);
 #define zxImageCellFromRGB(img,pm,x,y,r,g,b) \
   zxImageCellFromPixel( img, x, y, (pm)->PixelFromRGB(r,g,b) )
@@ -172,6 +174,11 @@ __END_DECLS
 #ifdef __ZX11_USE_XFT
 #include <zx11/zximage_freetype.h>
 #endif /* __ZX11_USE_XFT */
+
+/* MagickWand support available */
+#ifdef __ZX11_USE_MAGICKWAND
+# include <zx11/zximage_magickwand.h>
+#endif /* __ZX11_USE_MAGICKWAND */
 
 #include <zx11/zximage_supported.h>
 

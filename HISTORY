@@ -1,3 +1,7 @@
+2024. 4.30. Added MagickWand support. [zximage, zximage_magickwand, tools]
+2024. 4.30. Added zxImageCellFRGB. [zximage]
+2024. 4.30. Added PixelFRGB member to zxPixelManip, and modified zxPixelManipSet. [zxpixel]
+2024. 4.30. Defined _zxPixel16FRGB, _zxPixel24FRGB, and _zxPixel32FRGB. [zxpixel]
 2024. 3.21. Corrected type of counter variables from FT_Int to FT_UInt. [zximage_freetype]
 2024. 2.20. Replaced zxDequeueEvent with zxCheckEvent in the main loop of zxwatch. [app]
 2024. 2.20. Replaced time and localtime to clock_gettime and localtime_r, respectively, in zxwatch. [app]

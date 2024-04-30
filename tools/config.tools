@@ -7,9 +7,10 @@ ifeq ($(CONFIG_USE_XEXT),y)
 	LINKCPP+=-lXext
 	DEF += -D__ZX11_USE_XEXT
 ifeq ($(CONFIG_USE_XFT),y)
-	INCLUDE+=`pkg-config --cflags-only-I --libs xft`
-	LINK+=`pkg-config --cflags-only-I --libs xft fontconfig`
-	LINKCPP+=`pkg-config --cflags-only-I --libs xft fontconfig`
+	INCLUDE+=`pkg-config --cflags-only-I xft`
+	LIB+=`pkg-config --libs-only-L --cflags-only-other xft`
+	LINK+=`pkg-config --libs-only-l xft fontconfig`
+	LINKCPP+=`pkg-config --libs-only-l xft fontconfig`
 	DEF += -D__ZX11_USE_XFT
 	CONFIG_USE_PNG=y
 endif
@@ -19,6 +20,14 @@ ifeq ($(CONFIG_USE_XPM),y)
 	LINK+=-lXpm
 	LINKCPP+=-lXpm
 	DEF += -D__ZX11_USE_XPM
+endif
+
+ifeq ($(CONFIG_USE_MAGICKWAND),y)
+	INCLUDE+=`pkg-config --cflags-only-I MagickWand`
+	LIB+=`pkg-config --libs-only-L --cflags-only-other MagickWand`
+	LINK+=`pkg-config --libs-only-l MagickWand` 
+	LINKCPP+=`pkg-config --libs-only-l MagickWand` 
+	DEF += -D__ZX11_USE_MAGICKWAND
 endif
 
 ifeq ($(CONFIG_USE_PNG),y)

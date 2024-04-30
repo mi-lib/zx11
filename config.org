@@ -15,6 +15,9 @@ CONFIG_USE_XPM=y
 # original widget
 CONFIG_USE_WIDGET=y
 
+# MagickWand (C API of ImageMagick) support
+CONFIG_USE_MAGICKWAND=y
+
 # PNG (Portable Network Graphics) format support
 # (libz and libpng required)
 CONFIG_USE_PNG=y
