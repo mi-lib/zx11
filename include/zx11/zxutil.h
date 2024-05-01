@@ -18,23 +18,26 @@ __BEGIN_DECLS
 
 extern Display *zxdisplay;
 extern Window zxrootwindow;
-extern Screen *zxscreen;
 extern Colormap zxcmap;
 extern Visual *zxvisual;
 extern int zxdepth;
 extern XEvent zxevent;
 
-#define zxScreenWidth()   WidthOfScreen( zxscreen )
-#define zxScreenHeight()  HeightOfScreen( zxscreen )
+#define zxScreenWidth()  WidthOfScreen( DefaultScreenOfDisplay( zxdisplay ) )
+#define zxScreenHeight() HeightOfScreen( DefaultScreenOfDisplay( zxdisplay ) )
+
+/*! \brief return values from zxInit. */
+typedef enum{
+  ZXINIT_FAILURE=0,
+  ZXINIT_SUCCESS,
+  ZXINIT_DUP,
+} zxInitStatus;
 
 /*! \brief initialize X11 system and get information of display and the root window */
-bool zxInit(void);
+zxInitStatus zxInit(void);
 
 /*! \brief exit from connection with X11 system */
-#define zxExit() do{\
-  XCloseDisplay( zxdisplay );\
-  zxdisplay = NULL;\
-} while( 0 )
+void zxExit(void);
 
 /*! \brief flush all events in queue */
 #define zxFlush() XFlush( zxdisplay )

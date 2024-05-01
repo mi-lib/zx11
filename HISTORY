@@ -1,4 +1,7 @@
-2024. 4.30. Added not in zxImageToPixmap (without any functional modifications). [zximage]
+2024. 5. 1. Abolished zxscreen, and redefined zxScreenWidth and zxScreenHeight. [zxutil]
+2024. 5. 1. Reimplemented zxExit as a function. [zxutil]
+2024. 5. 1. Defined zxInitStatus for return values from zxInit. [zxutil]
+2024. 4.30. Added note in zxImageToPixmap (without any functional modifications). [zximage]
 2024. 4.30. Added MagickWand support. [zximage, zximage_magickwand, tools]
 2024. 4.30. Added zxImageCellFRGB. [zximage]
 2024. 4.30. Added PixelFRGB member to zxPixelManip, and modified zxPixelManipSet. [zxpixel]

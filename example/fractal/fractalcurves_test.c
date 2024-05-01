@@ -218,16 +218,13 @@ void Pendant(zxWindow *c, double ox, double oy, double dx, double dy, int dim, i
     Pendant( c, ox+(1+ratio)*d[i].x, oy+(1+ratio)*d[i].y,-ratio*d[i].x,-ratio*d[i].y, dim-1, 0 );
 }
 
-
-
-
-#define DIM_BINTREE 10
-#define DIM_CCURVE  10
+#define DIM_BINTREE 11
+#define DIM_CCURVE  12
 #define DIM_DRAGON  10
 #define DIM_FERN     8
-#define DIM_KOCH     5
-#define DIM_GASKET   5
-#define DIM_HILBERT  5
+#define DIM_KOCH     8
+#define DIM_GASKET   7
+#define DIM_HILBERT  6
 #define DIM_PENDANT  5
 
 int main(int argc, char *argv[])

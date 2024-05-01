@@ -18,9 +18,6 @@ Display *zxdisplay = NULL;
 /* default root window */
 Window zxrootwindow;
 
-/* default screen */
-Screen *zxscreen;
-
 /* default colormap */
 Colormap zxcmap;
 
@@ -70,25 +67,33 @@ static Atom zx_wm_delete_window;
 /* basic methods */
 
 /* initialize X11 system and get information of display and the root window */
-bool zxInit(void)
+zxInitStatus zxInit(void)
 {
   if( zxdisplay ){
     ZRUNWARN( "already connected to X server" );
-    return true;
+    return ZXINIT_DUP;
   }
   if( !( zxdisplay = XOpenDisplay( NULL ) ) ){
     ZRUNERROR( "cannot connect to X server" );
-    return false;
+    return ZXINIT_FAILURE;
   }
   zxrootwindow = DefaultRootWindow( zxdisplay );
-  zxscreen     = DefaultScreenOfDisplay( zxdisplay );
   zxcmap       = DefaultColormap( zxdisplay, 0 );
   zxvisual     = DefaultVisual( zxdisplay, 0 );
   zxdepth      = DefaultDepth( zxdisplay, 0 );
 
   zx_wm_protocols = XInternAtom( zxdisplay, "WM_PROTOCOLS", False );
   zx_wm_delete_window = XInternAtom( zxdisplay, "WM_DELETE_WINDOW", False );
-  return true;
+  return ZXINIT_SUCCESS;
+}
+
+/* exit from connection with X11 system */
+void zxExit(void)
+{
+  if( zxdisplay ){
+    XCloseDisplay( zxdisplay );
+    zxdisplay = NULL;
+  }
 }
 
 /* set default window attributes */
