@@ -163,6 +163,14 @@ zxImage *zxImageClone(zxImage *src, zxImage *dest)
   return dest;
 }
 
+bool zxImageCmp(zxImage *img1, zxImage *img2)
+{
+  if( img1->width  != img2->width  ||
+      img1->height != img2->height ||
+      img1->bpp    != img2->bpp ) return false;
+  return memcmp( img1->buf, img2->buf, img1->width * img1->height * img1->bpp ) == 0;
+}
+
 /* image pasting */
 
 void zxImageCanvasRange(zxImage *canvas, zxImage *img, uint x, uint y, uint *w, uint *h)
@@ -542,6 +550,34 @@ zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate)
   return dest;
 }
 
+zxImage *zxImageNormalize(zxImage *src, zxImage *dest)
+{
+  uint i, j;
+  ubyte r, g, b, r_max, g_max, b_max;
+  zxPixelManip pm;
+
+  zxPixelManipSetDefault( &pm );
+  /* find maximum value */
+  r_max = g_max = b_max = 0;
+  for( i=0; i<src->height; i++ )
+    for( j=0; j<src->width; j++ ){
+      zxImageCellRGB( src, &pm, j, i, &r, &g, &b );
+      if( r > r_max ) r_max = r;
+      if( g > g_max ) g_max = g;
+      if( b > b_max ) b_max = b;
+    }
+  /* normalize */
+  if( r_max == 0 ) r_max = 1;
+  if( g_max == 0 ) g_max = 1;
+  if( b_max == 0 ) b_max = 1;
+  for( i=0; i<src->height; i++ )
+    for( j=0; j<src->width; j++ ){
+      zxImageCellRGB( src, &pm, j, i, &r, &g, &b );
+      zxImageCellFromFRGB( dest, &pm, j, i, (double)r/r_max, (double)g/g_max, (double)b/b_max );
+    }
+  return dest;
+}
+
 static void _zxImageHistogram(zxImage *img, zxPixelManip *pm, uint h[], double sh[])
 {
   uint i, j;
@@ -626,14 +662,14 @@ zxImage *zxImageDither(zxImage *src, zxImage *dest)
 
 /* general filter */
 
-static void _zxImageFilterPickPixel(zxImage *src, int x, int y, int w, int h, int size, zxPixel p[], uint sh)
+static void _zxImageFilterPickPixel(zxImage *src, uint x, uint y, uint w, uint h, int size, zxPixel p[], uint sh)
 {
   int i, j, k, sx, sy;
 
   for( k=0, i=0; i<size; i++ ){
-    sy = zLimit( y + i - sh, 0, w-1 );
+    sy = zLimit( y + i - sh, 0, h-1 );
     for( j=0; j<size; j++ ){
-      sx = zLimit( x + j - sh, 0, h-1 );
+      sx = zLimit( x + j - sh, 0, w-1 );
       p[k++] = zxImageCellPixel( src, sx, sy );
     }
   }
@@ -653,8 +689,7 @@ zxImage *zxImageFilter(zxImage *src, zxImage *dest, double f[], int size)
   for( y=0; y<h; y++ )
     for( x=0; x<w; x++ ){
       _zxImageFilterPickPixel( src, x, y, w, h, size, p, sh );
-      zxImageCellFromPixel( dest, x, y,
-        zxPixelBlend( &pm, p, f, s2 ) );
+      zxImageCellFromPixel( dest, x, y, zxPixelBlend( &pm, p, f, s2 ) );
     }
  TERMINATE:
   free( p );
@@ -885,6 +920,77 @@ zxImage *zxImageLaplacian(zxImage *src, zxImage *dest)
     1.0, 1.0, 1.0,
   };
   return zxImageFilter( src, dest, weight, 3 );
+}
+
+/* Hough transformation */
+
+zArray2Class( zxHoughBin, zxHoughBinListCell* );
+
+zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, zxImage *src, int theta_div, int dist_div)
+{
+  double theta, dist, dist_max;
+  int i, j, k, l;
+  zxHoughBin bin;
+  zxHoughBinListCell *bin_list_cell, *bin_list_cell_prev;
+  zxPixelManip pm;
+  ubyte r, g, b;
+  zxImage tmpimg1, tmpimg2;
+
+  zListInit( bin_list );
+  zArray2Alloc( &bin, zxHoughBinListCell*, theta_div, dist_div );
+  for( i=0; i<dist_div; i++ )
+    for( j=0; j<theta_div; j++ )
+      *zArray2ElemNC(&bin,j,i) = NULL;
+  /* edge detection */
+  zxImageClone( src, &tmpimg1 );
+  zxImageGrayscalizeDRC( &tmpimg1 );
+  zxImageAllocDefault( &tmpimg2, tmpimg1.width, tmpimg1.height );
+  zxImageLaplacian( &tmpimg1, &tmpimg2 );
+  zxImageNormalizeDRC( &tmpimg2 );
+  /* vote to bins */
+  zxPixelManipSetDefault( &pm );
+  dist_max = sqrt( tmpimg2.width*tmpimg2.width + tmpimg2.height*tmpimg2.height );
+  for( i=0; i<tmpimg2.height; i++ ){
+    for( j=0; j<tmpimg2.width; j++ ){
+      zxImageCellRGB( &tmpimg2, &pm, j, i, &r, &g, &b );
+      if( r < 0x80 ) continue;
+      for( k=0; k<theta_div; k++ ){
+        theta = 2 * M_PI * k / theta_div;
+        dist = j * cos(theta) + i * sin(theta);
+        l = (int)( dist/dist_max * dist_div );
+        if( !( bin_list_cell = *zArray2ElemNC(&bin,k,l) ) ){
+          if( !( bin_list_cell = zAlloc( zxHoughBinListCell, 1 ) ) ){
+            ZALLOCERROR();
+            bin_list = NULL;
+            goto TERMINATE;
+          }
+          bin_list_cell->data.theta = theta;
+          bin_list_cell->data.dist = dist_max * l / dist_div;
+          bin_list_cell->data.count = 1;
+          *zArray2ElemNC(&bin,k,l) = bin_list_cell;
+          zListInsertHead( bin_list, bin_list_cell );
+        } else{
+          bin_list_cell->data.count++;
+          while( zListCellPrev(bin_list_cell) != zListRoot(bin_list) &&
+                 zListCellPrev(bin_list_cell)->data.count < bin_list_cell->data.count ){
+            bin_list_cell_prev = zListCellPrev(bin_list_cell);
+            zListCellSwap( zxHoughBinListCell, bin_list_cell, bin_list_cell_prev );
+          }
+        }
+      }
+    }
+  }
+  if( zListIsEmpty( bin_list ) ){
+    ZRUNWARN( "visible pixels not found" );
+    bin_list = NULL;
+    goto TERMINATE;
+  }
+
+ TERMINATE:
+  zxImageDestroy( &tmpimg1 );
+  zxImageDestroy( &tmpimg2 );
+  zArray2Free( &bin );
+  return bin_list;
 }
 
 /* normal map */

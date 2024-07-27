@@ -75,6 +75,8 @@ int zxImageSizeEqual(zxImage *d1, zxImage *d2);
 zxImage *zxImageCopy(zxImage *src, zxImage *dest);
 zxImage *zxImageClone(zxImage *src, zxImage *dest);
 
+bool zxImageCmp(zxImage *img1, zxImage *img2);
+
 /* image pasting */
 
 void zxImageCanvasRange(zxImage *canvas, zxImage *img, uint x, uint y, uint *w, uint *h);
@@ -105,8 +107,16 @@ zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bim
 zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest);
 zxImage *zxImageNegate(zxImage *src, zxImage *dest);
 zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate);
+zxImage *zxImageNormalize(zxImage *src, zxImage *dest);
 zxImage *zxImageEqualize(zxImage *src, zxImage *dest);
 zxImage *zxImageDither(zxImage *src, zxImage *dest);
+
+#define zxImageGrayscalizeDRC(img)   zxImageGrayscalize( img, img )
+#define zxImageNegateDRC(img)        zxImageNegate( img, img )
+#define zxImageToneDownDRC(img,rate) zxImageToneDown( img, img, rate )
+#define zxImageNormalizeDRC(img)     zxImageNormalize( img, img )
+#define zxImageEqualizeDRC(img)      zxImageEqualize( img, img )
+#define zxImageDitherDRC(img)        zxImageDither( img, img )
 
 /* general filter */
 
@@ -130,6 +140,17 @@ zxImage *zxImageSobelH(zxImage *src, zxImage *dest);
 zxImage *zxImageSobelV(zxImage *src, zxImage *dest);
 zxImage *zxImageSobel(zxImage *src, zxImage *dest);
 zxImage *zxImageLaplacian(zxImage *src, zxImage *dest);
+
+/* Hough transformation */
+
+typedef struct{
+  double theta;
+  double dist;
+  int count;
+} zxHoughBinData;
+zListClass( zxHoughBinList, zxHoughBinListCell, zxHoughBinData );
+
+zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, zxImage *src, int theta_div, int dist_div);
 
 /* normal map */
 
