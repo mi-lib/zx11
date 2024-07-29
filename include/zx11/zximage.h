@@ -150,7 +150,7 @@ typedef struct{
 } zxHoughBinData;
 zListClass( zxHoughBinList, zxHoughBinListCell, zxHoughBinData );
 
-zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, zxImage *src, int theta_div, int dist_div);
+zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, zxImage *src, uint theta_div, uint dist_div);
 
 /* normal map */
 

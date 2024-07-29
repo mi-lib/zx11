@@ -1,3 +1,4 @@
+2024. 7.30. Fixed signedness of variables in zxImageHoughLines. [zximage]
 2024. 7.27. Added zxImageHoughLines. [zximage]
 2024. 7.27. Added  zxImageGrayscalizeDRC, zxImageNegateDRC, zxImageToneDownDRC, zxImageNormalizeDRC, zxImageEqualizeDRC, and zxImageDitherDRC. [zximage]
 2024. 7.27. Added zxImageCmp. [zximage]

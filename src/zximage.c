@@ -926,10 +926,10 @@ zxImage *zxImageLaplacian(zxImage *src, zxImage *dest)
 
 zArray2Class( zxHoughBin, zxHoughBinListCell* );
 
-zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, zxImage *src, int theta_div, int dist_div)
+zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, zxImage *src, uint theta_div, uint dist_div)
 {
   double theta, dist, dist_max;
-  int i, j, k, l;
+  uint i, j, k, l;
   zxHoughBin bin;
   zxHoughBinListCell *bin_list_cell, *bin_list_cell_prev;
   zxPixelManip pm;
@@ -957,7 +957,7 @@ zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, zxImage *src, int th
       for( k=0; k<theta_div; k++ ){
         theta = 2 * M_PI * k / theta_div;
         dist = j * cos(theta) + i * sin(theta);
-        l = (int)( dist/dist_max * dist_div );
+        l = (uint)( dist/dist_max * dist_div );
         if( !( bin_list_cell = *zArray2ElemNC(&bin,k,l) ) ){
           if( !( bin_list_cell = zAlloc( zxHoughBinListCell, 1 ) ) ){
             ZALLOCERROR();
