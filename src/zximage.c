@@ -1227,7 +1227,7 @@ zxImage *zxImageFromPixmap(zxImage *img, Pixmap pmap, uint w, uint h)
 
 /* file format checker and generalized I/O */
 
-bool zxImageFileIdent(char filename[], const unsigned char ident[], uint size)
+bool zxImageFileIdent(const char *filename, const unsigned char ident[], uint size)
 {
   FILE *fp;
   char buf[BUFSIZ];
@@ -1241,7 +1241,7 @@ bool zxImageFileIdent(char filename[], const unsigned char ident[], uint size)
   return !memcmp( buf, ident, sizeof(byte)*size ) ? true : false;
 }
 
-int zxImageReadFile(zxImage *img, char filename[])
+int zxImageReadFile(zxImage *img, const char *filename)
 {
   zxImageInit( img );
 
@@ -1283,7 +1283,7 @@ int zxImageReadFile(zxImage *img, char filename[])
   return 0;
 }
 
-int zxImageWriteFile(zxImage *img, char filename[])
+int zxImageWriteFile(zxImage *img, const char *filename)
 {
   char *suffix, suffix_lower[BUFSIZ];
 

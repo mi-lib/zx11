@@ -1,3 +1,5 @@
+2025. 1.19. Modified makefile for examples. [example]
+2025. 1.19. Added const qualifiers to zxImageFileIdent, zxImageReadFile, zxImageWriteFile, zxImageFileIsPBM, zxImageFileIsPGM, zxImageFileIsPPM, zxImageFileIsPNM, zxImageReadPNMFile, zxImageWritePBMFile, zxImageWritePGMFile, zxImageWritePPMFile, zxImageFileIsBMP, zxImageReadBMPFile, zxImageWriteBMPFile, zxImageFileIsJPEG, zxImageReadJPEGFile, zxImageWriteJPEGFile, zxImageWriteJPEGFileDefault, zxImageFileIsPNG, zxImageReadPNGFile, zxImageWritePNGFile, zxImageFileIsTIFF, zxImageReadTIFFFile, zxImageWriteTIFFFile, zxImageWriteTIFFFileDefault, zxImageFileIsPDT, zxImageReadPDTFile, zxImageFileIsMAG, and zxImageReadMAGFile. [zximage, zximage_pnm, zximage_dib, zximage_jpeg, zximage_png, zximage_tiff, zximage_pdf, zximage_mag, app]
 2024. 7.30. Fixed signedness of variables in zxImageHoughLines. [zximage]
 2024. 7.27. Added zxImageHoughLines. [zximage]
 2024. 7.27. Added  zxImageGrayscalizeDRC, zxImageNegateDRC, zxImageToneDownDRC, zxImageNormalizeDRC, zxImageEqualizeDRC, and zxImageDitherDRC. [zximage]

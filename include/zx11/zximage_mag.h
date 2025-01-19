@@ -13,13 +13,13 @@ __BEGIN_DECLS
 
 #define ZX_MAG_SUFFIX "mag"
 
-bool zxImageFileIsMAG(char filename[]);
+bool zxImageFileIsMAG(const char *filename);
 
 int zxMAGDispComment(FILE *fp);
-int zxMAGDispCommentFile(const char filename[]);
+int zxMAGDispCommentFile(const char *filename);
 
 int zxImageReadMAG(FILE *fp, zxImage *img);
-int zxImageReadMAGFile(zxImage *img, char filename[]);
+int zxImageReadMAGFile(zxImage *img, const char *filename);
 
 __END_DECLS
 

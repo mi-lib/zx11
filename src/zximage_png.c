@@ -6,7 +6,7 @@
 
 #include <zx11/zximage_png.h>
 
-bool zxImageFileIsPNG(char filename[])
+bool zxImageFileIsPNG(const char *filename)
 {
   const unsigned char __zx_png_ident[] = {
     0x89, 0x50, 0x4e, 0x47,
@@ -63,7 +63,7 @@ int zxPNGCheck(FILE *fp)
   return !png_sig_cmp( header, 0, ZX_PNG_CHECK_BYTE );
 }
 
-int zxPNGCheckFile(const char filename[])
+int zxPNGCheckFile(const char *filename)
 {
   FILE *fp;
   int result;
@@ -193,7 +193,7 @@ int zxImageReadPNG(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageReadPNGFile(zxImage *img, char filename[])
+int zxImageReadPNGFile(zxImage *img, const char *filename)
 {
   FILE *fp;
   int result = 0;
@@ -263,7 +263,7 @@ int zxImageWritePNG(FILE *fp, zxImage *img)
   return _zxPNGWrite( img, &png, fp );
 }
 
-int zxImageWritePNGFile(zxImage *img, char filename[])
+int zxImageWritePNGFile(zxImage *img, const char *filename)
 {
   FILE *fp;
   int result = 0;

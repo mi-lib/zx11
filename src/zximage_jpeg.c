@@ -7,7 +7,7 @@
 #include <zx11/zximage_jpeg.h>
 #include <setjmp.h>
 
-bool zxImageFileIsJPEG(char filename[])
+bool zxImageFileIsJPEG(const char *filename)
 {
   const unsigned char __zx_jpeg_ident[] = {
     /*
@@ -85,7 +85,7 @@ int zxImageReadJPEG(FILE *fp, zxImage *img)
   return result;
 }
 
-int zxImageReadJPEGFile(zxImage *img, char filename[])
+int zxImageReadJPEGFile(zxImage *img, const char *filename)
 {
   FILE *fp;
   int result;
@@ -140,7 +140,7 @@ int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality)
   return ret;
 }
 
-int zxImageWriteJPEGFile(zxImage *img, char filename[], int quality)
+int zxImageWriteJPEGFile(zxImage *img, const char *filename, int quality)
 {
   FILE *fp;
   int result;
@@ -154,7 +154,7 @@ int zxImageWriteJPEGFile(zxImage *img, char filename[], int quality)
   return result;
 }
 
-int zxImageWriteJPEGFileDefault(zxImage *img, char filename[])
+int zxImageWriteJPEGFileDefault(zxImage *img, const char *filename)
 {
   return zxImageWriteJPEGFile( img, filename, ZX_JPEG_DEFAULT_QUALITY );
 }

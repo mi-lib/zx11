@@ -16,10 +16,10 @@ __BEGIN_DECLS
 
 #define ZX_PDT_SUFFIX "pdt"
 
-bool zxImageFileIsPDT(char filename[]);
+bool zxImageFileIsPDT(const char *filename);
 
 bool zxImageReadPDT(FILE *fp, zxImage *img);
-int zxImageReadPDTFile(zxImage *img, char filename[]);
+int zxImageReadPDTFile(zxImage *img, const char *filename);
 
 __END_DECLS
 

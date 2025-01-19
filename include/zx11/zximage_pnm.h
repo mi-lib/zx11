@@ -27,27 +27,27 @@ __BEGIN_DECLS
 
 /* file format identification */
 
-bool zxImageFileIsPBM(char filename[]);
-bool zxImageFileIsPGM(char filename[]);
-bool zxImageFileIsPPM(char filename[]);
-bool zxImageFileIsPNM(char filename[]);
+bool zxImageFileIsPBM(const char *filename);
+bool zxImageFileIsPGM(const char *filename);
+bool zxImageFileIsPPM(const char *filename);
+bool zxImageFileIsPNM(const char *filename);
 
 /* input of PNM file */
 
 int zxImageReadPNMHeader(FILE *fp, zxImage *img);
 int zxImageReadPNM(FILE *fp, zxImage *img);
-int zxImageReadPNMFile(zxImage *img, char filename[]);
+int zxImageReadPNMFile(zxImage *img, const char *filename);
 
 /* output of PNM file */
 
 int zxImageWritePBM(FILE *fp, zxImage *img);
-int zxImageWritePBMFile(zxImage *img, char filename[]);
+int zxImageWritePBMFile(zxImage *img, const char *filename);
 
 int zxImageWritePGM(FILE *fp, zxImage *img);
-int zxImageWritePGMFile(zxImage *img, char filename[]);
+int zxImageWritePGMFile(zxImage *img, const char *filename);
 
 int zxImageWritePPM(FILE *fp, zxImage *img);
-int zxImageWritePPMFile(zxImage *img, char filename[]);
+int zxImageWritePPMFile(zxImage *img, const char *filename);
 
 __END_DECLS
 

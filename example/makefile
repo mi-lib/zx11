@@ -1,11 +1,12 @@
-INCLUDE=`zx11-config -I`
-LIB=`zx11-config -L`
+CFLAGS=`zx11-config --cflags`
 LINK=`zx11-config -l`
-DEF=`zx11-config -D`
+
+TARGET=$(shell ls *.c | xargs -i basename {} .c | tr -s "\n" " ")
 
 CC=gcc
-CFLAGS=-Wall -O3 $(LIB) $(INCLUDE) $(DEF)
+CFLAGS+=-Wall -O3 -funroll-loops -g
 
+all: $(TARGET)
 %: %.c
 	$(CC) $(CFLAGS) -o $@ $< $(LINK)
 clean:

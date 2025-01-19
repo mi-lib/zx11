@@ -186,7 +186,7 @@ bool zxmagv_dump(zStrAddrList *filelist)
   return true;
 }
 
-void zxmagv_convert(zStrAddrList *filelist, int (* image_write)(zxImage*,char*), char *suffix)
+void zxmagv_convert(zStrAddrList *filelist, int (* image_write)(zxImage*,const char*), char *suffix)
 {
   zStrAddrListCell *cp;
   zxImage dat;

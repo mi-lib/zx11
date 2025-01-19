@@ -10,25 +10,25 @@
 
 /* file format identification */
 
-bool zxImageFileIsPBM(char filename[])
+bool zxImageFileIsPBM(const char *filename)
 {
   return zxImageFileIdent( filename, (const unsigned char *)"P1", 2 ) ||
          zxImageFileIdent( filename, (const unsigned char *)"P4", 2 );
 }
 
-bool zxImageFileIsPGM(char filename[])
+bool zxImageFileIsPGM(const char *filename)
 {
   return zxImageFileIdent( filename, (const unsigned char *)"P2", 2 ) ||
          zxImageFileIdent( filename, (const unsigned char *)"P5", 2 );
 }
 
-bool zxImageFileIsPPM(char filename[])
+bool zxImageFileIsPPM(const char *filename)
 {
   return zxImageFileIdent( filename, (const unsigned char *)"P3", 2 ) ||
          zxImageFileIdent( filename, (const unsigned char *)"P6", 2 );
 }
 
-bool zxImageFileIsPNM(char filename[])
+bool zxImageFileIsPNM(const char *filename)
 {
   return zxImageFileIsPBM( filename ) ||
          zxImageFileIsPGM( filename ) ||
@@ -210,7 +210,7 @@ int zxImageReadPNM(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageReadPNMFile(zxImage *img, char filename[])
+int zxImageReadPNMFile(zxImage *img, const char *filename)
 {
   FILE *fp;
   int result;
@@ -255,7 +255,7 @@ int zxImageWritePBM(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageWritePBMFile(zxImage *img, char filename[])
+int zxImageWritePBMFile(zxImage *img, const char *filename)
 {
   FILE *fp;
   int result;
@@ -288,7 +288,7 @@ int zxImageWritePGM(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageWritePGMFile(zxImage *img, char filename[])
+int zxImageWritePGMFile(zxImage *img, const char *filename)
 {
   FILE *fp;
   int result;
@@ -322,7 +322,7 @@ int zxImageWritePPM(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageWritePPMFile(zxImage *img, char filename[])
+int zxImageWritePPMFile(zxImage *img, const char *filename)
 {
   FILE *fp;
   int result;

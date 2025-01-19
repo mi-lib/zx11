@@ -6,7 +6,7 @@
 
 #include <zx11/zximage_mag.h>
 
-bool zxImageFileIsMAG(char filename[])
+bool zxImageFileIsMAG(const char *filename)
 {
   return zxImageFileIdent( filename, (const unsigned char *)"MAKI", 4 );
 }
@@ -96,7 +96,7 @@ int zxMAGDispComment(FILE *fp)
   return 1;
 }
 
-int zxMAGDispCommentFile(const char filename[])
+int zxMAGDispCommentFile(const char *filename)
 {
   FILE *fp;
   int result;
@@ -325,7 +325,7 @@ int zxImageReadMAG(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageReadMAGFile(zxImage *img, char filename[])
+int zxImageReadMAGFile(zxImage *img, const char *filename)
 {
   FILE *fp;
 

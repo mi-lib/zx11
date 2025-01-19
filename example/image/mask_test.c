@@ -18,10 +18,10 @@ int main(int argc, char *argv[])
     exit( 1 );
 
   printf( "enter mask pixel pos:\n" );
-  printf( "x = " ); scanf( "%d", &x );
-  printf( "y = " ); scanf( "%d", &y );
+  printf( "x = " ); if( !scanf( "%d", &x ) );
+  printf( "y = " ); if( !scanf( "%d", &y ) );
   mask = zxImageCellPixel( &front, x, y );
-  printf( "mask = %lX\n", mask );
+  printf( "mask = %X\n", mask );
   zxImagePutMasked( &back, &front, 0, 0, mask );
 
   zxWindowCreateAndOpen( &win, 0, 0, back.width, back.height );
@@ -32,6 +32,6 @@ int main(int argc, char *argv[])
   zxImageDestroy( &back );
   zxImageDestroy( &front );
   zxWindowClose( &win );
-  zxClose();
+  zxExit();
   return 0;
 }

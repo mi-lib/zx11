@@ -14,16 +14,16 @@ __BEGIN_DECLS
 
 #define ZX_PNG_SUFFIX "png"
 
-bool zxImageFileIsPNG(char filename[]);
+bool zxImageFileIsPNG(const char *filename);
 
 int zxPNGCheck(FILE *fp);
-int zxPNGCheckFile(const char filename[]);
+int zxPNGCheckFile(const char *filename);
 
 int zxImageReadPNG(FILE *fp, zxImage *img);
-int zxImageReadPNGFile(zxImage *img, char filename[]);
+int zxImageReadPNGFile(zxImage *img, const char *filename);
 
 int zxImageWritePNG(FILE *fp, zxImage *img);
-int zxImageWritePNGFile(zxImage *img, char filename[]);
+int zxImageWritePNGFile(zxImage *img, const char *filename);
 
 __END_DECLS
 

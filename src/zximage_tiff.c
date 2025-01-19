@@ -6,7 +6,7 @@
 
 #include <zx11/zximage_tiff.h>
 
-bool zxImageFileIsTIFF(char filename[])
+bool zxImageFileIsTIFF(const char *filename)
 {
   const unsigned char __zx_tiff_ident1[] = {
     0x4d, 0x4d, 0x00, 0x2a,
@@ -24,7 +24,7 @@ bool zxImageFileIsTIFF(char filename[])
   return 0;\
 } while(0)
 
-int zxImageReadTIFFFile(zxImage *img, char filename[])
+int zxImageReadTIFFFile(zxImage *img, const char *filename)
 {
   TIFF *tiff;
   uint i, j, length, width;
@@ -70,7 +70,7 @@ int zxImageReadTIFFFile(zxImage *img, char filename[])
   return ret;
 }
 
-int zxImageWriteTIFFFile(zxImage *img, char filename[], int cmpmethod)
+int zxImageWriteTIFFFile(zxImage *img, const char *filename, int cmpmethod)
 {
   TIFF *tiff;
   uint bps = 8;
@@ -122,7 +122,7 @@ int zxImageWriteTIFFFile(zxImage *img, char filename[], int cmpmethod)
   return ret;
 }
 
-int zxImageWriteTIFFFileDefault(zxImage *img, char filename[])
+int zxImageWriteTIFFFileDefault(zxImage *img, const char *filename)
 {
   return zxImageWriteTIFFFile( img, filename, COMPRESSION_NONE );
 }

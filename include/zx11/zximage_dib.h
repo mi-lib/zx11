@@ -13,13 +13,13 @@ __BEGIN_DECLS
 
 #define ZX_DIB_SUFFIX "bmp"
 
-bool zxImageFileIsBMP(char filename[]);
+bool zxImageFileIsBMP(const char *filename);
 
 int zxImageReadBMP(FILE *fp, zxImage *img);
-int zxImageReadBMPFile(zxImage *img, char filename[]);
+int zxImageReadBMPFile(zxImage *img, const char *filename);
 
 int zxImageWriteBMP(FILE *fp, zxImage *img);
-int zxImageWriteBMPFile(zxImage *img, char filename[]);
+int zxImageWriteBMPFile(zxImage *img, const char *filename);
 
 __END_DECLS
 

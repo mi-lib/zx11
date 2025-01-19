@@ -18,11 +18,11 @@ __BEGIN_DECLS
 
 #define ZXTIFF_RESOLUTION_DEFAULT 72.0
 
-bool zxImageFileIsTIFF(char filename[]);
+bool zxImageFileIsTIFF(const char *filename);
 
-int zxImageReadTIFFFile(zxImage *img, char filename[]);
-int zxImageWriteTIFFFile(zxImage *img, char filename[], int cmpmethod);
-int zxImageWriteTIFFFileDefault(zxImage *img, char filename[]);
+int zxImageReadTIFFFile(zxImage *img, const char *filename);
+int zxImageWriteTIFFFile(zxImage *img, const char *filename, int cmpmethod);
+int zxImageWriteTIFFFileDefault(zxImage *img, const char *filename);
 
 __END_DECLS
 

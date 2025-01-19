@@ -9,7 +9,7 @@
 
 #include <zx11/zximage_pdt.h>
 
-bool zxImageFileIsPDT(char filename[])
+bool zxImageFileIsPDT(const char *filename)
 {
   return zxImageFileIdent( filename, (const unsigned char *)"PDT", 3 );
 }
@@ -217,7 +217,7 @@ bool zxImageReadPDT(FILE *fp, zxImage *img)
   return true;
 }
 
-int zxImageReadPDTFile(zxImage *img, char filename[])
+int zxImageReadPDTFile(zxImage *img, const char *filename)
 {
   FILE *fp;
 

@@ -7,7 +7,7 @@
 #include <zx11/zximage_dib.h>
 
 /* BMP file format checker */
-bool zxImageFileIsBMP(char filename[])
+bool zxImageFileIsBMP(const char *filename)
 {
   return zxImageFileIdent( filename, (const unsigned char *)"BM", 2 );
 }
@@ -391,7 +391,7 @@ int zxImageReadBMP(FILE *fp, zxImage *img)
   return result;
 }
 
-int zxImageReadBMPFile(zxImage *img, char filename[])
+int zxImageReadBMPFile(zxImage *img, const char *filename)
 {
   FILE *fp;
   int result = 0;
@@ -508,7 +508,7 @@ int zxImageWriteBMP(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageWriteBMPFile(zxImage *img, char filename[])
+int zxImageWriteBMPFile(zxImage *img, const char *filename)
 {
   FILE *fp;
 

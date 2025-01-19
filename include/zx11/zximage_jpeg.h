@@ -17,14 +17,14 @@ __BEGIN_DECLS
 
 #define ZX_JPEG_DEFAULT_QUALITY 75
 
-bool zxImageFileIsJPEG(char filename[]);
+bool zxImageFileIsJPEG(const char *filename);
 
 int zxImageReadJPEG(FILE *fp, zxImage *img);
-int zxImageReadJPEGFile(zxImage *img, char filename[]);
+int zxImageReadJPEGFile(zxImage *img, const char *filename);
 
 int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality);
-int zxImageWriteJPEGFile(zxImage *img, char filename[], int quality);
-int zxImageWriteJPEGFileDefault(zxImage *img, char filename[]);
+int zxImageWriteJPEGFile(zxImage *img, const char *filename, int quality);
+int zxImageWriteJPEGFileDefault(zxImage *img, const char *filename);
 
 __END_DECLS
 
