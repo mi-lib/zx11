@@ -87,7 +87,7 @@ zxImage *zxImagePutSuperimpose(zxImage *canvas, zxImage *img, uint x, uint y);
 
 zxImage *zxImageGet(zxImage *src, zxImage *dest, uint x, uint y);
 
-/* image manipulation */
+/* geometric manipulations */
 
 zxImage *zxImageVertFlip(zxImage *src, zxImage *dest);
 zxImage *zxImageHorizFlip(zxImage *src, zxImage *dest);
@@ -98,7 +98,7 @@ zxImage *zxImageRotFilt(zxImage *src, zxImage *dest, uint ox, uint oy, uint x, u
 
 zxImage *zxImageResize(zxImage *src, zxImage *dest);
 
-/* color manipulation */
+/* color manipulations */
 
 zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bimg);
 zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest);
@@ -111,41 +111,53 @@ zxImage *zxImageCorrectGamma(zxImage *src, zxImage *dest, double gamma);
 zxImage *zxImageNormalize(zxImage *src, zxImage *dest);
 zxImage *zxImageEqualize(zxImage *src, zxImage *dest);
 
-zxImage *zxImageDither(zxImage *src, zxImage *dest);
+zxImage *zxImageDitherBayer(zxImage *src, zxImage *dest);
+zxImage *zxImageDitherNet(zxImage *src, zxImage *dest);
+zxImage *zxImageDitherSpiral(zxImage *src, zxImage *dest);
+#define zxImageDither(src,dest,pattern) zxImageDither##pattern( src, dest )
 
-#define zxImageGrayscalizeDRC(img)   zxImageGrayscalize( img, img )
-#define zxImageNegateDRC(img)        zxImageNegate( img, img )
+#define zxImageGrayscalizeDRC(img)        zxImageGrayscalize( img, img )
+#define zxImageNegateDRC(img)             zxImageNegate( img, img )
 
 #define zxImageBrightenDRC(img,rate)      zxImageBrighten( img, img, rate )
 #define zxImageContrastDRC(img,rate)      zxImageContrast( img, img, rate )
 #define zxImageCorrectGammaDRC(img,gamma) zxImageCorrectGamma( img, img, gamma )
 
-#define zxImageNormalizeDRC(img)     zxImageNormalize( img, img )
-#define zxImageEqualizeDRC(img)      zxImageEqualize( img, img )
-#define zxImageDitherDRC(img)        zxImageDither( img, img )
+#define zxImageNormalizeDRC(img)          zxImageNormalize( img, img )
+#define zxImageEqualizeDRC(img)           zxImageEqualize( img, img )
+
+#define zxImageDitherBayerDRC(img)        zxImageDitherBayer( img, img )
+#define zxImageDitherNetDRC(img)          zxImageDitherNet( img, img )
+#define zxImageDitherSpiralDRC(img)       zxImageDitherSpiral( img, img )
+#define zxImageDitherDRC(img,pattern)     zxImageDither##pattern##DRC( img )
 
 /* general filter */
 
 zxImage *zxImageFilter(zxImage *src, zxImage *dest, double f[], int size);
 zxImage *zxImageFilter2(zxImage *src, zxImage *dest, double f1[], double f2[], int size);
 
-/* blur */
+/* smoothing */
 
-zxImage *zxImageMedian(zxImage *src, zxImage *dest, int size);
+zxImage *zxImageSmoothMedian(zxImage *src, zxImage *dest, int size);
+zxImage *zxImageSmoothMin(zxImage *src, zxImage *dest, int size);
+zxImage *zxImageSmoothMax(zxImage *src, zxImage *dest, int size);
+zxImage *zxImageSmoothGaussian(zxImage *src, zxImage *dest);
 zxImage *zxImageAntialias(zxImage *src, zxImage *dest);
-zxImage *zxImageGaussian(zxImage *src, zxImage *dest);
 
 /* edge detection */
 
 zxImage *zxImageDiff(zxImage *src, zxImage *dest);
 zxImage *zxImageIntegral(zxImage *src, zxImage *dest);
-zxImage *zxImagePrewittH(zxImage *src, zxImage *dest);
-zxImage *zxImagePrewittV(zxImage *src, zxImage *dest);
-zxImage *zxImagePrewitt(zxImage *src, zxImage *dest);
-zxImage *zxImageSobelH(zxImage *src, zxImage *dest);
-zxImage *zxImageSobelV(zxImage *src, zxImage *dest);
-zxImage *zxImageSobel(zxImage *src, zxImage *dest);
-zxImage *zxImageLaplacian(zxImage *src, zxImage *dest);
+
+zxImage *zxImageEdgePrewittH(zxImage *src, zxImage *dest);
+zxImage *zxImageEdgePrewittV(zxImage *src, zxImage *dest);
+zxImage *zxImageEdgePrewitt(zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeSobelH(zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeSobelV(zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeSobel(zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeLaplacian(zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeRoberts(zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeForsen(zxImage *src, zxImage *dest);
 
 /* Hough transformation */
 

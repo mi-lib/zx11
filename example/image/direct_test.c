@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
   zxImageEqualizeDRC( &cpy );
   output_result( &win, &src, &dst, &cpy, "equalization" );
 
-  zxImageDither( &src, &dst );
+  zxImageDitherBayer( &src, &dst );
   zxImageCopy( &src, &cpy );
-  zxImageDitherDRC( &cpy );
-  output_result( &win, &src, &dst, &cpy, "dithering" );
+  zxImageDitherBayerDRC( &cpy );
+  output_result( &win, &src, &dst, &cpy, "dithering (Bayer pattern)" );
 
   zxImageDestroy( &src );
   zxImageDestroy( &cpy );

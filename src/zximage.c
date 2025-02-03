@@ -275,7 +275,7 @@ zxImage *zxImageGet(zxImage *src, zxImage *dest, uint x, uint y)
   return dest;
 }
 
-/* image manipulation */
+/* geometric manipulations */
 
 zxImage *zxImageVertFlip(zxImage *src, zxImage *dest)
 {
@@ -465,7 +465,7 @@ zxImage *zxImageResize(zxImage *src, zxImage *dest)
   return dest;
 }
 
-/* color manipulation */
+/* color manipulations */
 
 zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bimg)
 {
@@ -647,13 +647,10 @@ zxImage *zxImageEqualize(zxImage *src, zxImage *dest)
   return dest;
 }
 
-zxImage *zxImageDither(zxImage *src, zxImage *dest)
+/* dither */
+
+static zxImage *_zxImageDither(zxImage *src, zxImage *dest, const double pattern[])
 {
-  static double bayerpattern[] = {
-     0,  8,  2, 10,
-    12,  4, 14,  6,
-     3, 11,  1,  9,
-    15,  7, 13,  5 };
   uint i, j;
   uint w, h;
   ubyte r, g, b, th;
@@ -661,7 +658,7 @@ zxImage *zxImageDither(zxImage *src, zxImage *dest)
   zxImageCanvasRange( dest, src, 0, 0, &w, &h );
   for( i=0; i<h; i++ )
     for( j=0; j<w; j++ ){
-      th = bayerpattern[ (i%4)*4 + (j%4) ]*16 + 8;
+      th = pattern[ (i%4)*4 + (j%4) ]*16 + 8;
       zxImageCellRGB( src, j, i, &r, &g, &b );
       zxImageCellFromRGB( dest, j, i,
         r >= th ? 0xff : 0,
@@ -669,6 +666,36 @@ zxImage *zxImageDither(zxImage *src, zxImage *dest)
         b >= th ? 0xff : 0 );
     }
   return dest;
+}
+
+zxImage *zxImageDitherBayer(zxImage *src, zxImage *dest)
+{
+  const double pattern[] = {
+     0,  8,  2, 10,
+    12,  4, 14,  6,
+     3, 11,  1,  9,
+    15,  7, 13,  5 };
+  return _zxImageDither( src, dest, pattern );
+}
+
+zxImage *zxImageDitherNet(zxImage *src, zxImage *dest)
+{
+  const double pattern[] = {
+    11,  4,  6,  9,
+    12,  0,  2, 14,
+     7,  8, 10,  5,
+     3, 15, 13,  1 };
+  return _zxImageDither( src, dest, pattern );
+}
+
+zxImage *zxImageDitherSpiral(zxImage *src, zxImage *dest)
+{
+  const double pattern[] = {
+     6,  7,  8,  9,
+     5,  0,  1, 10,
+     4,  3,  2, 11,
+    15, 14, 13, 12 };
+  return _zxImageDither( src, dest, pattern );
 }
 
 /* general filter */
@@ -726,16 +753,16 @@ zxImage *zxImageFilter2(zxImage *src, zxImage *dest, double f1[], double f2[], i
   return dest;
 }
 
-/* blur */
+/* smoothing */
 
-static int _zx11_median_cmp(void *v1, void *v2, void *dummy)
+static int _zx11_smooth_filter_cmp(void *v1, void *v2, void *dummy)
 {
   if( *(ubyte*)v1 > *(ubyte*)v2 ) return 1;
   if( *(ubyte*)v1 < *(ubyte*)v2 ) return -1;
   return 0;
 }
 
-static void _zxImageMedianFind(zxImage *img, int j, int i, ubyte *rs, ubyte *gs, ubyte *bs, uint size, ubyte *r, ubyte *g, ubyte *b)
+static void _zxImageSmoothFilterKey(zxImage *img, int j, int i, ubyte *rs, ubyte *gs, ubyte *bs, uint size, ubyte *r, ubyte *g, ubyte *b, int key)
 {
   uint _i, _j, si, sj, k;
   int s2, sh;
@@ -749,17 +776,16 @@ static void _zxImageMedianFind(zxImage *img, int j, int i, ubyte *rs, ubyte *gs,
         zxImageCellRGB( img, sj, si, r, g, b );
       } else
         *r = *g = *b = 0;
-      zInsertSort( rs, r, k, s2, sizeof(ubyte), _zx11_median_cmp, NULL );
-      zInsertSort( gs, g, k, s2, sizeof(ubyte), _zx11_median_cmp, NULL );
-      zInsertSort( bs, b, k, s2, sizeof(ubyte), _zx11_median_cmp, NULL );
+      zInsertSort( rs, r, k, s2, sizeof(ubyte), _zx11_smooth_filter_cmp, NULL );
+      zInsertSort( gs, g, k, s2, sizeof(ubyte), _zx11_smooth_filter_cmp, NULL );
+      zInsertSort( bs, b, k, s2, sizeof(ubyte), _zx11_smooth_filter_cmp, NULL );
     }
-  sh = ( s2 - 1 ) / 2;
-  *r = rs[sh];
-  *g = gs[sh];
-  *b = bs[sh];
+  *r = rs[key];
+  *g = gs[key];
+  *b = bs[key];
 }
 
-zxImage *zxImageMedian(zxImage *src, zxImage *dest, int size)
+static zxImage *_zxImageSmoothFilter(zxImage *src, zxImage *dest, int size, int key)
 {
   uint i, j;
   uint w, h;
@@ -772,7 +798,7 @@ zxImage *zxImageMedian(zxImage *src, zxImage *dest, int size)
   zxImageCanvasRange( dest, src, 0, 0, &w, &h );
   for( i=0; i<h; i++ ){
     for( j=0; j<w; j++ ){
-      _zxImageMedianFind( src, j, i, rs, gs, bs, size, &r, &g, &b );
+      _zxImageSmoothFilterKey( src, j, i, rs, gs, bs, size, &r, &g, &b, key );
       zxImageCellFromRGB( dest, j, i, r, g, b );
     }
   }
@@ -783,22 +809,37 @@ zxImage *zxImageMedian(zxImage *src, zxImage *dest, int size)
   return dest;
 }
 
+zxImage *zxImageSmoothMedian(zxImage *src, zxImage *dest, int size)
+{
+  return _zxImageSmoothFilter( src, dest, size, ( size*size - 1 ) / 2 );
+}
+
+zxImage *zxImageSmoothMin(zxImage *src, zxImage *dest, int size)
+{
+  return _zxImageSmoothFilter( src, dest, size, 0 );
+}
+
+zxImage *zxImageSmoothMax(zxImage *src, zxImage *dest, int size)
+{
+  return _zxImageSmoothFilter( src, dest, size, size*size - 1 );
+}
+
+zxImage *zxImageSmoothGaussian(zxImage *src, zxImage *dest)
+{
+  double weight[] = {
+    0.0625, 0.1250, 0.0625,
+    0.1250, 0.2500, 0.1250,
+    0.0625, 0.1250, 0.0625,
+  };
+  return zxImageFilter( src, dest, weight, 3 );
+}
+
 zxImage *zxImageAntialias(zxImage *src, zxImage *dest)
 {
   double weight[] = {
     0.041667, 0.083333, 0.041667,
     0.083333, 0.5,      0.083333,
     0.041667, 0.083333, 0.041667,
-  };
-  return zxImageFilter( src, dest, weight, 3 );
-}
-
-zxImage *zxImageGaussian(zxImage *src, zxImage *dest)
-{
-  double weight[] = {
-    0.0625, 0.1250, 0.0625,
-    0.1250, 0.2500, 0.1250,
-    0.0625, 0.1250, 0.0625,
   };
   return zxImageFilter( src, dest, weight, 3 );
 }
@@ -843,7 +884,7 @@ zxImage *zxImageIntegral(zxImage *src, zxImage *dest)
   return dest;
 }
 
-zxImage *zxImagePrewittH(zxImage *src, zxImage *dest)
+zxImage *zxImageEdgePrewittH(zxImage *src, zxImage *dest)
 {
   double weight[] = {
    -1.0, 0.0, 1.0,
@@ -853,7 +894,7 @@ zxImage *zxImagePrewittH(zxImage *src, zxImage *dest)
   return zxImageFilter( src, dest, weight, 3 );
 }
 
-zxImage *zxImagePrewittV(zxImage *src, zxImage *dest)
+zxImage *zxImageEdgePrewittV(zxImage *src, zxImage *dest)
 {
   double weight[] = {
    -1.0,-1.0,-1.0,
@@ -863,7 +904,7 @@ zxImage *zxImagePrewittV(zxImage *src, zxImage *dest)
   return zxImageFilter( src, dest, weight, 3 );
 }
 
-zxImage *zxImagePrewitt(zxImage *src, zxImage *dest)
+zxImage *zxImageEdgePrewitt(zxImage *src, zxImage *dest)
 {
   double weight1[] = {
    -1.0, 0.0, 1.0,
@@ -878,7 +919,7 @@ zxImage *zxImagePrewitt(zxImage *src, zxImage *dest)
   return zxImageFilter2( src, dest, weight1, weight2, 3 );
 }
 
-zxImage *zxImageSobelH(zxImage *src, zxImage *dest)
+zxImage *zxImageEdgeSobelH(zxImage *src, zxImage *dest)
 {
   double weight[] = {
    -1.0, 0.0, 1.0,
@@ -888,7 +929,7 @@ zxImage *zxImageSobelH(zxImage *src, zxImage *dest)
   return zxImageFilter( src, dest, weight, 3 );
 }
 
-zxImage *zxImageSobelV(zxImage *src, zxImage *dest)
+zxImage *zxImageEdgeSobelV(zxImage *src, zxImage *dest)
 {
   double weight[] = {
    -1.0,-2.0,-1.0,
@@ -898,7 +939,7 @@ zxImage *zxImageSobelV(zxImage *src, zxImage *dest)
   return zxImageFilter( src, dest, weight, 3 );
 }
 
-zxImage *zxImageSobel(zxImage *src, zxImage *dest)
+zxImage *zxImageEdgeSobel(zxImage *src, zxImage *dest)
 {
   double weight1[] = {
    -1.0, 0.0, 1.0,
@@ -913,7 +954,7 @@ zxImage *zxImageSobel(zxImage *src, zxImage *dest)
   return zxImageFilter2( src, dest, weight1, weight2, 3 );
 }
 
-zxImage *zxImageLaplacian(zxImage *src, zxImage *dest)
+zxImage *zxImageEdgeLaplacian(zxImage *src, zxImage *dest)
 {
   double weight[] = {
     1.0, 1.0, 1.0,
@@ -921,6 +962,54 @@ zxImage *zxImageLaplacian(zxImage *src, zxImage *dest)
     1.0, 1.0, 1.0,
   };
   return zxImageFilter( src, dest, weight, 3 );
+}
+
+static void _zxImageEdgeFilterGet4Pixels(zxImage *img, int j, int i, float r[4], float g[4], float b[4])
+{
+  int j1, i1;
+
+  j1 = j < img->width  - 1 ? j + 1 : j;
+  i1 = i < img->height - 1 ? i + 1 : i;
+  zxImageCellFRGB( img, j,   i, &r[0], &g[0], &b[0] );
+  zxImageCellFRGB( img, j1,  i, &r[1], &g[1], &b[1] );
+  zxImageCellFRGB( img, j,  i1, &r[2], &g[2], &b[2] );
+  zxImageCellFRGB( img, j1, i1, &r[3], &g[3], &b[3] );
+}
+
+static float _zxImageEdgeRobertsPixelVal(float val[4])
+{
+  return sqrt( pow( sqrt(val[0]) - sqrt(val[3]), 2 ) + pow( sqrt(val[1]) - sqrt(val[2]), 2 ) );
+}
+
+static float _zxImageEdgeForsenPixelVal(float val[4])
+{
+  return fabs( val[0] - val[3] ) + fabs( val[1] - val[2] );
+}
+
+static zxImage *_zxImageEdgeFilter(zxImage *src, zxImage *dest, float (* pixel_val)(float val[4]))
+{
+  int i, j;
+  float r[4], g[4], b[4];
+  float val;
+
+  for( i=0; i<src->height; i++ ){
+    for( j=0; j<src->width; j++ ){
+      _zxImageEdgeFilterGet4Pixels( src, j, i, r, g, b );
+      val = pixel_val( r );
+      zxImageCellFromFRGB( dest, j, i, val, val, val );
+    }
+  }
+  return dest;
+}
+
+zxImage *zxImageEdgeRoberts(zxImage *src, zxImage *dest)
+{
+  return _zxImageEdgeFilter( src, dest, _zxImageEdgeRobertsPixelVal );
+}
+
+zxImage *zxImageEdgeForsen(zxImage *src, zxImage *dest)
+{
+  return _zxImageEdgeFilter( src, dest, _zxImageEdgeForsenPixelVal );
 }
 
 /* Hough transformation */
@@ -945,7 +1034,7 @@ zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, zxImage *src, uint t
   zxImageClone( src, &tmpimg1 );
   zxImageGrayscalizeDRC( &tmpimg1 );
   zxImageAllocDefault( &tmpimg2, tmpimg1.width, tmpimg1.height );
-  zxImageLaplacian( &tmpimg1, &tmpimg2 );
+  zxImageEdgeLaplacian( &tmpimg1, &tmpimg2 );
   zxImageNormalizeDRC( &tmpimg2 );
   /* vote to bins */
   dist_max = sqrt( tmpimg2.width*tmpimg2.width + tmpimg2.height*tmpimg2.height );
