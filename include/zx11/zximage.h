@@ -104,32 +104,36 @@ zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bim
 zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest);
 zxImage *zxImageNegate(zxImage *src, zxImage *dest);
 
+#define zxImageGrayscalizeDRC(img)        zxImageGrayscalize( img, img )
+#define zxImageNegateDRC(img)             zxImageNegate( img, img )
+
 zxImage *zxImageBrighten(zxImage *src, zxImage *dest, double rate);
 zxImage *zxImageContrast(zxImage *src, zxImage *dest, double rate);
 zxImage *zxImageCorrectGamma(zxImage *src, zxImage *dest, double gamma);
 
+#define zxImageBrightenDRC(img,rate)      zxImageBrighten( img, img, rate )
+#define zxImageContrastDRC(img,rate)      zxImageContrast( img, img, rate )
+#define zxImageCorrectGammaDRC(img,gamma) zxImageCorrectGamma( img, img, gamma )
+
 zxImage *zxImageNormalize(zxImage *src, zxImage *dest);
 zxImage *zxImageEqualize(zxImage *src, zxImage *dest);
+
+#define zxImageNormalizeDRC(img)          zxImageNormalize( img, img )
+#define zxImageEqualizeDRC(img)           zxImageEqualize( img, img )
 
 zxImage *zxImageDitherBayer(zxImage *src, zxImage *dest);
 zxImage *zxImageDitherNet(zxImage *src, zxImage *dest);
 zxImage *zxImageDitherSpiral(zxImage *src, zxImage *dest);
 #define zxImageDither(src,dest,pattern) zxImageDither##pattern( src, dest )
 
-#define zxImageGrayscalizeDRC(img)        zxImageGrayscalize( img, img )
-#define zxImageNegateDRC(img)             zxImageNegate( img, img )
-
-#define zxImageBrightenDRC(img,rate)      zxImageBrighten( img, img, rate )
-#define zxImageContrastDRC(img,rate)      zxImageContrast( img, img, rate )
-#define zxImageCorrectGammaDRC(img,gamma) zxImageCorrectGamma( img, img, gamma )
-
-#define zxImageNormalizeDRC(img)          zxImageNormalize( img, img )
-#define zxImageEqualizeDRC(img)           zxImageEqualize( img, img )
-
 #define zxImageDitherBayerDRC(img)        zxImageDitherBayer( img, img )
 #define zxImageDitherNetDRC(img)          zxImageDitherNet( img, img )
 #define zxImageDitherSpiralDRC(img)       zxImageDitherSpiral( img, img )
 #define zxImageDitherDRC(img,pattern)     zxImageDither##pattern##DRC( img )
+
+/* dither based on error diffusion with Floyd-Steinberg distribution. */
+zxImage *zxImageDitherErrorDiffusionDRC(zxImage *img);
+zxImage *zxImageDitherErrorDiffusion(zxImage *src, zxImage *dest);
 
 /* general filter */
 

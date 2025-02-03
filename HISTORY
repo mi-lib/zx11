@@ -1,3 +1,4 @@
+2025.02.03. Added error diffusion method with Floyd-Steinberg distribution for dithering. [zximage]
 2025.02.03. Renamed zxImageSmoothMedian, zxImageRangeMin, zxImageRangeMax, and zxImageGaussian to zxImageSmoothMedian, zxImageSmoothMin, zxImageSmoothMax, and zxImageSmoothGaussian, respectively. [zximage]
 2025.02.03. Renamed _zx11_range_filter_cmp, _zxImageRangeFilterKey, and _zxImageRangeFilter to _zx11_smooth_filter_cmp, _zxImageSmoothFilterKey, and _zxImageSmoothFilter, respectively. [zximage]
 2025.02.03. Renamed zxImagePrewittH, zxImagePrewittV, zxImagePrewitt, zxImageSobelH, zxImageSobelV, zxImageSobel, zxImageLaplacian, zxImageRoberts, and zxImageForsen to zxImageEdgePrewittH, zxImageEdgePrewittV, zxImageEdgePrewitt, zxImageEdgeSobelH, zxImageEdgeSobelV, zxImageEdgeSobel, zxImageEdgeLaplacian, zxImageEdgeRoberts, and zxImageEdgeForsen, respectively. [zximage]

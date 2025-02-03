@@ -10,18 +10,19 @@ int main(int argc, char *argv[])
     exit( 1 );
   zxImageAllocDefault( &dest, src.width, src.height );
 
-  zxWindowCreateAndOpen( &win, 0, 0, src.width*4, src.height*2 );
+  zxWindowCreateAndOpen( &win, 0, 0, src.width*5, src.height*2 );
   zxImageDrawAll( &win, &src, 0, 0 );
   zxImageDither( &src, &dest, Bayer  ); zxImageDrawAll( &win, &dest, src.width,   0 );
   zxImageDither( &src, &dest, Net    ); zxImageDrawAll( &win, &dest, src.width*2, 0 );
   zxImageDither( &src, &dest, Spiral ); zxImageDrawAll( &win, &dest, src.width*3, 0 );
+  zxImageDitherErrorDiffusion( &src, &dest ); zxImageDrawAll( &win, &dest, src.width*4, 0 );
 
   zxImageGrayscalizeDRC( &src );
   zxImageDrawAll( &win, &src, 0, src.height );
   zxImageDither( &src, &dest, Bayer  ); zxImageDrawAll( &win, &dest, src.width,   src.height );
   zxImageDither( &src, &dest, Net    ); zxImageDrawAll( &win, &dest, src.width*2, src.height );
   zxImageDither( &src, &dest, Spiral ); zxImageDrawAll( &win, &dest, src.width*3, src.height );
-
+  zxImageDitherErrorDiffusion( &src, &dest ); zxImageDrawAll( &win, &dest, src.width*4, src.height );
   zxFlush();
   getchar();
 

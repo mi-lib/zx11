@@ -698,6 +698,54 @@ zxImage *zxImageDitherSpiral(zxImage *src, zxImage *dest)
   return _zxImageDither( src, dest, pattern );
 }
 
+#define _zxImageDitherErrorDiffusionVal(val,error) do{\
+  if( *(val) >= 0.5 ){\
+    *(error) = *(val) - 1.0;\
+    *(val) = 1.0;\
+  } else{\
+    *(error) = *(val);\
+    *(val) = 0.0;\
+  }\
+} while(0)
+
+#define _zxImageDitherErrorDiffusionPixel(img,j,i,er,eg,eb,weight) do{\
+  if( zxImagePosIsValid( img, j, i ) ){\
+    float __r, __g, __b;\
+    zxImageCellFRGB( img, j, i, &__r, &__g, &__b );\
+    __r = zLimit( __r + weight * er, 0, 1 );\
+    __g = zLimit( __g + weight * eg, 0, 1 );\
+    __b = zLimit( __b + weight * eb, 0, 1 );\
+    zxImageCellFromFRGB( img, j, i, __r, __g, __b );\
+  }\
+} while(0)
+
+/* dither based on error diffusion with Floyd-Steinberg distribution. */
+zxImage *zxImageDitherErrorDiffusionDRC(zxImage *img)
+{
+  uint i, j;
+  float r, g, b, er, eg, eb;
+
+  for( i=0; i<img->height; i++ )
+    for( j=0; j<img->width; j++ ){
+      zxImageCellFRGB( img, j, i, &r, &g, &b );
+      _zxImageDitherErrorDiffusionVal( &r, &er );
+      _zxImageDitherErrorDiffusionVal( &g, &eg );
+      _zxImageDitherErrorDiffusionVal( &b, &eb );
+      _zxImageDitherErrorDiffusionPixel( img, j+1, i  , er, eg, eb, 7.0/16 );
+      _zxImageDitherErrorDiffusionPixel( img, j-1, i+1, er, eg, eb, 3.0/16 );
+      _zxImageDitherErrorDiffusionPixel( img, j  , i+1, er, eg, eb, 5.0/16 );
+      _zxImageDitherErrorDiffusionPixel( img, j+1, i+1, er, eg, eb, 1.0/16 );
+      zxImageCellFromFRGB( img, j, i, r, g, b );
+    }
+  return img;
+}
+
+zxImage *zxImageDitherErrorDiffusion(zxImage *src, zxImage *dest)
+{
+  if( !zxImageCopy( src, dest ) ) return NULL;
+  return zxImageDitherErrorDiffusionDRC( dest );
+}
+
 /* general filter */
 
 static void _zxImageFilterPickPixel(zxImage *src, uint x, uint y, uint w, uint h, int size, zxPixel p[], uint sh)
