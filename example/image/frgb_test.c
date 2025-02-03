@@ -49,38 +49,38 @@ int main(void)
   zxWindow win;
   zxImage dat;
   double alpha;
-  zxPixelManip pm;
+  zxPixelManip *pm;
   int i;
 
   zxInit();
   zxImageAllocDefault( &dat, 300, 300 );
   zxWindowCreateAndOpen( &win, 0, 0, dat.width, dat.height );
 
-  zxPixelManipSet( &pm, zxdepth );
+  pm = zxPixelManipDefault();
   for( i=0; i<DIV; i++ ){
     alpha = 1 - 2 * myabs( (double)i / DIV - 0.5 );
-    brightR( &pm, &dat, alpha );
+    brightR( pm, &dat, alpha );
     zxImageDrawAll( &win, &dat, 0, 0 );
     zxFlush();
     usleep( 100000 );
   }
   for( i=0; i<DIV; i++ ){
     alpha = 1 - 2 * myabs( (double)i / DIV - 0.5 );
-    brightG( &pm, &dat, alpha );
+    brightG( pm, &dat, alpha );
     zxImageDrawAll( &win, &dat, 0, 0 );
     zxFlush();
     usleep( 100000 );
   }
   for( i=0; i<DIV; i++ ){
     alpha = 1 - 2 * myabs( (double)i / DIV - 0.5 );
-    brightB( &pm, &dat, alpha );
+    brightB( pm, &dat, alpha );
     zxImageDrawAll( &win, &dat, 0, 0 );
     zxFlush();
     usleep( 100000 );
   }
   for( i=0; i<DIV; i++ ){
     alpha = 1 - 2 * myabs( (double)i / DIV - 0.5 );
-    bright( &pm, &dat, alpha );
+    bright( pm, &dat, alpha );
     zxImageDrawAll( &win, &dat, 0, 0 );
     zxFlush();
     usleep( 100000 );

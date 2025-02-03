@@ -44,7 +44,6 @@ int zxImageReadJPEG(FILE *fp, zxImage *img)
   JSAMPARRAY jb;
   int colsize, result = 0;
   void (* conv)(zxPixelManip*, ubyte*, int, int, int, ubyte *);
-  zxPixelManip pm;
 
   cinfo.err = jpeg_std_error( &pub );
   pub.error_exit = _zx_jpg_error_exit;
@@ -55,27 +54,25 @@ int zxImageReadJPEG(FILE *fp, zxImage *img)
 
   colsize = cinfo.output_width * cinfo.output_components;
   jb = (*cinfo.mem->alloc_sarray)( (j_common_ptr)&cinfo, JPOOL_IMAGE, colsize, 1 );
-  switch( zxImageBPPDefault() ){
+  if( !zxImageAllocDefault( img, cinfo.output_width, cinfo.output_height ) ){
+    ZRUNERROR( "cannot allocate enough memory for a JPEG image" );
+    goto TERMINATE;
+  }
+  switch( img->bpp ){
   case 2:
     conv = _zx_jpg_conv16;
-    zxPixelManipSet( &pm, 16 );
     break;
   case 4:
     conv = _zx_jpg_conv32;
-    zxPixelManipSetDefault( &pm );
     break;
   default:
-    ZRUNERROR( "unsupported color depth" );
-    goto TERMINATE;
-  }
-  if( !zxImageAllocDefault( img, cinfo.output_width, cinfo.output_height ) ){
-    ZRUNERROR( "cannot allocate enough memory for JPEG image" );
+    ZRUNERROR( "unsupported color depth %d", img->bpp );
     goto TERMINATE;
   }
   for( y=0; cinfo.output_scanline < (unsigned)img->height; y++ ){
     jpeg_read_scanlines( &cinfo, jb, 1 );
     for( x=0, i=0; i<colsize; i+=cinfo.output_components, x++ )
-      (*conv)( &pm, img->buf, img->width, x, y, &jb[0][i] );
+      (*conv)( img->pm, img->buf, img->width, x, y, &jb[0][i] );
   }
   jpeg_finish_decompress( &cinfo );
   result = 1;
@@ -104,7 +101,6 @@ int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality)
   struct jpeg_compress_struct cinfo;
   struct jpeg_error_mgr jerr;
   JSAMPARRAY buf;
-  zxPixelManip pm;
   uint i, j;
   int ret = 1;
 
@@ -125,11 +121,10 @@ int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality)
     ret = 0;
     goto TERMINATE;
   }
-  zxPixelManipSetDefault( &pm );
   for( i=0; i<img->height; i++ )
     if( ( buf[i] = (JSAMPROW)malloc( sizeof(JSAMPLE)*img->width*3 ) ) )
       for( j=0; j<img->width; j++ )
-        zxImageCellRGB( img, &pm, j, i, &buf[i][j*3], &buf[i][j*3+1], &buf[i][j*3+2] );
+        zxImageCellRGB( img, j, i, &buf[i][j*3], &buf[i][j*3+1], &buf[i][j*3+2] );
   jpeg_write_scanlines( &cinfo, buf, img->height );
   for( i=0; i<img->height; i++ ) free( buf[i] );
 

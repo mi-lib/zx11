@@ -21,6 +21,7 @@ __BEGIN_DECLS
 typedef struct{
   uint width, height;
   ubyte bpp; /* byte per pixel */
+  zxPixelManip *pm; /* pixel manipulator */
   ubyte *buf;
   ubyte *mask_buf; /* mask buffer */
 } zxImage;
@@ -38,40 +39,36 @@ zxPixel zxImageCellPixelCheck(zxImage *img, uint x, uint y);
 void zxImageCellFromPixel(zxImage *img, uint x, uint y, zxPixel pixel);
 void zxImageCellFromPixelCheck(zxImage *img, uint x, uint y, zxPixel pixel);
 
-#define zxImageCellRGB(img,pm,x,y,r,g,b) \
-  (pm)->PixelRGB( zxImageCellPixel(img,x,y), r, g, b )
-#define zxImageCellFRGB(img,pm,x,y,r,g,b) \
-  (pm)->PixelFRGB( zxImageCellPixel(img,x,y), r, g, b )
-ubyte zxImageCellGS(zxImage *img, zxPixelManip *pm, uint x, uint y);
-#define zxImageCellFromRGB(img,pm,x,y,r,g,b) \
-  zxImageCellFromPixel( img, x, y, (pm)->PixelFromRGB(r,g,b) )
-#define zxImageCellFromGS(img,pm,x,y,v) \
-  zxImageCellFromPixel( img, x, y, zxPixelFromGS(pm,v) )
-#define zxImageCellFromFRGB(img,pm,x,y,r,g,b) \
-  zxImageCellFromPixel( img, x, y, (pm)->PixelFromFRGB(r,g,b) )
-#define zxImageCellNegate(img,pm,x,y) \
-  zxPixelNegate( pm, zxImageCellPixel(img,x,y) )
+#define zxImageCellRGB(img,x,y,r,g,b) \
+  (img)->pm->PixelRGB( zxImageCellPixel(img,x,y), r, g, b )
+#define zxImageCellFRGB(img,x,y,r,g,b) \
+  (img)->pm->PixelFRGB( zxImageCellPixel(img,x,y), r, g, b )
+ubyte zxImageCellGS(zxImage *img, uint x, uint y);
+#define zxImageCellFromRGB(img,x,y,r,g,b) \
+  zxImageCellFromPixel( img, x, y, (img)->pm->PixelFromRGB(r,g,b) )
+#define zxImageCellFromGS(img,x,y,v) \
+  zxImageCellFromPixel( img, x, y, zxPixelFromGS((img)->pm,v) )
+#define zxImageCellFromFRGB(img,x,y,r,g,b) \
+  zxImageCellFromPixel( img, x, y, (img)->pm->PixelFromFRGB(r,g,b) )
+#define zxImageCellNegate(img,x,y) \
+  zxPixelNegate( (img)->pm, zxImageCellPixel(img,x,y) )
 
 #define zxImageMaskAddr(img,x,y)  ((img)->mask_buf+((img)->width*(y)+(x)))
 #define zxImageMask(img,x,y)      *zxImageMaskAddr(img,x,y)
 #define zxImageSetMask(img,x,y,m) ( zxImageMask(img,x,y) = (m) )
 
-ubyte zxImageBPP(ubyte depth);
-#define zxImageBPPDefault() zxImageBPP( zxdepth )
-
 /* buffer manipulation */
 
 zxImage *zxImageInit(zxImage *img);
 zxImage *zxImageAlloc(zxImage *img, uint width, uint height, ubyte depth);
-#define zxImageAllocDefault(img,w,h) zxImageAlloc( img, w, h, zxdepth )
+#define zxImageAllocDefault(img,w,h)  zxImageAlloc( img, w, h, zxdepth )
 zxImage *zxImageAllocMask(zxImage *img);
 zxImage *zxImageCreateMask(zxImage *img, zxPixel mask);
-#define zxImageCreateMaskDefault(img) \
-  zxImageCreateMask( img, WhitePixel( zxdisplay, 0 ) )
+#define zxImageCreateMaskDefault(img) zxImageCreateMask( img, WhitePixel( zxdisplay, 0 ) )
 zxImage *zxImageDestroy(zxImage *img);
 zxImage *zxImageClear(zxImage *img);
 zxImage *zxImageFill(zxImage *img, zxPixel pixel);
-int zxImageSizeEqual(zxImage *d1, zxImage *d2);
+bool zxImageSizeEqual(zxImage *img1, zxImage *img2);
 zxImage *zxImageCopy(zxImage *src, zxImage *dest);
 zxImage *zxImageClone(zxImage *src, zxImage *dest);
 
@@ -106,14 +103,23 @@ zxImage *zxImageResize(zxImage *src, zxImage *dest);
 zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bimg);
 zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest);
 zxImage *zxImageNegate(zxImage *src, zxImage *dest);
-zxImage *zxImageToneDown(zxImage *src, zxImage *dest, double rate);
+
+zxImage *zxImageBrighten(zxImage *src, zxImage *dest, double rate);
+zxImage *zxImageContrast(zxImage *src, zxImage *dest, double rate);
+zxImage *zxImageCorrectGamma(zxImage *src, zxImage *dest, double gamma);
+
 zxImage *zxImageNormalize(zxImage *src, zxImage *dest);
 zxImage *zxImageEqualize(zxImage *src, zxImage *dest);
+
 zxImage *zxImageDither(zxImage *src, zxImage *dest);
 
 #define zxImageGrayscalizeDRC(img)   zxImageGrayscalize( img, img )
 #define zxImageNegateDRC(img)        zxImageNegate( img, img )
-#define zxImageToneDownDRC(img,rate) zxImageToneDown( img, img, rate )
+
+#define zxImageBrightenDRC(img,rate)      zxImageBrighten( img, img, rate )
+#define zxImageContrastDRC(img,rate)      zxImageContrast( img, img, rate )
+#define zxImageCorrectGammaDRC(img,gamma) zxImageCorrectGamma( img, img, gamma )
+
 #define zxImageNormalizeDRC(img)     zxImageNormalize( img, img )
 #define zxImageEqualizeDRC(img)      zxImageEqualize( img, img )
 #define zxImageDitherDRC(img)        zxImageDither( img, img )
@@ -155,13 +161,11 @@ zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, zxImage *src, uint t
 /* normal map */
 
 #define _zxNormalize(x) ( 0.5 * ( (x) + 1.0 ) )
-void zxImageNormalVec(zxImage *img, zxPixelManip *pm, double depth, uint j, uint i, double *x, double *y, double *z);
+void zxImageNormalVec(zxImage *img, double depth, uint j, uint i, double *x, double *y, double *z);
 zxImage *zxImageNormalMap(zxImage *src, double depth, zxImage *dest);
 
 /* special effect */
 
-zxPixel zxImageCellAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h);
-zxImage *zxImageAverage(zxImage *img, zxPixelManip *pm, uint x, uint y, uint w, uint h);
 zxImage *zxImageMosaic(zxImage *img, uint x, uint y, uint w, uint h, uint nx, uint ny);
 
 /* drawing */

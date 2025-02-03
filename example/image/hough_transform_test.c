@@ -20,8 +20,10 @@ int main(int argc, char *argv[])
   zxImageDrawAll( &win, &src, 0, 0 );
   zxFlush();
 
+  eprintf( "in progress..." );
   zxImageHoughLines( &bin_list, &src, theta_div, dist_div );
-  zxWindowSetColorByName( &win, "green" );
+  eprintf( "done.\n" );
+  zxWindowSetColorByName( &win, "red" );
   for( cp=zListTail(&bin_list), i=0; i<n; i++, cp=zListCellNext(cp) ){
     printf( "theta = %g, dist = %g\n", cp->data.theta, cp->data.dist );
     s = sin( cp->data.theta );

@@ -6,7 +6,7 @@ enum{
   ZXMAGV_OPTION_GEOMETRY = 0,
   ZXMAGV_OPTION_INFO,
   ZXMAGV_OPTION_GRAYSCALE,
-  ZXMAGV_OPTION_TONE,
+  ZXMAGV_OPTION_BRIGHTNESS,
   ZXMAGV_OPTION_FG,
   ZXMAGV_OPTION_BG,
   ZXMAGV_OPTION_SILENT,
@@ -21,7 +21,7 @@ zOption opt[] = {
   { "geometry", "geometry", "<window geometry>", "window geometry", NULL, false },
   { "info", "info", NULL, "output information of MAG file(s) to the standard output", NULL, false },
   { "gray", "gray", NULL, "grayscalize images", NULL, false },
-  { "tone", "tone", "<value (0-100)>", "set tone of images", "100", false },
+  { "brightness", "brightness", "<value (0-2)>", "set brightness of images", "1.0", false },
   { "fg", "fg", "<color>", "foreground color", "white", false },
   { "bg", "bg", "<color>", "background color", "black", false },
   { "silent", "silent", NULL, "silent mode", NULL, true },
@@ -122,8 +122,8 @@ int zxmagv_view(char *filename, zxRegion *reg)
   if( !zxImageAllocDefault( &dat, orgdat.width, orgdat.height ) ) goto TERMINATE2;
   if( opt[ZXMAGV_OPTION_GRAYSCALE].flag ){
     if( !zxImageGrayscalize( &orgdat, &dat ) ) goto TERMINATE1;
-  } else if( opt[ZXMAGV_OPTION_TONE].flag ){
-    if( !zxImageToneDown( &orgdat, &dat, 0.01*atof(opt[ZXMAGV_OPTION_TONE].arg) ) ) goto TERMINATE1;
+  } else if( opt[ZXMAGV_OPTION_BRIGHTNESS].flag ){
+    if( !zxImageBrighten( &orgdat, &dat, atof(opt[ZXMAGV_OPTION_BRIGHTNESS].arg) ) ) goto TERMINATE1;
   } else{
     if( !zxImageClone( &orgdat, &dat ) ) goto TERMINATE1;
   }

@@ -9,13 +9,16 @@ int main(int argc, char *argv[])
   if( zxImageReadFile( &src, argc > 1 ? argv[1] : "../fig/lena_mini.jpg" ) == 0 )
     exit( 1 );
   zxImageAllocDefault( &dst, src.width, src.height );
-  zxImageEqualize( &src, &dst );
   zxWindowCreateAndOpen( &win, 0, 0, src.width*2, src.height );
   zxImageDrawAll( &win, &src, 0, 0 );
-  zxImageDrawAll( &win, &dst, src.width, 0 );
+  zxImageCopy( &src, &dst );
+  zxImageMosaic( &dst,
+    0.2*dst.width, 0.2*dst.height,
+    0.6*dst.width, 0.6*dst.height, dst.width/30, dst.height/30 );
+  zxImageDrawAll( &win, &dst, dst.width, 0 );
+
   zxFlush();
   getchar();
-
   zxImageDestroy( &src );
   zxImageDestroy( &dst );
   zxExit();

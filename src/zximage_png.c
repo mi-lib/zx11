@@ -28,27 +28,23 @@ static ubyte **__zx_png_buf_alloc(zxImage *img)
   ubyte **buf, *bp;
   ulong byteperrow, destbpp;
   zxPixel pixel;
-  zxPixelManip src, dest;
+  zxPixelManip *dest;
 
-  destbpp = ZX_BIT_PER_BYTE * 3; /* for RGB(ordinally 24bpp) */
+  destbpp = ZX_BIT_PER_BYTE * 3; /* for RGB (ordinally 24bpp) */
   byteperrow = img->width * destbpp;
-  buf = zAlloc( ubyte*, img->height );
-  if( buf == NULL ){
+  if( !( buf = zAlloc( ubyte*, img->height ) ) ){
     ZRUNERROR( "cannot allocate buffer for PNG" );
     return NULL;
   }
-  zxPixelManipSetDefault( &src );
-  zxPixelManipSet( &dest, destbpp );
+  dest = zxPixelManipFind( destbpp );
   for( i=0; i<img->height; i++ ){
-    buf[i] = zAlloc( ubyte, byteperrow );
-    if( buf[i] == NULL )
+    if( !( buf[i] = zAlloc( ubyte, byteperrow ) ) )
       ZRUNERROR( "cannot allocate buffer for PNG" );
     else
       for( j=0; j<img->width; j++ ){
-        pixel = zxPixelConv( zxImageCellPixel( img, j, i ),
-          &src, &dest );
+        pixel = zxPixelConv( zxImageCellPixel( img, j, i ), img->pm, dest );
         bp = &buf[i][j*3];
-        dest.PixelRGB( pixel, bp, bp+1, bp+2 );
+        dest->PixelRGB( pixel, bp, bp+1, bp+2 );
       }
   }
   return buf;
@@ -68,8 +64,7 @@ int zxPNGCheckFile(const char *filename)
   FILE *fp;
   int result;
 
-  fp = fopen( filename, "rb" );
-  if( fp == NULL ){
+  if( !( fp = fopen( filename, "rb" ) ) ){
     ZOPENERROR( filename );
     return 0;
   }
@@ -86,13 +81,11 @@ static void _zxPNGInit(zxPNG *png)
 
 static int _zxPNGCreateInfo(zxPNG *png)
 {
-  png->info_ptr = png_create_info_struct( png->png_ptr );
-  if( png->info_ptr == NULL ){
+  if( !( png->info_ptr = png_create_info_struct( png->png_ptr ) ) ){
     ZRUNERROR( "cannot allocate PNG info" );
     return 0;
   }
-  png->end_ptr = png_create_info_struct( png->png_ptr );
-  if( png->end_ptr == NULL ){
+  if( !( png->end_ptr = png_create_info_struct( png->png_ptr ) ) ){
     ZRUNERROR( "cannot allocate PNG end info" );
     return 0;
   }
@@ -102,9 +95,8 @@ static int _zxPNGCreateInfo(zxPNG *png)
 /* read */
 static int _zxPNGCreateReadInfo(zxPNG *png)
 {
-  png->png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING,
-    NULL, NULL, NULL );
-  if( png->png_ptr == NULL ){
+  png->png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
+  if( !png->png_ptr ){
     ZRUNERROR( "cannot allocate PNG struct" );
     return 0;
   }
@@ -123,7 +115,7 @@ static int _zxPNGRead(zxImage *img, zxPNG *png, FILE *fp)
   int byteperrow, bpp;
   png_bytep buf;
   zxPixel pixel;
-  zxPixelManip src, dest;
+  zxPixelManip *src;
 
   /* create info */
   if( _zxPNGCreateReadInfo( png ) == 0 )
@@ -147,8 +139,7 @@ static int _zxPNGRead(zxImage *img, zxPNG *png, FILE *fp)
   bpp = byteperrow / width;
 
   /* allocate buffer */
-  buf = (png_bytep)malloc( byteperrow );
-  if( buf == NULL ){
+  if( !( buf = (png_bytep)malloc( byteperrow ) ) ){
     ZRUNERROR( "cannot allocate buffer for PNG" );
     return 0;
   }
@@ -159,15 +150,13 @@ static int _zxPNGRead(zxImage *img, zxPNG *png, FILE *fp)
   }
 
   /* read image */
-  zxPixelManipSet( &src, bpp * ZX_BIT_PER_BYTE );
-  zxPixelManipSetDefault( &dest );
+  src = zxPixelManipFind( bpp * ZX_BIT_PER_BYTE );
   for( i=0; i<height; i++ ){
     png_read_row( png->png_ptr, buf, NULL );
     for( j=0; j<width; j++ ){
       k = j * bpp;
-      pixel = src.PixelFromRGB( buf[k], buf[k+1], buf[k+2] );
-      zxImageCellFromPixel( img, j, i,
-        zxPixelConv( pixel, &src, &dest ) );
+      pixel = src->PixelFromRGB( buf[k], buf[k+1], buf[k+2] );
+      zxImageCellFromPixel( img, j, i, zxPixelConv( pixel, src, img->pm ) );
     }
   }
   png_read_end( png->png_ptr, png->info_ptr );
@@ -198,8 +187,7 @@ int zxImageReadPNGFile(zxImage *img, const char *filename)
   FILE *fp;
   int result = 0;
 
-  fp = fopen( filename, "rb" );
-  if( fp == NULL ){
+  if( !( fp = fopen( filename, "rb" ) ) ){
     ZOPENERROR( filename );
     return 0;
   }
@@ -211,9 +199,8 @@ int zxImageReadPNGFile(zxImage *img, const char *filename)
 /* write */
 static int _zxPNGCreateWriteInfo(zxPNG *png)
 {
-  png->png_ptr = png_create_write_struct( PNG_LIBPNG_VER_STRING,
-    NULL, NULL, NULL );
-  if( png->png_ptr == NULL ){
+  png->png_ptr = png_create_write_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
+  if( !png->png_ptr ){
     ZRUNERROR( "cannot allocate PNG struct" );
     return 0;
   }
@@ -233,11 +220,8 @@ static int _zxPNGWrite(zxImage *img, zxPNG *png, FILE *fp)
   /* create info */
   if( _zxPNGCreateWriteInfo( png ) == 0 )
     return 0; /* fail to create info struct */
-
   /* allocate buffer */
-  buf = __zx_png_buf_alloc( img );
-  if( buf == NULL ) return 0;
-
+  if( !( buf = __zx_png_buf_alloc( img ) ) ) return 0;
   /* write image */
   png_init_io( png->png_ptr, fp );
   png_set_IHDR( png->png_ptr, png->info_ptr, img->width, img->height,
@@ -268,8 +252,7 @@ int zxImageWritePNGFile(zxImage *img, const char *filename)
   FILE *fp;
   int result = 0;
 
-  fp = fopen( filename, "wb" );
-  if( fp == NULL ){
+  if( !( fp = fopen( filename, "wb" ) ) ){
     ZOPENERROR( filename );
     return 0;
   }

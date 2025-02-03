@@ -5,10 +5,8 @@ void test_disk_rasterize(zxImage *img, uint x, uint y, uint r, uint g)
 {
   int jmin, jmax, j, xj;
   int imin, imax, i, yi;
-  zxPixelManip pm;
   ubyte gp;
 
-  zxPixelManipSetDefault( &pm );
   imin =-r;
   imax = r;
   for( i=imin; i<=imax; i++ ){
@@ -16,8 +14,8 @@ void test_disk_rasterize(zxImage *img, uint x, uint y, uint r, uint g)
     jmin =-jmax;
     for( j=jmin; j<=jmax; j++ ){
       if( !zxImagePosIsValid( img, ( xj = x + j ), ( yi = y + i ) ) ) continue;
-      gp = zxImageCellGS( img, &pm, xj, yi );
-      zxImageCellFromGS( img, &pm, xj, yi, zMax(gp,2*g+100) );
+      gp = zxImageCellGS( img, xj, yi );
+      zxImageCellFromGS( img, xj, yi, zMax(gp,2*g+100) );
     }
   }
 }

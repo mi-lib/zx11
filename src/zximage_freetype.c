@@ -61,7 +61,7 @@ void zxFTImageUnloadFont(zxFTImage *font)
   FT_Done_Face( font->face );
 }
 
-static void _zxFTImagePutChar(zxImage *img, zxPixelManip *pm, zxFTImage *font, uword c, float red, float green, float blue)
+static void _zxFTImagePutChar(zxImage *img, zxFTImage *font, uword c, float red, float green, float blue)
 {
   FT_GlyphSlot slot;
   FT_UInt i, j, x, y;
@@ -77,7 +77,7 @@ static void _zxFTImagePutChar(zxImage *img, zxPixelManip *pm, zxFTImage *font, u
       if( j >= img->width || i >= img->height ) continue;
       val = slot->bitmap.buffer[i*slot->bitmap.width+j];
       if( val > 0 ){
-        zxImageCellFromFRGB( img, pm, x, y, red*val/(float)0xff, green*val/(float)0xff, blue*val/(float)0xff );
+        zxImageCellFromFRGB( img, x, y, red*val/(float)0xff, green*val/(float)0xff, blue*val/(float)0xff );
         img->mask_buf ? zxImageSetMask( img, x, y, 0xff ) : 0;
       }
     }
@@ -91,14 +91,12 @@ static void _zxFTImagePutChar(zxImage *img, zxPixelManip *pm, zxFTImage *font, u
 
 void zxImageDrawString(zxImage *img, zxFTImage *font, int x, int y, const uword *string, float red, float green, float blue)
 {
-  zxPixelManip pm;
   uword *cp;
 
-  zxPixelManipSetDefault( &pm );
   zxFTImageSetCoord( font, x, y, 0 );
   for( cp=(uword *)string; *cp; cp++ ){
     FT_Set_Transform( font->face, &font->matrix, &font->pen );
-    _zxFTImagePutChar( img, &pm, font, *cp, red, green, blue );
+    _zxFTImagePutChar( img, font, *cp, red, green, blue );
     _zxFTImageAdvance( font );
   }
 }

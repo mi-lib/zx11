@@ -143,7 +143,7 @@ static int _zxMAGReadPalette(zxMAGInfo *info)
 {
   uint32_t i;
   uint8_t r, g, b;
-  zxPixelManip src, dest;
+  zxPixelManip *src, *dest;
 
   switch( info->palettesize ){
   case 16:
@@ -165,8 +165,8 @@ static int _zxMAGReadPalette(zxMAGInfo *info)
     ZRUNERROR( "not enough memory for palette" );
     return 0;
   }
-  zxPixelManipSet( &src, info->depth );
-  zxPixelManipSetDefault( &dest );
+  src = zxPixelManipFind( info->depth );
+  dest = zxPixelManipDefault();
   for( i=0; i<info->palettesize; i++ ){
     _zxMAGReadData( info->fp, (char *)&g, 1 );
     _zxMAGReadData( info->fp, (char *)&r, 1 );
@@ -176,8 +176,7 @@ static int _zxMAGReadPalette(zxMAGInfo *info)
       g >>= 3;
       b >>= 3;
     }
-    info->palette[i] = zxPixelConv( src.PixelFromRGB(r,g,b),
-      &src, &dest );
+    info->palette[i] = zxPixelConv( src->PixelFromRGB(r,g,b), src, dest );
   }
   return 1;
 }
@@ -315,8 +314,7 @@ int zxImageReadMAG(FILE *fp, zxImage *img)
   _zxMAGReadComment( info.fp );
   _zxMAGReadHeader( &info );
   if( _zxMAGReadPalette( &info ) ){
-    if( zxImageAllocDefault( img,
-      info.xmax-info.xmin+1, info.ymax-info.ymin+1 ) ){
+    if( zxImageAllocDefault( img, info.xmax-info.xmin+1, info.ymax-info.ymin+1 ) ){
       if( _zxImageReadPixelMAG( img, &info ) )
         free( info.flag );
     }

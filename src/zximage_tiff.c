@@ -31,7 +31,6 @@ int zxImageReadTIFFFile(zxImage *img, const char *filename)
   ubyte bps, spp;
   uint *buf, p;
   ubyte r, g, b;
-  zxPixelManip pm;
   int ret = 1;
 
   if( !( tiff = TIFFOpen( filename, "r" ) ) ){
@@ -55,14 +54,13 @@ int zxImageReadTIFFFile(zxImage *img, const char *filename)
     goto TERMINATE;
   }
   zxImageAllocDefault( img, width, length );
-  zxPixelManipSetDefault( &pm );
   for( i=0; i<length; i++ )
     for( j=0; j<width; j++ ){
       p = buf[ width * (length - 1 - i) + j ];
       r = TIFFGetR( p );
       g = TIFFGetG( p );
       b = TIFFGetB( p );
-      zxImageCellFromRGB( img, &pm, j, i, r, g, b );
+      zxImageCellFromRGB( img, j, i, r, g, b );
     }
  TERMINATE:
   free( buf );
@@ -78,7 +76,6 @@ int zxImageWriteTIFFFile(zxImage *img, const char *filename, int cmpmethod)
   ubyte *buf, *p;
   uint i, j;
   int ret = 1;
-  zxPixelManip pm;
 
   if( !( tiff = TIFFOpen( filename, "w" ) ) ){
     ZOPENERROR( filename );
@@ -109,10 +106,9 @@ int zxImageWriteTIFFFile(zxImage *img, const char *filename, int cmpmethod)
 
   if( !( buf = zAlloc( ubyte, img->width*img->height*3 ) ) )
     zxTIFFError( tiff, "bad memory allocation" );
-  zxPixelManipSetDefault( &pm );
   for( p=buf, i=0; i<img->height; i++ )
     for( j=0; j<img->width; j++, p+=3 )
-      zxImageCellRGB( img, &pm, j, i, p, p+1, p+2 );
+      zxImageCellRGB( img, j, i, p, p+1, p+2 );
   if( TIFFWriteEncodedStrip( tiff, 0, buf, img->width * img->height * 3 ) < 0 ){
     ZRUNERROR( "failed to encode TIFF" );
     ret = 0;

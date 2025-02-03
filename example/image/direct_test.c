@@ -1,6 +1,16 @@
 #include <zm/zm.h>
 #include <zx11/zximage.h>
 
+void output_result(zxWindow *win, zxImage *src, zxImage *dst, zxImage *cpy, const char *effectname)
+{
+  zxImageDrawAll( win, src, 0, 0 );
+  zxImageDrawAll( win, dst, src->width, 0 );
+  zxImageDrawAll( win, cpy, src->width*2, 0 );
+  zxFlush();
+  printf( "%s ... %s", effectname, zxImageCmp( cpy, dst ) ? "OK" : "fail" );
+  getchar();
+}
+
 int main(int argc, char *argv[])
 {
   zxWindow win;
@@ -17,62 +27,42 @@ int main(int argc, char *argv[])
   zxImageGrayscalize( &src, &dst );
   zxImageCopy( &src, &cpy );
   zxImageGrayscalizeDRC( &cpy );
-  zxImageDrawAll( &win, &src, 0, 0 );
-  zxImageDrawAll( &win, &dst, src.width, 0 );
-  zxImageDrawAll( &win, &cpy, src.width*2, 0 );
-  zxFlush();
-  printf( "grayscalization ... %s", zxImageCmp( &cpy, &dst ) ? "OK" : "fail" );
-  getchar();
+  output_result( &win, &src, &dst, &cpy, "grayscalization" );
 
   zxImageNegate( &src, &dst );
   zxImageCopy( &src, &cpy );
   zxImageNegateDRC( &cpy );
-  zxImageDrawAll( &win, &src, 0, 0 );
-  zxImageDrawAll( &win, &dst, src.width, 0 );
-  zxImageDrawAll( &win, &cpy, src.width*2, 0 );
-  zxFlush();
-  printf( "negation ... %s", zxImageCmp( &cpy, &dst ) ? "OK" : "fail" );
-  getchar();
+  output_result( &win, &src, &dst, &cpy, "negation" );
 
-  zxImageToneDown( &src, &dst, 0.5 );
+  zxImageBrighten( &src, &dst, 1.5 );
   zxImageCopy( &src, &cpy );
-  zxImageToneDownDRC( &cpy, 0.5 );
-  zxImageDrawAll( &win, &src, 0, 0 );
-  zxImageDrawAll( &win, &dst, src.width, 0 );
-  zxImageDrawAll( &win, &cpy, src.width*2, 0 );
-  zxFlush();
-  printf( "Downtoning ... %s", zxImageCmp( &cpy, &dst ) ? "OK" : "fail" );
-  getchar();
+  zxImageBrightenDRC( &cpy, 1.5 );
+  output_result( &win, &src, &dst, &cpy, "brightness" );
+
+  zxImageContrast( &src, &dst, 1.5 );
+  zxImageCopy( &src, &cpy );
+  zxImageContrastDRC( &cpy, 1.5 );
+  output_result( &win, &src, &dst, &cpy, "contrasting" );
+
+  zxImageCorrectGamma( &src, &dst, 2.0 );
+  zxImageCopy( &src, &cpy );
+  zxImageCorrectGammaDRC( &cpy, 2.0 );
+  output_result( &win, &src, &dst, &cpy, "gamma correction" );
 
   zxImageNormalize( &src, &dst );
   zxImageCopy( &src, &cpy );
   zxImageNormalizeDRC( &cpy );
-  zxImageDrawAll( &win, &src, 0, 0 );
-  zxImageDrawAll( &win, &dst, src.width, 0 );
-  zxImageDrawAll( &win, &cpy, src.width*2, 0 );
-  zxFlush();
-  printf( "Normalization ... %s", zxImageCmp( &cpy, &dst ) ? "OK" : "fail" );
-  getchar();
+  output_result( &win, &src, &dst, &cpy, "normalization" );
 
   zxImageEqualize( &src, &dst );
   zxImageCopy( &src, &cpy );
   zxImageEqualizeDRC( &cpy );
-  zxImageDrawAll( &win, &src, 0, 0 );
-  zxImageDrawAll( &win, &dst, src.width, 0 );
-  zxImageDrawAll( &win, &cpy, src.width*2, 0 );
-  zxFlush();
-  printf( "Equalization ... %s", zxImageCmp( &cpy, &dst ) ? "OK" : "fail" );
-  getchar();
+  output_result( &win, &src, &dst, &cpy, "equalization" );
 
   zxImageDither( &src, &dst );
   zxImageCopy( &src, &cpy );
   zxImageDitherDRC( &cpy );
-  zxImageDrawAll( &win, &src, 0, 0 );
-  zxImageDrawAll( &win, &dst, src.width, 0 );
-  zxImageDrawAll( &win, &cpy, src.width*2, 0 );
-  zxFlush();
-  printf( "Dithering ... %s", zxImageCmp( &cpy, &dst ) ? "OK" : "fail" );
-  getchar();
+  output_result( &win, &src, &dst, &cpy, "dithering" );
 
   zxImageDestroy( &src );
   zxImageDestroy( &cpy );

@@ -37,12 +37,10 @@ zxImage *zxImageFromMagickWand(zxImage *img, MagickWand *wand)
   PixelWand **pixels;
   unsigned long int w;
   long int i, j;
-  zxPixelManip pm;
 
   _MagickWandGenesis();
   if( !zxImageAllocDefault( img, MagickGetImageWidth(wand), MagickGetImageHeight(wand) ) )
     return NULL;
-  zxPixelManipSetDefault( &pm );
   if( !( iterator = NewPixelIterator( wand ) ) )
     _MagickWandThrowException( wand );
   for( i=0; i<img->height; i++ ){
@@ -52,7 +50,7 @@ zxImage *zxImageFromMagickWand(zxImage *img, MagickWand *wand)
     }
     for( j=0; j<img->width; j++ ){
       PixelGetMagickColor( pixels[j], &pixel );
-      zxImageCellFromRGB( img, &pm, j, i, pixel.red, pixel.green, pixel.blue );
+      zxImageCellFromRGB( img, j, i, pixel.red, pixel.green, pixel.blue );
     }
     PixelSyncIterator( iterator );
   }
@@ -66,7 +64,6 @@ MagickWand *zxImageToMagickWand(zxImage *img, MagickWand *wand)
   PixelIterator *iterator;
   PixelWand *dummy_pixel;
   PixelWand **pixels;
-  zxPixelManip pm;
   long int i, j;
   unsigned long int w;
   float r, g, b;
@@ -82,11 +79,10 @@ MagickWand *zxImageToMagickWand(zxImage *img, MagickWand *wand)
     _MagickWandThrowException( wand );
     return NULL;
   }
-  zxPixelManipSetDefault( &pm );
   for( i=0; i<img->height; i++ ){
     if( !( pixels = PixelGetNextIteratorRow( iterator, &w ) ) || w != img->width ) break;
     for( j=0; j<img->width; j++ ){
-      zxImageCellFRGB( img, &pm, j, i, &r, &g, &b );
+      zxImageCellFRGB( img, j, i, &r, &g, &b );
       PixelSetMagickColor( pixels[j], _MagickPixelPacketFromNormalizedFloat( &pixel, r, g, b ) );
     }
     PixelSyncIterator( iterator );

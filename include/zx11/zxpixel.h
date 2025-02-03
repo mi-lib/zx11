@@ -41,8 +41,8 @@ typedef struct{
   zxPixel (*PixelNegate)(zxPixel p);
 } zxPixelManip;
 
-zxPixelManip *zxPixelManipSet(zxPixelManip *pm, int depth);
-#define zxPixelManipSetDefault(p)  zxPixelManipSet(p,zxdepth)
+zxPixelManip *zxPixelManipFind(int depth);
+#define zxPixelManipDefault() zxPixelManipFind( zxdepth )
 
 zxPixel zxPixelConv(zxPixel pixel, zxPixelManip *src, zxPixelManip *dest);
 zxPixel zxPixelBlend(zxPixelManip *pm, zxPixel p[], double w[], uint n);

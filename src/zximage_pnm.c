@@ -37,97 +37,97 @@ bool zxImageFileIsPNM(const char *filename)
 
 /* input of PNM file */
 
-static zxPixelManip _zx_pnm_pm;
+typedef struct{
+  ubyte *buf;
+  uint rowsize;
+  uint current_bit;
+  ubyte mask;
+} zxPBM;
 
 /* PBM (Portable Bitmap), ASCII mode */
-static void _zxImageReadPBMASCII(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPBMASCII(FILE *fp, zxImage *img, int x, int y, zxPBM *dummy)
 {
-  int dummy;
+  int dummyval;
   ubyte val;
 
-  val = zFInt( fp, &dummy ) ? 0 : 0xff;
-  zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, val, val, val );
+  val = zFInt( fp, &dummyval ) ? 0 : 0xff;
+  zxImageCellFromRGB( img, x, y, val, val, val );
 }
 
 /* PBM (Portable Bitmap), binary mode */
-static ubyte *__zx_pbm_buf = NULL;
-static uint __zx_pbm_rowsize = 0;
-static bool _zxImageCreatePBMBuf(uint width)
+static bool _zxImageCreatePBMBuf(zxPBM *pbm, uint width)
 {
-  __zx_pbm_rowsize = width / 8 + ( ( width % 8 ) ? 1 : 0 );
-  if( !( __zx_pbm_buf = zAlloc( ubyte, __zx_pbm_rowsize ) ) ){
+  pbm->rowsize = width / 8 + ( ( width % 8 ) ? 1 : 0 );
+  if( !( pbm->buf = zAlloc( ubyte, pbm->rowsize ) ) ){
     ZALLOCERROR();
     return false;
   }
   return true;
 }
 
-static void _zxImageDestroyPBMBuf(void)
+static void _zxImageDestroyPBMBuf(zxPBM *pbm)
 {
-  zFree( __zx_pbm_buf );
+  zFree( pbm->buf );
 }
 
-static void _zxImageReadPBMBIN(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPBMBIN(FILE *fp, zxImage *img, int x, int y, zxPBM *pbm)
 {
-  static uint k=0;
-  static ubyte mask=0x80;
   ubyte val;
 
   if( x == 0 ){
-    k = 0;
-    mask = 0x80;
-    if( fread( __zx_pbm_buf, 1, __zx_pbm_rowsize, fp ) != 1 );
+    pbm->current_bit = 0;
+    pbm->mask = 0x80;
+    if( fread( pbm->buf, 1, pbm->rowsize, fp ) != 1 );
   }
-  val = __zx_pbm_buf[k] & mask ? 0 : 0xff;
-  zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, val, val, val );
-
-  if( ( mask >>= 1 ) == 0 ){
-    mask = 0x80;
-    k++;
+  val = pbm->buf[pbm->current_bit] & pbm->mask ? 0 : 0xff;
+  zxImageCellFromRGB( img, x, y, val, val, val );
+  if( ( pbm->mask >>= 1 ) == 0 ){
+    pbm->mask = 0x80;
+    pbm->current_bit++;
   }
 }
 
 /* PGM (Portable Graymap), ASCII mode */
-static void _zxImageReadPGMASCII(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPGMASCII(FILE *fp, zxImage *img, int x, int y, zxPBM *dummy)
 {
   int val;
 
   zFInt( fp, &val );
-  zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, (ubyte)val, (ubyte)val, (ubyte)val );
+  zxImageCellFromRGB( img, x, y, (ubyte)val, (ubyte)val, (ubyte)val );
 }
 
 /* PGM (Portable Graymap), binary mode */
-static void _zxImageReadPGMBIN(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPGMBIN(FILE *fp, zxImage *img, int x, int y, zxPBM *dummy)
 {
   ubyte val;
 
   if( fread( &val, 1, 1, fp ) != 1 );
-  zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, val, val, val );
+  zxImageCellFromRGB( img, x, y, val, val, val );
 }
 
 /* PPM (Portable Pixmap), ASCII mode */
-static void _zxImageReadPPMASCII(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPPMASCII(FILE *fp, zxImage *img, int x, int y, zxPBM *dummy)
 {
   int r, g, b;
 
   zFInt( fp, &r );
   zFInt( fp, &g );
   zFInt( fp, &b );
-  zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, (ubyte)r, (ubyte)g, (ubyte)b );
+  zxImageCellFromRGB( img, x, y, (ubyte)r, (ubyte)g, (ubyte)b );
 }
 
 /* PPM (Portable Pixmap), binary mode */
-static void _zxImageReadPPMBIN(FILE *fp, zxImage *img, int x, int y)
+static void _zxImageReadPPMBIN(FILE *fp, zxImage *img, int x, int y, zxPBM *dummy)
 {
   ubyte r, g, b;
 
   if( fread( &r, 1, 1, fp ) != 1 );
   if( fread( &g, 1, 1, fp ) != 1 );
   if( fread( &b, 1, 1, fp ) != 1 );
-  zxImageCellFromRGB( img, &_zx_pnm_pm, x, y, r, g, b );
+  zxImageCellFromRGB( img, x, y, r, g, b );
 }
 
-static void (* __zximage_pnm_read_pixel[])(FILE *, zxImage *, int, int) = {
+static void (* __zximage_pnm_read_pixel[])(FILE *, zxImage *, int, int, zxPBM *) = {
   NULL /* dummy */,
   _zxImageReadPBMASCII,
   _zxImageReadPGMASCII,
@@ -184,7 +184,8 @@ int zxImageReadPNM(FILE *fp, zxImage *img)
 {
   uint i, j;
   ubyte type;
-  void (* read_pixel)(FILE *, zxImage *, int, int);
+  zxPBM pbm;
+  void (* read_pixel)(FILE *, zxImage *, int, int, zxPBM *);
 
   zxImageInit( img );
   if( ( type = zxImageReadPNMHeader( fp, img ) ) == ZX_PNM_INVALID ){
@@ -192,21 +193,21 @@ int zxImageReadPNM(FILE *fp, zxImage *img)
     return 0;
   }
   /* PBM requires raster buffer for each row */
-  if( type == ZX_PBM_BIN && !_zxImageCreatePBMBuf( img->width ) ) return 0;
+  if( type == ZX_PBM_BIN && !_zxImageCreatePBMBuf( &pbm, img->width ) ) return 0;
 
   read_pixel = __zximage_pnm_read_pixel[type];
   if( !( img->buf = zAlloc( ubyte, img->width*img->height*img->bpp ) ) ){
     ZRUNERROR( "cannot allocate enough memory for image buffer" );
     return 0;
   }
-  zxPixelManipSetDefault( &_zx_pnm_pm );
+  img->pm = zxPixelManipDefault();
   for( i=0; i<img->height; i++ )
     for( j=0; j<img->width; j++ )
-      read_pixel( fp, img, j, i );
+      read_pixel( fp, img, j, i, &pbm );
 
   /* freeing raster buffer for PBM */
   if( type == ZX_PBM_BIN )
-    _zxImageDestroyPBMBuf();
+    _zxImageDestroyPBMBuf( &pbm );
   return 1;
 }
 
@@ -237,10 +238,9 @@ int zxImageWritePBM(FILE *fp, zxImage *img)
   fprintf( fp, "P4\n" ); /* magic number for PBM */
   fprintf( fp, "# data generated by ZX11\n" );
   fprintf( fp, "%d %d\n", img->width, img->height );
-  zxPixelManipSetDefault( &_zx_pnm_pm );
   for( i=0; i<img->height; i++ ){
     for( mask=0x80, val=0, j=0; j<img->width; j++ ){
-      zxImageCellRGB( img, &_zx_pnm_pm, j, i, &r, &g, &b );
+      zxImageCellRGB( img, j, i, &r, &g, &b );
       if( r < _ZX_PBM_THRESHOLD && g < _ZX_PBM_THRESHOLD && b < _ZX_PBM_THRESHOLD )
         val |= mask;
       if( ( mask >>= 1 ) == 0 ){
@@ -278,10 +278,9 @@ int zxImageWritePGM(FILE *fp, zxImage *img)
   fprintf( fp, "# data generated by ZX11\n" );
   fprintf( fp, "%d %d\n", img->width, img->height );
   fprintf( fp, "255\n" );
-  zxPixelManipSetDefault( &_zx_pnm_pm );
   for( i=0; i<img->height; i++ )
     for( j=0; j<img->width; j++ ){
-      zxImageCellRGB( img, &_zx_pnm_pm, j, i, &r, &g, &b );
+      zxImageCellRGB( img, j, i, &r, &g, &b );
       val = ( r + g + b ) / 3;
       fwrite( &val, 1, 1, fp );
     }
@@ -311,10 +310,9 @@ int zxImageWritePPM(FILE *fp, zxImage *img)
   fprintf( fp, "# data generated by ZX11\n" );
   fprintf( fp, "%d %d\n", img->width, img->height );
   fprintf( fp, "255\n" );
-  zxPixelManipSetDefault( &_zx_pnm_pm );
   for( i=0; i<img->height; i++ )
     for( j=0; j<img->width; j++ ){
-      zxImageCellRGB( img, &_zx_pnm_pm, j, i, &r, &g, &b );
+      zxImageCellRGB( img, j, i, &r, &g, &b );
       fwrite( &r, 1, 1, fp );
       fwrite( &g, 1, 1, fp );
       fwrite( &b, 1, 1, fp );
