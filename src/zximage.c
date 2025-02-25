@@ -892,6 +892,37 @@ zxImage *zxImageAntialias(zxImage *src, zxImage *dest)
   return zxImageFilter( src, dest, weight, 3 );
 }
 
+zxImage *zxImageSmoothBilateral(zxImage *src, zxImage *dest)
+{
+  double weight[] = {
+    0.0625, 0.1250, 0.0625,
+    0.1250, 0.2500, 0.1250,
+    0.0625, 0.1250, 0.0625,
+  };
+  double filter[9], diff, den;
+  zxPixel p[9];
+  uint x, y, w, h;
+  float r1, g1, b1, r0, g0, b0;
+  int i, j, k;
+  const double beta = 2 * 0.1 * 0.1;
+
+  zxImageCanvasRange( dest, src, 0, 0, &w, &h );
+  for( y=0; y<h; y++ )
+    for( x=0; x<w; x++ ){
+      _zxImageFilterPickPixel( src, x, y, w, h, 3, p, 1 );
+      src->pm->PixelFRGB( p[4], &r0, &g0, &b0 );
+      for( den=0, k=0, i=0; i<3; i++ )
+        for( j=0; j<3; j++, k++ ){
+          src->pm->PixelFRGB( p[k], &r1, &g1, &b1 );
+          diff = (r1-r0)*(r1-r0) + (g1-g0)*(g1-g0) + (b1-b0)*(b1-b0);
+          den += ( filter[k] = weight[k] * exp( -diff/beta ) );
+        }
+      for( k=0; k<9; k++ ) filter[k] /= den;
+      zxImageCellFromPixel( dest, x, y, zxPixelBlend( dest->pm, p, filter, 9 ) );
+    }
+  return dest;
+}
+
 /* edge detection */
 
 zxImage *zxImageDiff(zxImage *src, zxImage *dest)

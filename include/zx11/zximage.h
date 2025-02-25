@@ -147,6 +147,7 @@ zxImage *zxImageSmoothMin(zxImage *src, zxImage *dest, int size);
 zxImage *zxImageSmoothMax(zxImage *src, zxImage *dest, int size);
 zxImage *zxImageSmoothGaussian(zxImage *src, zxImage *dest);
 zxImage *zxImageAntialias(zxImage *src, zxImage *dest);
+zxImage *zxImageSmoothBilateral(zxImage *src, zxImage *dest);
 
 /* edge detection */
 
