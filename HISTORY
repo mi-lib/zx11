@@ -1,3 +1,4 @@
+2025.03.21. Modified _zxImageSmoothFilterKey, _zxImageEdgeFilterGet4Pixels and _zxImageEdgeFilter to correct signedness of coordinate variables. [zximage]
 2025.02.25. Added zxImageSmoothBilateral. [zximage]
 2025.02.03. Added error diffusion method with Floyd-Steinberg distribution for dithering. [zximage]
 2025.02.03. Renamed zxImageSmoothMedian, zxImageRangeMin, zxImageRangeMax, and zxImageGaussian to zxImageSmoothMedian, zxImageSmoothMin, zxImageSmoothMax, and zxImageSmoothGaussian, respectively. [zximage]

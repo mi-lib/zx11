@@ -810,7 +810,7 @@ static int _zx11_smooth_filter_cmp(void *v1, void *v2, void *dummy)
   return 0;
 }
 
-static void _zxImageSmoothFilterKey(zxImage *img, int j, int i, ubyte *rs, ubyte *gs, ubyte *bs, uint size, ubyte *r, ubyte *g, ubyte *b, int key)
+static void _zxImageSmoothFilterKey(zxImage *img, uint j, uint i, ubyte *rs, ubyte *gs, ubyte *bs, uint size, ubyte *r, ubyte *g, ubyte *b, int key)
 {
   uint _i, _j, si, sj, k;
   int s2, sh;
@@ -1043,9 +1043,9 @@ zxImage *zxImageEdgeLaplacian(zxImage *src, zxImage *dest)
   return zxImageFilter( src, dest, weight, 3 );
 }
 
-static void _zxImageEdgeFilterGet4Pixels(zxImage *img, int j, int i, float r[4], float g[4], float b[4])
+static void _zxImageEdgeFilterGet4Pixels(zxImage *img, uint j, uint i, float r[4], float g[4], float b[4])
 {
-  int j1, i1;
+  uint j1, i1;
 
   j1 = j < img->width  - 1 ? j + 1 : j;
   i1 = i < img->height - 1 ? i + 1 : i;
@@ -1067,7 +1067,7 @@ static float _zxImageEdgeForsenPixelVal(float val[4])
 
 static zxImage *_zxImageEdgeFilter(zxImage *src, zxImage *dest, float (* pixel_val)(float val[4]))
 {
-  int i, j;
+  uint i, j;
   float r[4], g[4], b[4];
   float val;
 
