@@ -10,13 +10,11 @@ int main(int argc, char *argv[])
 {
   zxWindow c;
   zxImage img;
-  zxPixelManip pm;
-  register int i, j;
+  int i, j;
   double x, y, zx, zy, r, t, u, v;
 
   zxInit();
   zxImageAllocDefault( &img, 700, 500 );
-  zxPixelManipSetDefault( &pm );
   x = y = 0;
   for( i=1; i<=W; i++ ){
     for( j=1; j<=W; j++ ){
@@ -29,7 +27,7 @@ int main(int argc, char *argv[])
       y = r * sin( t );
       u = ( x + 4 ) * K - 350;
       v = ( 2 - y ) * K - 100;
-      zxImageCellFromRGB( &img, &pm, u, v, 0xff, 0xff, 0xff );
+      zxImageCellFromRGB( &img, u, v, 0xff, 0xff, 0xff );
     }
   }
   zxWindowCreateAndOpen( &c, 100, 100, 700, 500 );

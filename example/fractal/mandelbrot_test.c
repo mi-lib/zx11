@@ -19,7 +19,7 @@ static zxPixel c_pix[C_NUM];
 int mandelbrot_pixel(zxImage *img, int x, int y)
 {
   double cx, cy, sx, sy, zx=0, zy=0;
-  register int i;
+  int i;
 
   cx = ( x - mandelbrot_ox ) * ratio_x;
   cy = ( y - mandelbrot_oy ) * ratio_y;
@@ -36,7 +36,7 @@ int mandelbrot_pixel(zxImage *img, int x, int y)
 
 void mandelbrot_img(zxImage *img)
 {
-  register int i, j;
+  int i, j;
 
   for( i=0; i<=wx; i++ )
     for( j=0; j<=wy; j++ )
@@ -45,18 +45,18 @@ void mandelbrot_img(zxImage *img)
 
 void mandelbrot_color_init(void)
 {
-  register zxPixel r, g, b;
-  register int i;
-  zxPixelManip pm;
+  zxPixel r, g, b;
+  zxPixelManip *pm;
+  int i;
   double phase_base;
 
-  zxPixelManipSetDefault( &pm );
+  pm = zxPixelManipDefault();
   for( i=0; i<C_NUM; i++ ){
     phase_base = (double)i/C_NUM;
     r = 0xff * exp(-phase_base*10);
     g = 0xff * 0.5*( 1 - cos( 2*PI*pow(phase_base,0.7) ) );
     b = 0xff * zMin(1.2*phase_base,1);
-    c_pix[i] = pm.PixelFromRGB( r, g, b );
+    c_pix[i] = pm->PixelFromRGB( r, g, b );
   }
 }
 
@@ -75,7 +75,7 @@ void mandelbrot_draw(zxWindow *parent, int x, int y)
 int julia_pixel(zxImage *img, int x, int y)
 {
   double sx, sy, zx, zy;
-  register int i;
+  int i;
 
   zx = ( x - julia_ox ) * ratio_x;
   zy = ( y - julia_oy ) * ratio_y;
@@ -94,7 +94,7 @@ int julia_pixel(zxImage *img, int x, int y)
 
 void julia_img(zxImage *img)
 {
-  register int i, j;
+  int i, j;
 
   for( i=0; i<=wx; i++ )
     for( j=0; j<=wy; j++ )
@@ -103,18 +103,18 @@ void julia_img(zxImage *img)
 
 void julia_color_init(double phase_offset)
 {
-  register zxPixel r, g, b;
-  register int i;
-  zxPixelManip pm;
+  zxPixel r, g, b;
+  zxPixelManip *pm;
+  int i;
   double phase_base;
 
-  zxPixelManipSetDefault( &pm );
+  pm = zxPixelManipDefault();
   for( i=0; i<C_NUM; i++ ){
     phase_base = 2*PI*pow((double)i/C_NUM,0.5) + phase_offset;
     r = 0xff * 0.5*( cos( phase_base          ) + 1 );
     g = 0xff * 0.5*( cos( phase_base + PI  /4 ) + 1 );
     b = 0xff * 0.5*( cos( phase_base + PI*3/4 ) + 1 );
-    c_pix[i] = pm.PixelFromRGB( r, g, b );
+    c_pix[i] = pm->PixelFromRGB( r, g, b );
   }
 }
 

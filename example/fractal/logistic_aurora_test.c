@@ -21,7 +21,7 @@ double logistic_func(double r, double x)
 
 double logistic_put(double r, double x)
 {
-  register int i, j, k;
+  int i, j, k;
 
   for( i=0; i<LOOP; i++ ){
     x = logistic_func( r, x );
@@ -43,16 +43,14 @@ void logistic(void)
 
 void density_to_image(zxImage *img)
 {
-  register int i, j;
+  int i, j;
   ubyte p1, p2;
-  zxPixelManip pm;
 
-  zxPixelManipSetDefault( &pm );
   for( i=0; i<H; i++ )
     for( j=0; j<W; j++ ){
       p1 = zMin( dens[i][j] * 0xff, 0xff );
       p2 = zMin( 0.8*dens[i][j] * 0xff, 0xff );
-      zxImageCellFromRGB( img, &pm, j, i, p2, p1, p2 );
+      zxImageCellFromRGB( img, j, i, p2, p1, p2 );
     }
 }
 

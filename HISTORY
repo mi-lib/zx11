@@ -1,3 +1,7 @@
+2025.04.30. Modified some examples in example/fractal to conform to new specification of zxPixelManip and zxImage. [example]
+2025.04.30. Modified pixel_test in test to conform to new specification of zxPixelManip and zxImage. [test]
+2025.04.29. Modified makefile to conform to new specification of zeda-makefile-gen. [all]
+2025.04.29. Modified makefile in example. [example]
 2025.03.21. Modified _zxImageSmoothFilterKey, _zxImageEdgeFilterGet4Pixels and _zxImageEdgeFilter to correct signedness of coordinate variables. [zximage]
 2025.02.25. Added zxImageSmoothBilateral. [zximage]
 2025.02.03. Added error diffusion method with Floyd-Steinberg distribution for dithering. [zximage]
