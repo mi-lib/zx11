@@ -418,31 +418,31 @@ bool zxParseGeometry(char *str, zxRegion *reg)
   if( isdigit( str[0] ) ){
     switch( sscanf( str, "%hd%c%hd%c%hd%c%hd",
       &reg->width, &op[0], &reg->height, &op[1], &reg->x, &op[2], &reg->y ) ){
-    case 2: case 3: if( op[0] != 'x' ) goto ERROR; break;
-    case 1: case 4: case 6: goto ERROR;
+    case 2: case 3: if( op[0] != 'x' ) goto ZXPARSE_GEOMETRY_ERROR; break;
+    case 1: case 4: case 6: goto ZXPARSE_GEOMETRY_ERROR;
     default: ;
     }
   } else{
     if( str[0] == 'x' ){
       switch( sscanf( str, "%c%hd%c%hd%c%hd",
         &op[0], &reg->height, &op[1], &reg->x, &op[2], &reg->y ) ){
-      case 1: case 3: case 5: goto ERROR;
+      case 1: case 3: case 5: goto ZXPARSE_GEOMETRY_ERROR;
       default: ;
       }
     } else{
       switch( sscanf( str, "%c%hd%c%hd", &op[1], &reg->x, &op[2], &reg->y ) ){
-      case 1: case 3: goto ERROR;
+      case 1: case 3: goto ZXPARSE_GEOMETRY_ERROR;
       default: ;
       }
     }
   }
   if( op[1] == '-' ) reg->x = -reg->x;
-  else if( op[1] != '+' ) goto ERROR;
+  else if( op[1] != '+' ) goto ZXPARSE_GEOMETRY_ERROR;
   if( op[2] == '-' ) reg->y = -reg->y;
-  else if( op[2] != '+' ) goto ERROR;
+  else if( op[2] != '+' ) goto ZXPARSE_GEOMETRY_ERROR;
   return true;
 
- ERROR:
+ ZXPARSE_GEOMETRY_ERROR:
   ZRUNERROR( "invalid geometry expression: %s", str );
   return false;
 }
