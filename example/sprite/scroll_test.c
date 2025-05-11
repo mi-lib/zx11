@@ -11,7 +11,7 @@ zxVec d = { 1, 0 };
 
 void *draw(void *dummy)
 {
-  register int j=0, id=0;
+  int j=0, id=0;
 
   while( 1 ){
     zxsPatternSet( zListHead(&layer.data.plist), 0, id );

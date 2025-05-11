@@ -4,7 +4,7 @@
 
 int main(void)
 {
-  register int i;
+  int i;
   char **fname;
   int n;
   XFontStruct *fs;

@@ -1,3 +1,4 @@
+2025.05.11. Removed register qualifiers from example codes. [example]
 2025.05.11. Modified zxParseGeometry to rename an ERROR label. [zxutil]
 2025.04.30. Modified some examples in example/fractal to conform to new specification of zxPixelManip and zxImage. [example]
 2025.04.30. Modified pixel_test in test to conform to new specification of zxPixelManip and zxImage. [test]

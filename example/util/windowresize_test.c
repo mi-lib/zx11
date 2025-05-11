@@ -4,7 +4,7 @@
 int main(void)
 {
   zxWindow win;
-  register int w=150, h=100, x=8, y=20;
+  int w=150, h=100, x=8, y=20;
 
   zxInit();
   zxWindowCreate( &win, x, y, w, h );

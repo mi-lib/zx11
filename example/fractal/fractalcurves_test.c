@@ -184,7 +184,7 @@ static XPoint points[10];
 
 void Pendant(zxWindow *c, double ox, double oy, double dx, double dy, int dim, int flag)
 {
-  register int i;
+  int i;
   double r1, r2;
   vector d[5], e[5];
   static char *color[] = {

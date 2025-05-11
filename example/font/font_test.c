@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   zxWindow win;
   char *c;
   XCharStruct *cs;
-  register int i;
+  int i;
 
   zxInit();
   zxWindowCreateAndOpen( &win, 50, 50, 500, 500 );
