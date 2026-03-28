@@ -1,6 +1,6 @@
 #include <zx11/zximage.h>
 
-#define FONTFILE "/usr/share/fonts/truetype/ipafont-nonfree-uigothic/ipagui.ttf"
+#define FONTFILE "/usr/share/fonts/truetype/vlgothic/VL-Gothic-Regular.ttf"
 
 int main(int argc, char *argv[])
 {
@@ -18,7 +18,6 @@ int main(int argc, char *argv[])
   zBitmapAlloc( &src, img.width, img.height );
   zBitmapAlloc( &dest, img.width, img.height );
   zxImageToBitmap( &img, &src, 0x7f );
-
   zBitmapSkeletonize( &src, &dest );
 
   zxWindowCreateAndOpen( &win, 0, 0, img.width*2, img.height );

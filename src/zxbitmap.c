@@ -260,12 +260,11 @@ zBitmap *zBitmapSkeletonize(const zBitmap *src, zBitmap *dest)
 {
   zBitmap tmp;
 
-  if( !zBitmapClone( src, &tmp ) ) return NULL;
+  if( !zBitmapAlloc( &tmp, dest->width, dest->height ) ) return NULL;
+  zBitmapCopy( src, dest );
   while( 1 ){
-    _zBitmapSkeletonizeOne( &tmp, dest, 0x15, 0x54 );
-    zBitmapCopy( dest, &tmp );
+    _zBitmapSkeletonizeOne( dest, &tmp, 0x15, 0x54 );
     if( _zBitmapSkeletonizeOne( &tmp, dest, 0x45, 0x51 ) == 0 ) break;
-    zBitmapCopy( dest, &tmp );
   }
   zBitmapDestroy( &tmp );
   return dest;
