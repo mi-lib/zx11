@@ -13,10 +13,10 @@
 __BEGIN_DECLS
 
 zxImage *zxImageFromMagickWand(zxImage *img, MagickWand *wand);
-MagickWand *zxImageToMagickWand(zxImage *img, MagickWand *wand);
+MagickWand *zxImageToMagickWand(const zxImage *img, MagickWand *wand);
 
 int zxImageReadFileMagickWand(zxImage *img, const char *filename);
-int zxImageWriteFileMagickWand(zxImage *img, const char *filename);
+int zxImageWriteFileMagickWand(const zxImage *img, const char *filename);
 
 __END_DECLS
 

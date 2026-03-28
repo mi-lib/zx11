@@ -228,7 +228,7 @@ int zxImageReadPNMFile(zxImage *img, const char *filename)
 /* output of PNM file */
 /* only binary output is supported. */
 
-int zxImageWritePBM(FILE *fp, zxImage *img)
+int zxImageWritePBM(FILE *fp, const zxImage *img)
 {
   uint i, j;
   ubyte mask;
@@ -255,7 +255,7 @@ int zxImageWritePBM(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageWritePBMFile(zxImage *img, const char *filename)
+int zxImageWritePBMFile(const zxImage *img, const char *filename)
 {
   FILE *fp;
   int result;
@@ -269,7 +269,7 @@ int zxImageWritePBMFile(zxImage *img, const char *filename)
   return result;
 }
 
-int zxImageWritePGM(FILE *fp, zxImage *img)
+int zxImageWritePGM(FILE *fp, const zxImage *img)
 {
   uint i, j;
   ubyte r, g, b, val;
@@ -287,7 +287,7 @@ int zxImageWritePGM(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageWritePGMFile(zxImage *img, const char *filename)
+int zxImageWritePGMFile(const zxImage *img, const char *filename)
 {
   FILE *fp;
   int result;
@@ -301,7 +301,7 @@ int zxImageWritePGMFile(zxImage *img, const char *filename)
   return result;
 }
 
-int zxImageWritePPM(FILE *fp, zxImage *img)
+int zxImageWritePPM(FILE *fp, const zxImage *img)
 {
   uint i, j;
   ubyte r, g, b;
@@ -320,7 +320,7 @@ int zxImageWritePPM(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageWritePPMFile(zxImage *img, const char *filename)
+int zxImageWritePPMFile(const zxImage *img, const char *filename)
 {
   FILE *fp;
   int result;

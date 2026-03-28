@@ -22,9 +22,9 @@ bool zxImageFileIsJPEG(const char *filename);
 int zxImageReadJPEG(FILE *fp, zxImage *img);
 int zxImageReadJPEGFile(zxImage *img, const char *filename);
 
-int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality);
-int zxImageWriteJPEGFile(zxImage *img, const char *filename, int quality);
-int zxImageWriteJPEGFileDefault(zxImage *img, const char *filename);
+int zxImageWriteJPEG(FILE *fp, const zxImage *img, int quality);
+int zxImageWriteJPEGFile(const zxImage *img, const char *filename, int quality);
+int zxImageWriteJPEGFileDefault(const zxImage *img, const char *filename);
 
 __END_DECLS
 

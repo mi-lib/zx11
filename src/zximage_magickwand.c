@@ -58,7 +58,7 @@ zxImage *zxImageFromMagickWand(zxImage *img, MagickWand *wand)
   return img;
 }
 
-MagickWand *zxImageToMagickWand(zxImage *img, MagickWand *wand)
+MagickWand *zxImageToMagickWand(const zxImage *img, MagickWand *wand)
 {
   MagickPixelPacket pixel;
   PixelIterator *iterator;
@@ -106,7 +106,7 @@ int zxImageReadFileMagickWand(zxImage *img, const char *filename)
   return 1;
 }
 
-int zxImageWriteFileMagickWand(zxImage *img, const char *filename)
+int zxImageWriteFileMagickWand(const zxImage *img, const char *filename)
 {
   MagickWand *wand;
   int retval = 1;

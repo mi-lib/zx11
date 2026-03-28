@@ -18,8 +18,8 @@ bool zxImageFileIsBMP(const char *filename);
 int zxImageReadBMP(FILE *fp, zxImage *img);
 int zxImageReadBMPFile(zxImage *img, const char *filename);
 
-int zxImageWriteBMP(FILE *fp, zxImage *img);
-int zxImageWriteBMPFile(zxImage *img, const char *filename);
+int zxImageWriteBMP(FILE *fp, const zxImage *img);
+int zxImageWriteBMPFile(const zxImage *img, const char *filename);
 
 __END_DECLS
 

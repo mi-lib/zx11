@@ -68,7 +68,7 @@ int zxImageReadTIFFFile(zxImage *img, const char *filename)
   return ret;
 }
 
-int zxImageWriteTIFFFile(zxImage *img, const char *filename, int cmpmethod)
+int zxImageWriteTIFFFile(const zxImage *img, const char *filename, int cmpmethod)
 {
   TIFF *tiff;
   uint bps = 8;
@@ -118,7 +118,7 @@ int zxImageWriteTIFFFile(zxImage *img, const char *filename, int cmpmethod)
   return ret;
 }
 
-int zxImageWriteTIFFFileDefault(zxImage *img, const char *filename)
+int zxImageWriteTIFFFileDefault(const zxImage *img, const char *filename)
 {
   return zxImageWriteTIFFFile( img, filename, COMPRESSION_NONE );
 }

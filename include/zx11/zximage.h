@@ -1,7 +1,7 @@
 /* ZX11 - a wrapper for interface library to the X Window System
  * Copyright (C) 1999 Tomomichi Sugihara (Zhidao)
  *
- * zximage - image manipulation on X11
+ * zximage - image manipulation on X11.
  */
 
 #ifndef __ZX_IMAGE_H__
@@ -13,29 +13,29 @@ __BEGIN_DECLS
 
 #define ZX_BIT_PER_BYTE 8
 
-/* ********************************************************** */
-/* CLASS: zxImage
- * image buffer
- * ********************************************************** */
-
+/*! \struct zxImage
+ * \brief image buffer class.
+ */
 typedef struct{
-  uint width, height;
-  ubyte bpp; /* byte per pixel */
-  zxPixelManip *pm; /* pixel manipulator */
-  ubyte *buf;
-  ubyte *mask_buf; /* mask buffer */
+  uint width;       /*! \brief width of image  */
+  uint height;      /*! \brief height of image */
+  ubyte bpp;        /*! \brief byte per pixel */
+  zxPixelManip *pm; /*! \brief pixel manipulator */
+  ubyte *buf;       /*! \brief buffer */
+  ubyte *mask_buf;  /*! \brief mask buffer */
 } zxImage;
 
 /* pixel manipulation */
 
-#define zxImagePosIsValid(img,x,y) \
-  ( (x) < (img)->width && (y) < (img)->height )
+#define zxImageXPosIsValid(img,x)  ( (x) >= 0 && (x) < (img)->width )
+#define zxImageYPosIsValid(img,y)  ( (y) >= 0 && (y) < (img)->height )
+#define zxImagePosIsValid(img,x,y) ( zxImageXPosIsValid(img,x) && zxImageYPosIsValid(img,y) )
 
-#define zxImageAddr(img,x,y) ((img)->buf+(img)->bpp*((img)->width*(y)+(x)))
+#define zxImageAddr(img,x,y) ( (img)->buf + (img)->bpp * ( (img)->width * (y) + (x) ) )
 #define zxImageCell(img,x,y) *zxImageAddr(img,x,y)
 
-zxPixel zxImageCellPixel(zxImage *img, uint x, uint y);
-zxPixel zxImageCellPixelCheck(zxImage *img, uint x, uint y);
+zxPixel zxImageCellPixel(const zxImage *img, uint x, uint y);
+zxPixel zxImageCellPixelCheck(const zxImage *img, uint x, uint y);
 void zxImageCellFromPixel(zxImage *img, uint x, uint y, zxPixel pixel);
 void zxImageCellFromPixelCheck(zxImage *img, uint x, uint y, zxPixel pixel);
 
@@ -43,7 +43,7 @@ void zxImageCellFromPixelCheck(zxImage *img, uint x, uint y, zxPixel pixel);
   (img)->pm->PixelRGB( zxImageCellPixel(img,x,y), r, g, b )
 #define zxImageCellFRGB(img,x,y,r,g,b) \
   (img)->pm->PixelFRGB( zxImageCellPixel(img,x,y), r, g, b )
-ubyte zxImageCellGS(zxImage *img, uint x, uint y);
+ubyte zxImageCellGS(const zxImage *img, uint x, uint y);
 #define zxImageCellFromRGB(img,x,y,r,g,b) \
   zxImageCellFromPixel( img, x, y, (img)->pm->PixelFromRGB(r,g,b) )
 #define zxImageCellFromGS(img,x,y,v) \
@@ -53,7 +53,7 @@ ubyte zxImageCellGS(zxImage *img, uint x, uint y);
 #define zxImageCellNegate(img,x,y) \
   zxPixelNegate( (img)->pm, zxImageCellPixel(img,x,y) )
 
-#define zxImageMaskAddr(img,x,y)  ((img)->mask_buf+((img)->width*(y)+(x)))
+#define zxImageMaskAddr(img,x,y)  ( (img)->mask_buf + ( (img)->width * (y) + (x) ) )
 #define zxImageMask(img,x,y)      *zxImageMaskAddr(img,x,y)
 #define zxImageSetMask(img,x,y,m) ( zxImageMask(img,x,y) = (m) )
 
@@ -68,62 +68,66 @@ zxImage *zxImageCreateMask(zxImage *img, zxPixel mask);
 zxImage *zxImageDestroy(zxImage *img);
 zxImage *zxImageClear(zxImage *img);
 zxImage *zxImageFill(zxImage *img, zxPixel pixel);
-bool zxImageSizeEqual(zxImage *img1, zxImage *img2);
-zxImage *zxImageCopy(zxImage *src, zxImage *dest);
-zxImage *zxImageClone(zxImage *src, zxImage *dest);
+bool zxImageSizeEqual(const zxImage *img1, const zxImage *img2);
+zxImage *zxImageCopy(const zxImage *src, zxImage *dest);
+zxImage *zxImageClone(const zxImage *src, zxImage *dest);
 
-bool zxImageCmp(zxImage *img1, zxImage *img2);
+bool zxImageCmp(const zxImage *img1, const zxImage *img2);
 
 /* image pasting */
 
-void zxImageCanvasRange(zxImage *canvas, zxImage *img, uint x, uint y, uint *w, uint *h);
+/* find valid range of an image to manipulate. */
+bool zxCanvasRange(uint width_dest, uint height_dest, uint width_src, uint height_src, uint x, uint y, uint *w, uint *h);
+bool zxImageCanvasRange(const zxImage *canvas, const zxImage *img, uint x, uint y, uint *w, uint *h);
 
-zxImage *zxImagePut(zxImage *canvas, zxImage *img, uint x, uint y);
-zxImage *zxImagePutMasked(zxImage *canvas, zxImage *img, uint x, uint y, zxPixel mask);
-zxImage *zxImagePutAlphaBlend(zxImage *canvas, zxImage *img1, zxImage *img2, uint x, uint y, double alpha);
-zxImage *zxImagePutAlphaBlendMasked(zxImage *canvas, zxImage *img1, zxImage *img2, uint x, uint y, double alpha, zxPixel mask);
-zxImage *zxImagePutSuperimpose(zxImage *canvas, zxImage *img, uint x, uint y);
+zxImage *zxImagePut(zxImage *canvas, const zxImage *img, uint x, uint y);
+zxImage *zxImagePutMasked(zxImage *canvas, const zxImage *img, uint x, uint y, zxPixel mask);
+zxImage *zxImagePutAlphaBlend(zxImage *canvas, const zxImage *img1, const zxImage *img2, uint x, uint y, double alpha);
+zxImage *zxImagePutAlphaBlendMasked(zxImage *canvas, const zxImage *img1, const zxImage *img2, uint x, uint y, double alpha, zxPixel mask);
+zxImage *zxImagePutSuperimpose(zxImage *canvas, const zxImage *img, uint x, uint y);
 #define zxImagePutSuperimposeDefault(c,img) zxImagePutSuperimpose( c, img, 0, 0 )
 
-zxImage *zxImageGet(zxImage *src, zxImage *dest, uint x, uint y);
+zxImage *zxImageGet(const zxImage *src, zxImage *dest, uint x, uint y);
 
 /* geometric manipulations */
 
-zxImage *zxImageVertFlip(zxImage *src, zxImage *dest);
-zxImage *zxImageHorizFlip(zxImage *src, zxImage *dest);
-zxImage *zxImageRotRight(zxImage *src, zxImage *dest);
-zxImage *zxImageRotLeft(zxImage *src, zxImage *dest);
-zxImage *zxImageRot(zxImage *src, zxImage *dest, uint ox, uint oy, uint x, uint y, double theta);
-zxImage *zxImageRotFilt(zxImage *src, zxImage *dest, uint ox, uint oy, uint x, uint y, double theta);
+zxImage *zxImageVertFlip(const zxImage *src, zxImage *dest);
+zxImage *zxImageHorizFlip(const zxImage *src, zxImage *dest);
+zxImage *zxImageRotRight(const zxImage *src, zxImage *dest);
+zxImage *zxImageRotLeft(const zxImage *src, zxImage *dest);
+zxImage *zxImageRot(const zxImage *src, zxImage *dest, uint ox, uint oy, uint x, uint y, double theta);
+zxImage *zxImageRotFilt(const zxImage *src, zxImage *dest, uint ox, uint oy, uint x, uint y, double theta);
 
-zxImage *zxImageResize(zxImage *src, zxImage *dest);
+zxImage *zxImageResize(const zxImage *src, zxImage *dest);
 
 /* color manipulations */
 
-zxImage *zxImageAbstRGB(zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bimg);
-zxImage *zxImageGrayscalize(zxImage *src, zxImage *dest);
-zxImage *zxImageNegate(zxImage *src, zxImage *dest);
+const zxImage *zxImageAbstRGB(const zxImage *src, zxImage *rimg, zxImage *gimg, zxImage *bimg);
+zxImage *zxImageGrayscalize(const zxImage *src, zxImage *dest);
+zxImage *zxImageBinarize(const zxImage *src, zxImage *dest, ubyte threshold);
+zxImage *zxImageNegate(const zxImage *src, zxImage *dest);
 
 #define zxImageGrayscalizeDRC(img)        zxImageGrayscalize( img, img )
+#define zxImageBinarizeDRC(img)           zxImageBinarize( img, img );
 #define zxImageNegateDRC(img)             zxImageNegate( img, img )
 
-zxImage *zxImageBrighten(zxImage *src, zxImage *dest, double rate);
-zxImage *zxImageContrast(zxImage *src, zxImage *dest, double rate);
-zxImage *zxImageCorrectGamma(zxImage *src, zxImage *dest, double gamma);
+zxImage *zxImageBrighten(const zxImage *src, zxImage *dest, double rate);
+zxImage *zxImageContrast(const zxImage *src, zxImage *dest, double rate);
+zxImage *zxImageCorrectGamma(const zxImage *src, zxImage *dest, double gamma);
 
 #define zxImageBrightenDRC(img,rate)      zxImageBrighten( img, img, rate )
 #define zxImageContrastDRC(img,rate)      zxImageContrast( img, img, rate )
 #define zxImageCorrectGammaDRC(img,gamma) zxImageCorrectGamma( img, img, gamma )
 
-zxImage *zxImageNormalize(zxImage *src, zxImage *dest);
-zxImage *zxImageEqualize(zxImage *src, zxImage *dest);
+zxImage *zxImageNormalize(const zxImage *src, zxImage *dest);
+zxImage *zxImageEqualize(const zxImage *src, zxImage *dest);
 
 #define zxImageNormalizeDRC(img)          zxImageNormalize( img, img )
 #define zxImageEqualizeDRC(img)           zxImageEqualize( img, img )
 
-zxImage *zxImageDitherBayer(zxImage *src, zxImage *dest);
-zxImage *zxImageDitherNet(zxImage *src, zxImage *dest);
-zxImage *zxImageDitherSpiral(zxImage *src, zxImage *dest);
+zxImage *zxImageDitherBayer(const zxImage *src, zxImage *dest);
+zxImage *zxImageDitherNet(const zxImage *src, zxImage *dest);
+zxImage *zxImageDitherSpiral(const zxImage *src, zxImage *dest);
 #define zxImageDither(src,dest,pattern) zxImageDither##pattern( src, dest )
 
 #define zxImageDitherBayerDRC(img)        zxImageDitherBayer( img, img )
@@ -133,39 +137,42 @@ zxImage *zxImageDitherSpiral(zxImage *src, zxImage *dest);
 
 /* dither based on error diffusion with Floyd-Steinberg distribution. */
 zxImage *zxImageDitherErrorDiffusionDRC(zxImage *img);
-zxImage *zxImageDitherErrorDiffusion(zxImage *src, zxImage *dest);
+zxImage *zxImageDitherErrorDiffusion(const zxImage *src, zxImage *dest);
 
 /* general filter */
 
-zxImage *zxImageFilter(zxImage *src, zxImage *dest, double f[], int size);
-zxImage *zxImageFilter2(zxImage *src, zxImage *dest, double f1[], double f2[], int size);
+zxImage *zxImageFilter(const zxImage *src, zxImage *dest, double f[], int size);
+zxImage *zxImageFilter2(const zxImage *src, zxImage *dest, double f1[], double f2[], int size);
 
 /* smoothing */
 
-zxImage *zxImageSmoothMedian(zxImage *src, zxImage *dest, int size);
-zxImage *zxImageSmoothMin(zxImage *src, zxImage *dest, int size);
-zxImage *zxImageSmoothMax(zxImage *src, zxImage *dest, int size);
-zxImage *zxImageSmoothGaussian(zxImage *src, zxImage *dest);
-zxImage *zxImageAntialias(zxImage *src, zxImage *dest);
-zxImage *zxImageSmoothBilateral(zxImage *src, zxImage *dest);
+zxImage *zxImageSmoothMedian(const zxImage *src, zxImage *dest, int size);
+zxImage *zxImageSmoothMin(const zxImage *src, zxImage *dest, int size);
+zxImage *zxImageSmoothMax(const zxImage *src, zxImage *dest, int size);
+zxImage *zxImageSmoothGaussian(const zxImage *src, zxImage *dest);
+zxImage *zxImageAntialias(const zxImage *src, zxImage *dest);
+zxImage *zxImageSmoothBilateral(const zxImage *src, zxImage *dest);
 
 /* edge detection */
 
-zxImage *zxImageDiff(zxImage *src, zxImage *dest);
-zxImage *zxImageIntegral(zxImage *src, zxImage *dest);
+zxImage *zxImageDiff(const zxImage *src, zxImage *dest);
+zxImage *zxImageIntegral(const zxImage *src, zxImage *dest);
 
-zxImage *zxImageEdgePrewittH(zxImage *src, zxImage *dest);
-zxImage *zxImageEdgePrewittV(zxImage *src, zxImage *dest);
-zxImage *zxImageEdgePrewitt(zxImage *src, zxImage *dest);
-zxImage *zxImageEdgeSobelH(zxImage *src, zxImage *dest);
-zxImage *zxImageEdgeSobelV(zxImage *src, zxImage *dest);
-zxImage *zxImageEdgeSobel(zxImage *src, zxImage *dest);
-zxImage *zxImageEdgeLaplacian(zxImage *src, zxImage *dest);
-zxImage *zxImageEdgeRoberts(zxImage *src, zxImage *dest);
-zxImage *zxImageEdgeForsen(zxImage *src, zxImage *dest);
+zxImage *zxImageEdgePrewittH(const zxImage *src, zxImage *dest);
+zxImage *zxImageEdgePrewittV(const zxImage *src, zxImage *dest);
+zxImage *zxImageEdgePrewitt(const zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeSobelH(const zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeSobelV(const zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeSobel(const zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeLaplacian(const zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeRoberts(const zxImage *src, zxImage *dest);
+zxImage *zxImageEdgeForsen(const zxImage *src, zxImage *dest);
 
 /* Hough transformation */
 
+/*! \struct zxHoughBinData
+ * \brief bin class for Hough transformation.
+ */
 typedef struct{
   double theta;
   double dist;
@@ -173,31 +180,32 @@ typedef struct{
 } zxHoughBinData;
 zListClass( zxHoughBinList, zxHoughBinListCell, zxHoughBinData );
 
-zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, zxImage *src, uint theta_div, uint dist_div);
+zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, const zxImage *src, uint theta_div, uint dist_div);
 
 /* normal map */
 
 #define _zxNormalize(x) ( 0.5 * ( (x) + 1.0 ) )
-void zxImageNormalVec(zxImage *img, double depth, uint j, uint i, double *x, double *y, double *z);
-zxImage *zxImageNormalMap(zxImage *src, double depth, zxImage *dest);
+void zxImageNormalVec(const zxImage *img, double depth, uint j, uint i, double *x, double *y, double *z);
+zxImage *zxImageNormalMap(const zxImage *src, double depth, zxImage *dest);
 
 /* special effect */
 
+zxImage *zxImagePutRect(zxImage *img, uint x, uint y, uint width, uint height, ubyte red, ubyte green, ubyte blue);
 zxImage *zxImageMosaic(zxImage *img, uint x, uint y, uint w, uint h, uint nx, uint ny);
 
 /* drawing */
 
-Pixmap zxImageToPixmap(zxWindow *win, zxImage *img, Pixmap pmap, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
+Pixmap zxImageToPixmap(zxWindow *win, const zxImage *img, Pixmap pmap, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
 #define zxImageToPixmapAll(win,img,pixmap) \
   zxImageToPixmap( (win), (img), (pixmap), 0, 0, (img)->width, (img)->height, 0, 0 )
-Pixmap zxImageCreatePixmap(zxWindow *win, zxImage *img);
-Pixmap zxImageCreatePixmapMask(zxWindow *win, zxImage *img);
+Pixmap zxImageCreatePixmap(zxWindow *win, const zxImage *img);
+Pixmap zxImageCreatePixmapMask(zxWindow *win, const zxImage *img);
 
-void zxImageDraw(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
+void zxImageDraw(zxWindow *win, const zxImage *img, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
 #define zxImageDrawAll(win,img,x,y) \
   zxImageDraw( (win), (img), 0, 0, (img)->width, (img)->height, (x), (y) )
 
-bool zxImageDrawMask(zxWindow *win, zxImage *img, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
+bool zxImageDrawMask(zxWindow *win, const zxImage *img, uint src_x, uint src_y, uint w, uint h, uint dest_x, uint dest_y);
 #define zxImageDrawMaskAll(win,img,x,y) \
   zxImageDrawMask( (win), (img), 0, 0, (img)->width, (img)->height, (x), (y) )
 
@@ -208,7 +216,7 @@ zxImage *zxImageFromPixmap(zxImage *img, Pixmap pmap, uint w, uint h);
 bool zxImageFileIdent(const char *filename, const unsigned char ident[], uint size);
 
 int zxImageReadFile(zxImage *img, const char *filename);
-int zxImageWriteFile(zxImage *img, const char *filename);
+int zxImageWriteFile(const zxImage *img, const char *filename);
 
 __END_DECLS
 
@@ -223,5 +231,8 @@ __END_DECLS
 #endif /* __ZX11_USE_MAGICKWAND */
 
 #include <zx11/zximage_supported.h>
+
+/* bitmap manipulation */
+#include <zx11/zxbitmap.h>
 
 #endif /* __ZX_IMAGE_H__ */

@@ -446,7 +446,7 @@ static void _zxBMPWriteVal(FILE *fp, uint size, uint32_t val)
   }
 }
 
-static int _zxBMPWriteHeader(zxBMPInfo *info, zxImage *img)
+static int _zxBMPWriteHeader(zxBMPInfo *info, const zxImage *img)
 {
 #define ZX_BMP_DEFAULT_BPP         3
 #define ZX_BMP_DEFAULT_BITCOUNT    ZX_BMP_TCBIT
@@ -479,7 +479,7 @@ static int _zxBMPWriteHeader(zxBMPInfo *info, zxImage *img)
   return 1;
 }
 
-static void _zxBMPWrite(zxBMPInfo *info, zxImage *img)
+static void _zxBMPWrite(zxBMPInfo *info, const zxImage *img)
 {
   uint i, j;
   zxPixel pixel;
@@ -498,7 +498,7 @@ static void _zxBMPWrite(zxBMPInfo *info, zxImage *img)
   }
 }
 
-int zxImageWriteBMP(FILE *fp, zxImage *img)
+int zxImageWriteBMP(FILE *fp, const zxImage *img)
 {
   zxBMPInfo info;
 
@@ -508,7 +508,7 @@ int zxImageWriteBMP(FILE *fp, zxImage *img)
   return 1;
 }
 
-int zxImageWriteBMPFile(zxImage *img, const char *filename)
+int zxImageWriteBMPFile(const zxImage *img, const char *filename)
 {
   FILE *fp;
 

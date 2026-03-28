@@ -1,5 +1,5 @@
 OBJ=zxutil.o zxfont.o zxinput.o\
-	zxpixel.o zxpm.o zximage.o zximage_pnm.o
+	zxpixel.o zxpm.o zximage.o zximage_pnm.o zxbitmap.o
 
 ifeq ($(CONFIG_USE_XEXT),y)
 	CFLAGS += -D__ZX11_USE_XEXT

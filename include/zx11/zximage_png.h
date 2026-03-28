@@ -22,8 +22,8 @@ int zxPNGCheckFile(const char *filename);
 int zxImageReadPNG(FILE *fp, zxImage *img);
 int zxImageReadPNGFile(zxImage *img, const char *filename);
 
-int zxImageWritePNG(FILE *fp, zxImage *img);
-int zxImageWritePNGFile(zxImage *img, const char *filename);
+int zxImageWritePNG(FILE *fp, const zxImage *img);
+int zxImageWritePNGFile(const zxImage *img, const char *filename);
 
 __END_DECLS
 

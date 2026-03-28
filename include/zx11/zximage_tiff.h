@@ -21,8 +21,8 @@ __BEGIN_DECLS
 bool zxImageFileIsTIFF(const char *filename);
 
 int zxImageReadTIFFFile(zxImage *img, const char *filename);
-int zxImageWriteTIFFFile(zxImage *img, const char *filename, int cmpmethod);
-int zxImageWriteTIFFFileDefault(zxImage *img, const char *filename);
+int zxImageWriteTIFFFile(const zxImage *img, const char *filename, int cmpmethod);
+int zxImageWriteTIFFFileDefault(const zxImage *img, const char *filename);
 
 __END_DECLS
 

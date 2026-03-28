@@ -40,14 +40,14 @@ int zxImageReadPNMFile(zxImage *img, const char *filename);
 
 /* output of PNM file */
 
-int zxImageWritePBM(FILE *fp, zxImage *img);
-int zxImageWritePBMFile(zxImage *img, const char *filename);
+int zxImageWritePBM(FILE *fp, const zxImage *img);
+int zxImageWritePBMFile(const zxImage *img, const char *filename);
 
-int zxImageWritePGM(FILE *fp, zxImage *img);
-int zxImageWritePGMFile(zxImage *img, const char *filename);
+int zxImageWritePGM(FILE *fp, const zxImage *img);
+int zxImageWritePGMFile(const zxImage *img, const char *filename);
 
-int zxImageWritePPM(FILE *fp, zxImage *img);
-int zxImageWritePPMFile(zxImage *img, const char *filename);
+int zxImageWritePPM(FILE *fp, const zxImage *img);
+int zxImageWritePPMFile(const zxImage *img, const char *filename);
 
 __END_DECLS
 

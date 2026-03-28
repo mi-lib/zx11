@@ -96,7 +96,7 @@ int zxImageReadJPEGFile(zxImage *img, const char *filename)
   return result;
 }
 
-int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality)
+int zxImageWriteJPEG(FILE *fp, const zxImage *img, int quality)
 {
   struct jpeg_compress_struct cinfo;
   struct jpeg_error_mgr jerr;
@@ -135,7 +135,7 @@ int zxImageWriteJPEG(FILE *fp, zxImage *img, int quality)
   return ret;
 }
 
-int zxImageWriteJPEGFile(zxImage *img, const char *filename, int quality)
+int zxImageWriteJPEGFile(const zxImage *img, const char *filename, int quality)
 {
   FILE *fp;
   int result;
@@ -149,7 +149,7 @@ int zxImageWriteJPEGFile(zxImage *img, const char *filename, int quality)
   return result;
 }
 
-int zxImageWriteJPEGFileDefault(zxImage *img, const char *filename)
+int zxImageWriteJPEGFileDefault(const zxImage *img, const char *filename)
 {
   return zxImageWriteJPEGFile( img, filename, ZX_JPEG_DEFAULT_QUALITY );
 }

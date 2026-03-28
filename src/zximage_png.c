@@ -22,7 +22,7 @@ typedef struct{
   int compression_type, filter_type;
 } zxPNG;
 
-static ubyte **__zx_png_buf_alloc(zxImage *img)
+static ubyte **__zx_png_buf_alloc(const zxImage *img)
 {
   uint i, j;
   ubyte **buf, *bp;
@@ -212,7 +212,7 @@ static void _zxPNGDestroyWrite(zxPNG *png)
   png_destroy_write_struct( &png->png_ptr, &png->info_ptr );
 }
 
-static int _zxPNGWrite(zxImage *img, zxPNG *png, FILE *fp)
+static int _zxPNGWrite(const zxImage *img, zxPNG *png, FILE *fp)
 {
   uint i;
   ubyte **buf;
@@ -239,7 +239,7 @@ static int _zxPNGWrite(zxImage *img, zxPNG *png, FILE *fp)
   return 1;
 }
 
-int zxImageWritePNG(FILE *fp, zxImage *img)
+int zxImageWritePNG(FILE *fp, const zxImage *img)
 {
   zxPNG png;
 
@@ -247,7 +247,7 @@ int zxImageWritePNG(FILE *fp, zxImage *img)
   return _zxPNGWrite( img, &png, fp );
 }
 
-int zxImageWritePNGFile(zxImage *img, const char *filename)
+int zxImageWritePNGFile(const zxImage *img, const char *filename)
 {
   FILE *fp;
   int result = 0;
