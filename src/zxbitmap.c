@@ -230,24 +230,31 @@ static int _zBitmapSkeletonizeS(ubyte neighbors)
   return count_s;
 }
 
+static bool _zBitmapSkeletonizeCheck(const zBitmap *src, zBitmap *dest, uint j, uint i, ubyte pat1, ubyte pat2)
+{
+  int count_n;
+  ubyte neighbors;
+
+  if( zBitmapGetBit( src, j, i ) == 0 ) return false;
+  count_n = _zBitmapSkeletonizeN( src, j, i, &neighbors );
+  if( count_n < 2 || count_n > 6 ) return false;
+  if( _zBitmapSkeletonizeS( neighbors ) != 1 ) return false;
+  if( ( neighbors & pat1 ) == pat1 || ( neighbors & pat2 ) == pat2 ) return false;
+  return true;
+}
+
 static int _zBitmapSkeletonizeOne(const zBitmap *src, zBitmap *dest, ubyte pat1, ubyte pat2)
 {
-  uint i, j, w, h;
-  ubyte neighbors;
-  int count_n, count_s, count = 0;
+  uint i, j;
+  int count = 0;
 
-  if( !zxCanvasRange( dest->width, dest->height, src->width, src->height, 0, 0, &w, &h ) ) return -1;
-  for( i=0; i<h; i++ )
-    for( j=0; j<w; j++ ){
-      zBitmapPutBit( dest, j, i, zBitmapGetBit( src, j, i ) );
-      if( zBitmapGetBit( src, j, i ) == 0 ) continue;
-      count_n = _zBitmapSkeletonizeN( src, j, i, &neighbors );
-      if( count_n < 2 || count_n > 6 ) continue;
-      if( ( count_s = _zBitmapSkeletonizeS( neighbors ) ) != 1 ) continue;
-      if( ( neighbors & pat1 ) == pat1 || ( neighbors & pat2 ) == pat2 ) continue;
-      zBitmapPutBit( dest, j, i, 0 );
-      count = zBitmapGetBit( src, j, i );
-    }
+  for( i=0; i<src->height; i++ )
+    for( j=0; j<src->width; j++ )
+      if( _zBitmapSkeletonizeCheck( src, dest, j, i, pat1, pat2 ) ){
+        zBitmapPutBit( dest, j, i, 0 );
+        count += zBitmapGetBit( src, j, i );
+      } else
+        zBitmapPutBit( dest, j, i, zBitmapGetBit( src, j, i ) );
   return count;
 }
 
