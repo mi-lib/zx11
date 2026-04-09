@@ -184,39 +184,41 @@ int zBitmapDefrate(const zBitmap *src, zBitmap *dest, int num)
 
 /* skeletonization */
 
-static int _zBitmapSkeletonizeGetNeighbors(const zBitmap *bitmap, uint x, uint y, int index, ubyte *neighbors)
+static int _zBitmapSkeletonizeGetNeighbors(const zBitmap *bitmap, uint x, uint y, int index, ubyte mask, ubyte *neighbors)
 {
-  if( zBitmapXPosIsValid( bitmap, x ) && zBitmapGetBit( bitmap, x, y ) ){
-    *neighbors |= 0x1 << index;
-    return 1;
-  }
+  ubyte bit;
+
+  if( ( bit = ( 0x1 << index ) & mask ) )
+    if( zBitmapGetBit( bitmap, x, y ) ){
+      *neighbors |= bit;
+      return 1;
+    }
   return 0;
 }
 
 static int _zBitmapSkeletonizeN(const zBitmap *bitmap, uint x, uint y, ubyte *neighbors)
 {
-  int x1, x2, y1, y2;
+  ubyte mask = 0xff;
+  uint x1, x2, y1, y2;
   int count_n = 0;
 
+  if( x == 0                  ) mask &= 0x1f;
+  if( x == bitmap->width  - 1 ) mask &= 0xf1;
+  if( y == 0                  ) mask &= 0x7c;
+  if( y == bitmap->height - 1 ) mask &= 0xc7;
   x1 = x - 1;
   x2 = x + 1;
   y1 = y - 1;
   y2 = y + 1;
   *neighbors = 0;
-  if( zBitmapYPosIsValid( bitmap, y1 ) ){
-    count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x1, y1, 7, neighbors );
-    count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x , y1, 0, neighbors );
-    count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x2, y1, 1, neighbors );
-  }
-  if( zBitmapYPosIsValid( bitmap, y ) ){
-    count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x1, y , 6, neighbors );
-    count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x2, y , 2, neighbors );
-  }
-  if( zBitmapYPosIsValid( bitmap, y2 ) ){
-    count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x1, y2 , 5, neighbors );
-    count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x , y2 , 4, neighbors );
-    count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x2, y2 , 3, neighbors );
-  }
+  count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x1, y1, 7, mask, neighbors );
+  count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x , y1, 0, mask, neighbors );
+  count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x2, y1, 1, mask, neighbors );
+  count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x1, y , 6, mask, neighbors );
+  count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x2, y , 2, mask, neighbors );
+  count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x1, y2, 5, mask, neighbors );
+  count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x , y2, 4, mask, neighbors );
+  count_n += _zBitmapSkeletonizeGetNeighbors( bitmap, x2, y2, 3, mask, neighbors );
   return count_n;
 }
 
@@ -249,12 +251,14 @@ static int _zBitmapSkeletonizeOne(const zBitmap *src, zBitmap *dest, ubyte pat1,
   int count = 0;
 
   for( i=0; i<src->height; i++ )
-    for( j=0; j<src->width; j++ )
+    for( j=0; j<src->width; j++ ){
       if( _zBitmapSkeletonizeCheck( src, dest, j, i, pat1, pat2 ) ){
         zBitmapPutBit( dest, j, i, 0 );
         count += zBitmapGetBit( src, j, i );
-      } else
+      } else{
         zBitmapPutBit( dest, j, i, zBitmapGetBit( src, j, i ) );
+      }
+    }
   return count;
 }
 

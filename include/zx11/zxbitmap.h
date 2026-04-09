@@ -23,10 +23,6 @@ typedef struct{
   ubyte *buf;  /*! \brief buffer */
 } zBitmap;
 
-#define zBitmapXPosIsValid(bitmap,x)  ( (x) >= 0 && (x) < (bitmap)->width )
-#define zBitmapYPosIsValid(bitmap,y)  ( (y) >= 0 && (y) < (bitmap)->height )
-#define zBitmapPosIsValid(bitmap,x,y) ( zBitmapXPosIsValid(bitmap,x) && zBitmapYPosIsValid(bitmap,y) )
-
 /*! \brief initialize a bitmap. */
 zBitmap *zBitmapInit(zBitmap *bitmap);
 
