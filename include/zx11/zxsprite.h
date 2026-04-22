@@ -24,7 +24,7 @@ typedef struct{
     short x, y;   /* drawing destination position */
   } cur, cur_pre; /* present and previous cursor */
 } zxsPatternData;
-zListClass( zxsPatternList, zxsPattern, zxsPatternData );
+ZEDA_DEF_LIST_CLASS( zxsPatternList, zxsPattern, zxsPatternData );
 
 zxsPattern *zxsPatternInit(zxsPattern *pat);
 #define zxsPatternSetPixmap(p,m) ( (p)->data.pix = (m) )
@@ -86,7 +86,7 @@ typedef struct{
   zxsPattern *pat; /* pattern drawn in the region */
   zxRegion reg;
 } zxsRegionData;
-zListClass( zxsRegionList, zxsRegion, zxsRegionData );
+ZEDA_DEF_LIST_CLASS( zxsRegionList, zxsRegion, zxsRegionData );
 
 #define zxsRegionSet(r,x,y,w,h) \
   zxRegionSet(&(r)->reg,x,y,w,h)
@@ -109,7 +109,7 @@ typedef struct{
   zxsPatternList plist;
   zxsRegionList rlist_draw, rlist_erase;
 } zxsLayerData;
-zListClass( zxsLayerList, zxsLayer, zxsLayerData );
+ZEDA_DEF_LIST_CLASS( zxsLayerList, zxsLayer, zxsLayerData );
 
 #define zxsLayerListInit(l)    zListInit(l)
 #define zxsLayerListDestroy(l) zListDestroy( zxsLayer, l )

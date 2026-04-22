@@ -178,7 +178,7 @@ typedef struct{
   double dist;
   int count;
 } zxHoughBinData;
-zListClass( zxHoughBinList, zxHoughBinListCell, zxHoughBinData );
+ZEDA_DEF_LIST_CLASS( zxHoughBinList, zxHoughBinListCell, zxHoughBinData );
 
 zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, const zxImage *src, uint theta_div, uint dist_div);
 
