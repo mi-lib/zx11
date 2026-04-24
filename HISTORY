@@ -1,3 +1,4 @@
+2026.04.24. Applied renaming of zArray2Class to ZEDA_DEF_ARRAY2_CLASS. [zximage]
 2026.04.22. Applied renaming of zListClass to ZEDA_DEF_LIST_CLASS. [zximage, zxsprite]
 2026.04.09. Reimplemented _zBitmapSkeletonizeGetNeighbors and _zBitmapSkeletonizeN. [zxbitmap]
 2026.04.09. Abolished zBitmapXPosIsValid, zBitmapYPosIsValid, and zBitmapPosIsValid. [zxbitmap]

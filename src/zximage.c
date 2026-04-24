@@ -1181,7 +1181,7 @@ zxImage *zxImageEdgeForsen(const zxImage *src, zxImage *dest)
 
 /* Hough transformation */
 
-zArray2Class( zxHoughBin, zxHoughBinListCell* );
+ZEDA_DEF_ARRAY2_CLASS( zxHoughBin, zxHoughBinListCell* );
 
 /* Hough transformation for line detection. */
 zxHoughBinList *zxImageHoughLines(zxHoughBinList *bin_list, const zxImage *src, uint theta_div, uint dist_div)
